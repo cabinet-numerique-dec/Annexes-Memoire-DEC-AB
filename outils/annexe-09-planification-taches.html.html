@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Annexe 9 – Aide à la planification des tâches</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    :root {
+      --primary: #1e3a5f;
+      --primary-light: #2d5a8a;
+      --secondary: #0d9488;
+      --secondary-light: #14b8a6;
+      --accent: #f59e0b;
+      --danger: #dc2626;
+      --success: #059669;
+      --warning: #d97706;
+      --info: #2563eb;
+      --gray-50: #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-300: #d1d5db;
+      --gray-500: #6b7280;
+      --gray-600: #4b5563;
+      --gray-700: #374151;
+      --gray-800: #1f2937;
+      --radius: 12px;
+      --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+      --phase1: #dc2626;
+      --phase2: #7c3aed;
+      --phase3: #2563eb;
+      --phase4: #059669;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: linear-gradient(135deg, var(--gray-100) 0%, #e0e7ef 100%);
+      color: var(--gray-700); line-height: 1.6; min-height: 100vh;
+    }
+    .container { max-width: 1400px; margin: 0 auto; padding: 24px; }
+    .header {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      color: white; border-radius: var(--radius); padding: 32px; margin-bottom: 24px;
+      position: relative; overflow: hidden;
+    }
+    .header::before { content: ""; position: absolute; top: -50%; right: -10%; width: 300px; height: 300px; background: rgba(255,255,255,0.05); border-radius: 50%; }
+    .header h1 { font-size: 24px; font-weight: 700; margin-bottom: 8px; position: relative; }
+    .header p { opacity: 0.9; font-size: 14px; max-width: 900px; position: relative; }
+    .header-meta { display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
+    .badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.15); padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+    .badge-success { background: var(--success); }
+    .badge-warning { background: var(--warning); }
+    .badge-danger { background: var(--danger); }
+    .context-box { background: rgba(255,255,255,0.1); border-left: 4px solid var(--accent); padding: 16px 20px; border-radius: 0 8px 8px 0; margin-top: 20px; }
+    .context-box p { font-size: 13px; margin-bottom: 6px; opacity: 0.95; }
+
+    .action-bar { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
+    .btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: var(--primary-light); transform: translateY(-2px); box-shadow: var(--shadow); }
+    .btn-secondary { background: var(--gray-200); color: var(--gray-700); }
+    .btn-secondary:hover { background: var(--gray-300); }
+    .btn-success { background: var(--success); color: white; }
+    .btn-danger { background: var(--danger); color: white; }
+    .btn-warning { background: var(--warning); color: white; }
+    .btn-accent { background: var(--accent); color: white; }
+    .tabs { display: flex; gap: 4px; background: white; padding: 8px; border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 24px; flex-wrap: wrap; }
+    .tab { padding: 10px 16px; border: none; background: transparent; font-size: 13px; font-weight: 600; color: var(--gray-600); border-radius: 8px; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+    .tab:hover { background: var(--gray-100); }
+    .tab.active { background: var(--primary); color: white; }
+    .panel { display: none; animation: fadeIn 0.3s ease; }
+    .panel.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .card { background: white; border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow); margin-bottom: 20px; }
+    .card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--gray-200); }
+    .card-icon { width: 48px; height: 48px; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 22px; color: white; flex-shrink: 0; }
+    .card-icon.secondary { background: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-light) 100%); }
+    .card-icon.danger { background: linear-gradient(135deg, var(--danger) 0%, #ef4444 100%); }
+    .card-icon.success { background: linear-gradient(135deg, var(--success) 0%, #34d399 100%); }
+    .card h3 { font-size: 18px; font-weight: 700; color: var(--gray-800); }
+    .card .subtitle { color: var(--gray-500); font-size: 13px; margin-top: 2px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 20px; }
+    .stat-card { background: white; border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); text-align: center; transition: transform 0.2s, box-shadow 0.2s; }
+    .stat-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+    .stat-value { font-size: 32px; font-weight: 800; background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .stat-card.success .stat-value { background: linear-gradient(135deg, var(--success) 0%, #34d399 100%); -webkit-background-clip: text; background-clip: text; }
+    .stat-card.warning .stat-value { background: linear-gradient(135deg, var(--warning) 0%, var(--accent) 100%); -webkit-background-clip: text; background-clip: text; }
+    .stat-card.danger .stat-value { background: linear-gradient(135deg, var(--danger) 0%, #f87171 100%); -webkit-background-clip: text; background-clip: text; }
+    .stat-label { font-size: 13px; color: var(--gray-600); margin-top: 4px; font-weight: 500; }
+    .launch-date-box { background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border: 2px solid var(--accent); border-radius: var(--radius); padding: 20px; margin-bottom: 24px; }
+    .launch-date-box h4 { color: #92400e; margin-bottom: 12px; font-size: 14px; }
+    .launch-date-box .date-input-row { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+    .launch-date-box input[type="date"] { padding: 12px 16px; border: 2px solid #fbbf24; border-radius: 8px; font-size: 18px; font-weight: 700; color: var(--primary); background: white; cursor: pointer; }
+    .launch-date-box .days-remaining { font-size: 16px; font-weight: 600; color: #78350f; }
+    .launch-date-box .days-remaining strong { font-size: 24px; color: var(--primary); }
+    .launch-date-box .date-help { font-size: 12px; color: #92400e; margin-top: 8px; }
+
+    /* PHASE PROGRESS — CŒUR DE LA NOUVELLE VUE */
+    .phase-progress-box { background: white; border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow); margin-bottom: 24px; }
+    .phase-progress-box h4 { color: var(--primary); margin-bottom: 20px; font-size: 16px; }
+    .phase-row { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--gray-100); }
+    .phase-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+    .phase-label { min-width: 220px; font-weight: 600; font-size: 13px; color: var(--gray-800); display: flex; align-items: center; gap: 8px; }
+    .phase-dot { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+    .phase-bar-container { flex: 1; background: var(--gray-200); border-radius: 8px; height: 24px; overflow: hidden; }
+    .phase-bar { height: 100%; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: white; transition: width 0.5s ease; min-width: 0; }
+    .phase-bar.phase1 { background: linear-gradient(90deg, var(--phase1), #ef4444); }
+    .phase-bar.phase2 { background: linear-gradient(90deg, var(--phase2), #8b5cf6); }
+    .phase-bar.phase3 { background: linear-gradient(90deg, var(--phase3), #3b82f6); }
+    .phase-bar.phase4 { background: linear-gradient(90deg, var(--phase4), #10b981); }
+    .phase-count { min-width: 90px; text-align: right; font-size: 12px; color: var(--gray-600); font-weight: 500; }
+
+    /* TIMELINE */
+    .timeline-box { background: white; border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow); margin-bottom: 24px; }
+    .timeline-box h4 { color: var(--primary); margin-bottom: 16px; font-size: 16px; }
+    .timeline-phases { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    @media (max-width: 768px) { .timeline-phases { grid-template-columns: 1fr 1fr; } }
+    .timeline-phase { border-radius: 10px; padding: 16px; text-align: center; position: relative; overflow: hidden; }
+    .timeline-phase::before { content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0; opacity: 0.06; }
+    .timeline-phase.p1 { border: 2px solid var(--phase1); }
+    .timeline-phase.p1::before { background: var(--phase1); }
+    .timeline-phase.p2 { border: 2px solid var(--phase2); }
+    .timeline-phase.p2::before { background: var(--phase2); }
+    .timeline-phase.p3 { border: 2px solid var(--phase3); }
+    .timeline-phase.p3::before { background: var(--phase3); }
+    .timeline-phase.p4 { border: 2px solid var(--phase4); }
+    .timeline-phase.p4::before { background: var(--phase4); }
+    .timeline-phase .tp-title { font-weight: 700; font-size: 13px; margin-bottom: 6px; position: relative; }
+    .timeline-phase.p1 .tp-title { color: var(--phase1); }
+    .timeline-phase.p2 .tp-title { color: var(--phase2); }
+    .timeline-phase.p3 .tp-title { color: var(--phase3); }
+    .timeline-phase.p4 .tp-title { color: var(--phase4); }
+    .timeline-phase .tp-period { font-size: 11px; color: var(--gray-600); margin-bottom: 8px; position: relative; }
+    .timeline-phase .tp-stat { font-size: 20px; font-weight: 800; position: relative; }
+    .timeline-phase .tp-detail { font-size: 11px; color: var(--gray-500); margin-top: 4px; position: relative; }
+    .timeline-phase .tp-status { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 10px; font-weight: 600; margin-top: 8px; position: relative; }
+    .tp-status.completed { background: #d1fae5; color: var(--success); }
+    .tp-status.active { background: #fef3c7; color: #92400e; }
+    .tp-status.upcoming { background: var(--gray-100); color: var(--gray-500); }
+
+    .top-actions { background: white; border-radius: var(--radius); padding: 20px; margin-bottom: 24px; box-shadow: var(--shadow); border-left: 4px solid var(--danger); }
+    .top-actions h4 { color: var(--danger); margin-bottom: 16px; font-size: 16px; }
+    .action-item { background: var(--gray-50); border-radius: 10px; padding: 16px; margin-bottom: 12px; border-left: 4px solid var(--danger); }
+    .action-item:nth-child(2) { border-left-color: var(--warning); }
+    .action-item:nth-child(3) { border-left-color: var(--info); }
+    .action-item:last-child { margin-bottom: 0; }
+    .action-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+    .action-rank { width: 28px; height: 28px; background: var(--danger); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; }
+    .action-item:nth-child(2) .action-rank { background: var(--warning); }
+    .action-item:nth-child(3) .action-rank { background: var(--info); }
+    .action-title { font-weight: 700; color: var(--gray-800); flex: 1; margin-left: 12px; }
+    .action-deadline { background: var(--gray-200); padding: 4px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; }
+    .action-deadline.urgent { background: #fee2e2; color: var(--danger); }
+    .action-details { font-size: 13px; color: var(--gray-600); margin-left: 40px; }
+    .action-details strong { color: var(--gray-700); }
+
+    .kanban-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; min-height: 400px; }
+    @media (max-width: 1200px) { .kanban-container { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 768px) { .kanban-container { grid-template-columns: 1fr; } }
+    .kanban-column { background: var(--gray-100); border-radius: var(--radius); overflow: hidden; display: flex; flex-direction: column; }
+    .kanban-header { padding: 14px 16px; font-weight: 700; display: flex; align-items: center; justify-content: space-between; color: white; font-size: 14px; }
+    .kanban-header .count { background: rgba(255,255,255,0.3); padding: 2px 10px; border-radius: 12px; font-size: 12px; }
+    .col-todo .kanban-header { background: var(--gray-600); }
+    .col-progress .kanban-header { background: var(--warning); }
+    .col-done .kanban-header { background: var(--success); }
+    .col-blocked .kanban-header { background: var(--danger); }
+    .kanban-cards { padding: 12px; flex: 1; overflow-y: auto; max-height: 500px; min-height: 150px; }
+    .kanban-card { background: white; border-radius: 8px; padding: 14px; margin-bottom: 10px; box-shadow: var(--shadow); cursor: grab; transition: all 0.2s; border-left: 4px solid var(--gray-400); }
+    .kanban-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-2px); }
+    .kanban-card.dragging { opacity: 0.5; }
+    .kanban-card.phase1 { border-left-color: var(--phase1); }
+    .kanban-card.phase2 { border-left-color: var(--phase2); }
+    .kanban-card.phase3 { border-left-color: var(--phase3); }
+    .kanban-card.phase4 { border-left-color: var(--phase4); }
+    .kanban-card.critical { background: #fef2f2; border-left-width: 6px; }
+    .kanban-card-title { font-weight: 600; font-size: 13px; margin-bottom: 8px; color: var(--gray-800); }
+    .kanban-card-meta { display: flex; flex-wrap: wrap; gap: 6px; font-size: 11px; margin-bottom: 8px; }
+    .tag { padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: 600; }
+    .tag-phase1 { background: #fef2f2; color: var(--phase1); }
+    .tag-phase2 { background: #f3e8ff; color: var(--phase2); }
+    .tag-phase3 { background: #dbeafe; color: var(--phase3); }
+    .tag-phase4 { background: #d1fae5; color: var(--phase4); }
+    .tag-duration { background: #fef3c7; color: #92400e; }
+    .tag-critical { background: #fee2e2; color: #991b1b; }
+    .kanban-card-actions { display: flex; gap: 6px; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--gray-200); }
+    .card-btn { padding: 4px 10px; border: 1px solid var(--gray-300); background: white; border-radius: 4px; font-size: 11px; cursor: pointer; transition: all 0.15s; }
+    .card-btn:hover { background: var(--gray-100); }
+    .card-btn.done { background: var(--success); color: white; border-color: var(--success); }
+    .card-btn.block { background: var(--danger); color: white; border-color: var(--danger); }
+
+    .blocage-item { background: #fef2f2; border: 2px solid var(--danger); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; }
+    .blocage-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+    .blocage-title { font-weight: 700; color: #991b1b; }
+    .blocage-cause { font-size: 13px; color: #7f1d1d; margin-bottom: 8px; }
+    .blocage-action { background: white; padding: 10px 14px; border-radius: 6px; font-size: 13px; border-left: 3px solid var(--success); }
+    .blocage-action strong { color: var(--success); }
+
+    .simulation-box { background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border: 2px solid var(--info); border-radius: var(--radius); padding: 20px; margin-bottom: 20px; }
+    .simulation-box h4 { color: var(--info); margin-bottom: 16px; font-size: 15px; }
+    .simulation-row { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
+    .simulation-field label { display: block; font-size: 12px; font-weight: 600; color: var(--gray-600); margin-bottom: 4px; }
+    .simulation-field select, .simulation-field input { padding: 10px 14px; border: 2px solid var(--gray-200); border-radius: 8px; font-size: 14px; min-width: 200px; }
+    .simulation-result { background: white; border-radius: 8px; padding: 16px; }
+    .simulation-result h5 { color: var(--gray-700); margin-bottom: 10px; font-size: 14px; }
+    .simulation-impact { font-size: 13px; color: var(--gray-600); }
+    .simulation-impact.danger { color: var(--danger); font-weight: 600; }
+    .simulation-impact.success { color: var(--success); }
+
+    .checklist-section { background: white; border-radius: var(--radius); padding: 20px; margin-bottom: 20px; box-shadow: var(--shadow); }
+    .checklist-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 2px solid var(--gray-200); }
+    .checklist-header h4 { color: var(--primary); font-size: 16px; }
+    .checklist-progress { font-size: 13px; color: var(--gray-600); }
+    .checklist-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--gray-100); }
+    .checklist-item:last-child { border-bottom: none; }
+    .checklist-item input[type="checkbox"] { width: 22px; height: 22px; cursor: pointer; accent-color: var(--success); margin-top: 2px; flex-shrink: 0; }
+    .checklist-item.checked label { color: var(--success); }
+    .checklist-item label { flex: 1; cursor: pointer; font-size: 14px; color: var(--gray-700); }
+    .checklist-item .item-ref { font-size: 11px; color: var(--info); font-weight: 500; white-space: nowrap; }
+
+    .decision-entry { background: var(--gray-50); border-radius: 8px; padding: 14px 16px; margin-bottom: 12px; border-left: 4px solid var(--primary); }
+    .decision-entry .date { font-size: 12px; color: var(--gray-500); margin-bottom: 4px; }
+    .decision-entry .type-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 600; margin-left: 8px; }
+    .type-badge.operationnel { background: #dbeafe; color: var(--info); }
+    .type-badge.blocage { background: #fee2e2; color: var(--danger); }
+    .type-badge.planification { background: #d1fae5; color: var(--success); }
+    .decision-entry .title { font-weight: 600; color: var(--gray-800); margin-bottom: 4px; }
+    .decision-entry .details { font-size: 13px; color: var(--gray-600); }
+
+    .filters { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; background: white; padding: 16px; border-radius: var(--radius); box-shadow: var(--shadow); }
+    .filter-group { display: flex; flex-direction: column; gap: 4px; }
+    .filter-group label { font-size: 11px; font-weight: 600; color: var(--gray-500); text-transform: uppercase; }
+    .filter-group select, .filter-group input { padding: 8px 12px; border: 2px solid var(--gray-200); border-radius: 6px; font-size: 13px; min-width: 160px; }
+
+    .progress-container { background: var(--gray-200); border-radius: 10px; height: 20px; overflow: hidden; margin-bottom: 8px; }
+    .progress-bar { height: 100%; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: white; transition: width 0.5s ease; background: linear-gradient(90deg, var(--primary), var(--primary-light)); }
+
+    .modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.6); display: none; align-items: center; justify-content: center; z-index: 9998; padding: 20px; }
+    .modal-overlay.show { display: flex; }
+    .modal { background: white; border-radius: var(--radius); max-width: 600px; width: 100%; max-height: 85vh; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); overflow: hidden; }
+    .modal-header { background: var(--primary); color: white; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; }
+    .modal-title { font-weight: 700; font-size: 16px; }
+    .modal-close { background: rgba(255,255,255,0.2); border: none; color: white; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: 600; }
+    .modal-body { padding: 20px; overflow-y: auto; max-height: 65vh; }
+    .modal-footer { padding: 16px 20px; border-top: 1px solid var(--gray-200); display: flex; justify-content: flex-end; gap: 12px; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 13px; font-weight: 600; color: var(--gray-700); margin-bottom: 6px; }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px 14px; border: 2px solid var(--gray-200); border-radius: 8px; font-size: 14px; transition: border-color 0.2s; }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--primary); }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 500px) { .form-row { grid-template-columns: 1fr; } }
+
+    .toast { position: fixed; bottom: 24px; right: 24px; background: var(--gray-800); color: white; padding: 14px 20px; border-radius: 10px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); transform: translateY(100px); opacity: 0; transition: all 0.3s ease; z-index: 9999; font-size: 14px; font-weight: 500; }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast.success { background: var(--success); }
+    .toast.error { background: var(--danger); }
+
+    .loading-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 9999; }
+    .loading-overlay.show { display: flex; }
+    .loading-spinner { background: white; padding: 32px 48px; border-radius: var(--radius); text-align: center; }
+    .spinner { width: 48px; height: 48px; border: 4px solid var(--gray-200); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 16px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @media print {
+      body { background: white; }
+      .container { padding: 0; max-width: none; }
+      .tabs, .action-bar, .toast, .modal-overlay, .filters, .loading-overlay { display: none !important; }
+      .panel { display: block !important; page-break-inside: avoid; margin-bottom: 20px; }
+      .card { box-shadow: none; border: 1px solid var(--gray-200); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <h1>Annexe 9 - Aide a la planification des taches</h1>
+    <p>Outil de pilotage operationnel pour la creation d'un cabinet d'expertise comptable 100% numerique. Kanban des taches, identification des blocages, Top 3 actions hebdomadaires et simulation d'impact des retards.</p>
+    <div class="header-meta">
+      <span class="badge" id="badgeProgress">Avancement : 0%</span>
+      <span class="badge" id="badgeTasks">0 taches</span>
+      <span class="badge badge-warning" id="badgeBlocked">0 bloquee</span>
+      <span class="badge" id="badgeCritical">0 critique</span>
+    </div>
+    <div class="context-box">
+      <p><strong>Objectif :</strong> Repondre a la question "Qu'est-ce que je fais cette semaine ?" en 60 secondes.</p>
+      <p><strong>Frequence :</strong> Consultation quotidienne du Kanban, mise a jour hebdomadaire des taches.</p>
+      <p><strong>Principe :</strong> Vision immediate de ce qui avance, ce qui bloque, et les 3 priorites de la semaine.</p>
+    </div>
+  </div>
+
+
+
+  <div class="action-bar">
+    <button class="btn btn-primary" onclick="openModal('addTask')">+ Nouvelle tache</button>
+    <button class="btn btn-secondary" onclick="saveState()">Sauvegarder</button>
+    <button class="btn btn-primary" onclick="exportPDF()">Export PDF</button>
+    <button class="btn btn-secondary" onclick="exportJSON()">Export JSON</button>
+    <button class="btn btn-accent" onclick="loadCabinetXExample()">Cas pratique Cabinet X</button>
+    <button class="btn btn-danger" onclick="resetAll()">Reinitialiser</button>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="showPanel('dashboard')">Vue d'ensemble</button>
+    <button class="tab" onclick="showPanel('kanban')">Kanban</button>
+    <button class="tab" onclick="showPanel('blocages')">Blocages</button>
+    <button class="tab" onclick="showPanel('simulation')">Simulation</button>
+    <button class="tab" onclick="showPanel('checklist')">Checklist</button>
+    <button class="tab" onclick="showPanel('historique')">Historique</button>
+    <button class="tab" onclick="showPanel('guide')">Guide</button>
+  </div>
+
+  <!-- ==================== PANEL 1: VUE D'ENSEMBLE — RECENTRÉE PLANIFICATION ==================== -->
+  <div id="dashboard" class="panel active">
+    <div class="launch-date-box">
+      <h4>Date de lancement prevue du cabinet</h4>
+      <div class="date-input-row">
+        <input type="date" id="launchDate" onchange="updateLaunchDate()">
+        <div class="days-remaining">Soit dans <strong id="daysRemaining">--</strong> jours</div>
+      </div>
+      <div class="date-help">Definissez votre date cible de lancement commercial (inscription OEC effective)</div>
+    </div>
+
+    <div class="grid-4">
+      <div class="stat-card"><div class="stat-value" id="statTotal">0</div><div class="stat-label">Taches au total</div></div>
+      <div class="stat-card success"><div class="stat-value" id="statDone">0</div><div class="stat-label">Terminees</div></div>
+      <div class="stat-card warning"><div class="stat-value" id="statProgress">0</div><div class="stat-label">En cours</div></div>
+      <div class="stat-card danger"><div class="stat-value" id="statBlocked">0</div><div class="stat-label">Bloquees</div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon secondary">%</div>
+        <div><h3>Avancement global</h3><div class="subtitle" id="progressSubtitle">0 taches terminees sur 0</div></div>
+      </div>
+      <div class="progress-container"><div class="progress-bar" id="globalProgressBar" style="width: 0%;">0%</div></div>
+    </div>
+
+    <!-- NOUVEAU : PROGRESSION PAR PHASE — CŒUR DE L'OUTIL -->
+    <div class="phase-progress-box">
+      <h4>Avancement par phase</h4>
+      <div id="phaseProgressContent"></div>
+    </div>
+
+    <!-- NOUVEAU : TIMELINE DES 4 PHASES -->
+    <div class="timeline-box">
+      <h4>Vue synthetique des 4 phases</h4>
+      <div class="timeline-phases" id="timelinePhases"></div>
+    </div>
+
+    <div class="top-actions" id="topActionsContainer">
+      <h4>Top 3 actions de la semaine</h4>
+      <div id="topActionsList"></div>
+    </div>
+
+    <div class="card" id="blockedPreview">
+      <div class="card-header">
+        <div class="card-icon danger">!</div>
+        <div><h3>Taches bloquees</h3><div class="subtitle">Actions de deblocage a mener en priorite</div></div>
+      </div>
+      <div id="blockedPreviewList"></div>
+    </div>
+  </div>
+
+  <!-- ==================== PANEL 2: KANBAN ==================== -->
+  <div id="kanban" class="panel">
+    <div class="filters">
+      <div class="filter-group">
+        <label>Filtrer par phase</label>
+        <select id="filterPhase" onchange="renderKanban()">
+          <option value="">Toutes les phases</option>
+          <option value="phase1">Phase 1 : Administratif</option>
+          <option value="phase2">Phase 2 : Conformite</option>
+          <option value="phase3">Phase 3 : SI</option>
+          <option value="phase4">Phase 4 : Commercial</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>Rechercher</label>
+        <input type="text" id="searchTask" placeholder="Nom de tache..." oninput="renderKanban()">
+      </div>
+    </div>
+    <div class="kanban-container" id="kanbanBoard">
+      <div class="kanban-column col-todo" data-status="todo"><div class="kanban-header"><span>A faire</span><span class="count" id="count-todo">0</span></div><div class="kanban-cards" id="cards-todo"></div></div>
+      <div class="kanban-column col-progress" data-status="progress"><div class="kanban-header"><span>En cours</span><span class="count" id="count-progress">0</span></div><div class="kanban-cards" id="cards-progress"></div></div>
+      <div class="kanban-column col-done" data-status="done"><div class="kanban-header"><span>Termine</span><span class="count" id="count-done">0</span></div><div class="kanban-cards" id="cards-done"></div></div>
+      <div class="kanban-column col-blocked" data-status="blocked"><div class="kanban-header"><span>Bloque</span><span class="count" id="count-blocked">0</span></div><div class="kanban-cards" id="cards-blocked"></div></div>
+    </div>
+  </div>
+
+  <!-- ==================== PANEL 3: BLOCAGES ==================== -->
+  <div id="blocages" class="panel">
+    <div class="card">
+      <div class="card-header"><div class="card-icon danger">!</div><div><h3>Resolution des blocages</h3><div class="subtitle">Taches bloquees avec causes et actions de deblocage</div></div></div>
+      <div id="blocagesList"></div>
+    </div>
+  </div>
+
+  <!-- ==================== PANEL 4: SIMULATION ==================== -->
+  <div id="simulation" class="panel">
+    <div class="simulation-box">
+      <h4>Simulation : Et si je retarde une tache ?</h4>
+      <div class="simulation-row">
+        <div class="simulation-field"><label>Tache a retarder</label><select id="simTask" onchange="runSimulation()"><option value="">Selectionner une tache...</option></select></div>
+        <div class="simulation-field"><label>Retard (en jours)</label><input type="number" id="simDelay" value="7" min="1" max="90" onchange="runSimulation()"></div>
+      </div>
+      <div class="simulation-result" id="simulationResult"><h5>Impact du retard</h5><p class="simulation-impact">Selectionnez une tache pour voir l'impact.</p></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-icon">i</div><div><h3>Impact sur le planning</h3><div class="subtitle">Consequences d'un retard sur les taches suivantes</div></div></div>
+      <div id="simulationDetails"><p style="color: var(--gray-500); font-style: italic;">Lancez une simulation pour voir les details.</p></div>
+    </div>
+  </div>
+
+  <!-- ==================== PANEL 5: CHECKLIST — RÉFÉRENCES RÉGLEMENTAIRES, SANS COÛTS ==================== -->
+  <div id="checklist" class="panel">
+    <div class="checklist-section"><div class="checklist-header"><h4>Conformite reglementaire</h4><span class="checklist-progress" id="conformiteProgress">0/6 valides</span></div><div id="conformiteChecklist"></div></div>
+    <div class="checklist-section"><div class="checklist-header"><h4>Administratif & Juridique</h4><span class="checklist-progress" id="adminProgress">0/5 valides</span></div><div id="adminChecklist"></div></div>
+    <div class="checklist-section"><div class="checklist-header"><h4>Infrastructure SI</h4><span class="checklist-progress" id="siProgress">0/6 valides</span></div><div id="siChecklist"></div></div>
+    <div class="checklist-section"><div class="checklist-header"><h4>Commercial & Lancement</h4><span class="checklist-progress" id="commercialProgress">0/4 valides</span></div><div id="commercialChecklist"></div></div>
+  </div>
+
+  <!-- ==================== PANEL 6: HISTORIQUE ==================== -->
+  <div id="historique" class="panel">
+    <div class="card">
+      <div class="card-header"><div class="card-icon">H</div><div><h3>Historique des decisions operationnelles</h3><div class="subtitle">Tracabilite des arbitrages et actions menees</div></div></div>
+      <button class="btn btn-primary" onclick="openModal('addDecision')" style="margin-bottom: 16px;">+ Documenter une decision</button>
+      <div id="decisionsList"></div>
+    </div>
+  </div>
+
+  <!-- ==================== PANEL 7: GUIDE ==================== -->
+  <div id="guide" class="panel">
+    <div class="card">
+      <div class="card-header"><div class="card-icon">?</div><div><h3>Guide d'utilisation</h3><div class="subtitle">Mode d'emploi de l'outil de planification</div></div></div>
+      <h4 style="color: var(--primary); margin: 20px 0 12px;">1. Objectif de l'outil</h4>
+      <p style="margin-bottom: 16px; color: var(--gray-700);">Cette annexe permet de <strong>piloter operationnellement</strong> les taches de creation du cabinet. Elle repond a une question simple : <em>"Qu'est-ce que je fais cette semaine ?"</em></p>
+      <h4 style="color: var(--primary); margin: 20px 0 12px;">2. Les 6 vues principales</h4>
+      <ul style="margin-left: 24px; margin-bottom: 16px; color: var(--gray-700);">
+        <li><strong>Vue d'ensemble</strong> : Avancement global et par phase, timeline, Top 3 actions, apercu des blocages</li>
+        <li><strong>Kanban</strong> : Toutes les taches organisees par statut (drag and drop)</li>
+        <li><strong>Blocages</strong> : Focus sur les taches bloquees avec actions de deblocage</li>
+        <li><strong>Simulation</strong> : Anticiper l'impact d'un retard sur le planning</li>
+        <li><strong>Checklist</strong> : Points de controle reglementaires par categorie</li>
+        <li><strong>Historique</strong> : Tracabilite des decisions operationnelles</li>
+      </ul>
+      <h4 style="color: var(--primary); margin: 20px 0 12px;">3. Rituel hebdomadaire (15 min)</h4>
+      <div style="background: var(--gray-50); padding: 16px; border-radius: 8px; margin-bottom: 16px;">
+        <ol style="margin-left: 20px; color: var(--gray-700);">
+          <li>Consulter le <strong>Kanban</strong> : quelles taches terminees cette semaine ?</li>
+          <li>Mettre a jour le <strong>statut</strong> des taches en cours</li>
+          <li>Identifier les <strong>nouvelles taches bloquees</strong></li>
+          <li>Lire le <strong>Top 3 actions</strong> de la semaine</li>
+          <li>Planifier des creneaux pour les 3 actions prioritaires</li>
+          <li>Documenter les decisions importantes (onglet Historique)</li>
+        </ol>
+      </div>
+      <h4 style="color: var(--primary); margin: 20px 0 12px;">4. Les 4 phases du projet de creation</h4>
+      <ul style="margin-left: 24px; color: var(--gray-700);">
+        <li><span style="color: var(--phase1); font-weight: 700;">Phase 1</span> : Administratif & Juridique (inscription OEC, creation societe, compte bancaire)</li>
+        <li><span style="color: var(--phase2); font-weight: 700;">Phase 2</span> : Conformite (RCP, RGPD, LCB-FT, lettre de mission)</li>
+        <li><span style="color: var(--phase3); font-weight: 700;">Phase 3</span> : Infrastructure SI (logiciels, GED, cybersecurite, e-facture)</li>
+        <li><span style="color: var(--phase4); font-weight: 700;">Phase 4</span> : Commercial & Lancement (site web, LinkedIn, prospection, premiers clients)</li>
+      </ul>
+      <h4 style="color: var(--primary); margin: 20px 0 12px;">5. Charger un exemple</h4>
+      <div style="background: #fef3c7; padding: 16px; border-radius: 8px; border-left: 4px solid var(--accent);">
+        <p style="color: #92400e; margin-bottom: 8px;"><strong>Bouton "Charger exemple Cabinet X" :</strong> Charge un cas pratique complet avec 38 taches pre-remplies, des decisions documentees et une checklist partiellement validee.</p>
+        <p style="color: #92400e;"><strong>Ideal pour :</strong> Decouvrir l'outil, s'inspirer d'un planning realiste, adapter a son propre projet.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== MODALS ==================== -->
+<!-- MODAL TÂCHE — SANS CHAMP COÛT -->
+<div class="modal-overlay" id="modalAddTask" onclick="closeModal(event, 'modalAddTask')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header"><div class="modal-title" id="modalTaskTitle">Nouvelle tache</div><button class="modal-close" onclick="closeModalDirect('modalAddTask')">X</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="taskEditId">
+      <div class="form-group"><label>Intitule *</label><input type="text" id="taskTitle" placeholder="Ex: Inscription au tableau de l'Ordre"></div>
+      <div class="form-row">
+        <div class="form-group"><label>Phase</label><select id="taskPhase"><option value="phase1">Phase 1 : Administratif</option><option value="phase2">Phase 2 : Conformite</option><option value="phase3">Phase 3 : SI</option><option value="phase4">Phase 4 : Commercial</option></select></div>
+        <div class="form-group"><label>Duree estimee (jours)</label><input type="number" id="taskDuration" value="7" min="1"></div>
+      </div>
+      <div class="form-group"><label>Tache critique ?</label><select id="taskCritical"><option value="no">Non</option><option value="yes">Oui (impact sur delai global)</option></select></div>
+      <div class="form-group"><label>Description / Notes</label><textarea id="taskDescription" rows="2" placeholder="Details, contacts, liens utiles..."></textarea></div>
+      <div class="form-group"><label>Cause du blocage (si bloquee)</label><input type="text" id="taskBlockReason" placeholder="Ex: Attente devis fournisseur"></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModalDirect('modalAddTask')">Annuler</button><button class="btn btn-success" onclick="saveTask()">Enregistrer</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalAddDecision" onclick="closeModal(event, 'modalAddDecision')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header"><div class="modal-title">Documenter une decision</div><button class="modal-close" onclick="closeModalDirect('modalAddDecision')">X</button></div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group"><label>Date</label><input type="date" id="decisionDate"></div>
+        <div class="form-group"><label>Type</label><select id="decisionType"><option value="operationnel">Operationnel</option><option value="blocage">Resolution blocage</option><option value="planification">Planification</option></select></div>
+      </div>
+      <div class="form-group"><label>Decision prise</label><input type="text" id="decisionTitle" placeholder="Ex: Report de la tache X de 2 semaines"></div>
+      <div class="form-group"><label>Contexte / Raison</label><textarea id="decisionContext" rows="2" placeholder="Ex: Attente reponse fournisseur"></textarea></div>
+      <div class="form-group"><label>Impact / Resultat</label><textarea id="decisionImpact" rows="2" placeholder="Ex: Decalage lancement de 1 semaine"></textarea></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModalDirect('modalAddDecision')">Annuler</button><button class="btn btn-success" onclick="saveDecision()">Enregistrer</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="loading-overlay" id="loadingOverlay"><div class="loading-spinner"><div class="spinner"></div><div>Generation du PDF en cours...</div></div></div>
+
+<script>
+// =====================================================
+// CONFIGURATION
+// =====================================================
+const STORAGE_KEY = "annexe9_planification_v3";
+
+const PHASES = {
+  phase1: { name: "Administratif & Juridique", color: "#dc2626", period: "M-3 a M0" },
+  phase2: { name: "Conformite reglementaire", color: "#7c3aed", period: "M0 a M+1" },
+  phase3: { name: "Infrastructure SI", color: "#2563eb", period: "M0 a M+2" },
+  phase4: { name: "Commercial & Lancement", color: "#059669", period: "M+1 a M+4" }
+};
+
+// CHECKLIST — RÉFÉRENCES RÉGLEMENTAIRES (SANS COÛTS)
+const CHECKLIST_DATA = {
+  conformite: [
+    { id: "c1", label: "Inscription OEC validee (attestation)", ref: "Art. 3 Ordonnance 19/09/1945" },
+    { id: "c2", label: "Assurance RCP souscrite et attestation recue", ref: "Art. 17 Ordonnance 19/09/1945" },
+    { id: "c3", label: "Registre des traitements RGPD cree", ref: "Art. 30 Reglement UE 2016/679" },
+    { id: "c4", label: "Procedures LCB-FT formalisees", ref: "Art. L561-2 CMF / TRACFIN" },
+    { id: "c5", label: "Modele lettre de mission conforme NP", ref: "Art. 151 Code deontologie ; NPMQ §18-20" },
+    { id: "c6", label: "CGV cabinet redigees", ref: "Art. L441-1 Code de commerce" }
+  ],
+  admin: [
+    { id: "a1", label: "Statuts SASU rediges et signes", ref: "Art. L227-1 Code de commerce" },
+    { id: "a2", label: "Capital depose et attestation obtenue", ref: "Art. L227-1 Code de commerce" },
+    { id: "a3", label: "Annonce legale publiee (JAL)", ref: "Art. R210-3 et s. Code de commerce" },
+    { id: "a4", label: "Immatriculation RCS effectuee (Kbis)", ref: "Guichet unique INPI" },
+    { id: "a5", label: "Declaration des beneficiaires effectifs (RBE)", ref: "Art. L561-46 CMF" }
+  ],
+  si: [
+    { id: "s1", label: "Logiciel de production comptable choisi et souscrit", ref: "Voir Annexe 10 - Benchmark" },
+    { id: "s2", label: "Logiciel deploye et parametres de base configures", ref: "NPMQ §24 - Ressources technologiques" },
+    { id: "s3", label: "GED / Coffre-fort numerique en place", ref: "Art. L134-2 Code de commerce" },
+    { id: "s4", label: "Solution signature electronique configuree", ref: "eIDAS - Reglement UE 910/2014" },
+    { id: "s5", label: "Sauvegarde 3-2-1 operationnelle et testee", ref: "ANSSI - Guide securite TPE" },
+    { id: "s6", label: "MFA active sur tous les acces critiques", ref: "ANSSI - Mesure prioritaire 1" }
+  ],
+  commercial: [
+    { id: "m1", label: "Identite visuelle creee (logo, charte)", ref: "Art. 152 Code deontologie" },
+    { id: "m2", label: "Site web professionnel en ligne", ref: "Art. 152-154 Code deontologie" },
+    { id: "m3", label: "Profil LinkedIn optimise et actif", ref: "Voir Annexe 12 - LinkedIn" },
+    { id: "m4", label: "Premiers clients signes (objectif 2-3)", ref: "Art. 150 Code deontologie ; NPMQ §18-20" }
+  ]
+};
+
+// =====================================================
+// STATE
+// =====================================================
+let state = {
+  launchDate: '',
+  tasks: [],
+  decisions: [],
+  checklist: {},
+  taskIdCounter: 1,
+  isCabinetXLoaded: false
+};
+
+// =====================================================
+// EXEMPLE CABINET X — TÂCHES SANS COÛTS
+// =====================================================
+function getCabinetXTasks() {
+  return [
+    // PHASE 1 : ADMINISTRATIF & JURIDIQUE
+    { id: 1, title: "Constitution dossier CROEC IDF", phase: "phase1", duration: 7, critical: true, status: "done", description: "Dossier complet : diplome DEC, CV, casier judiciaire, attestation employeur, projet d'installation.", blockReason: "" },
+    { id: 2, title: "Depot dossier inscription OEC", phase: "phase1", duration: 1, critical: true, status: "done", description: "Depot en ligne via portail CROEC.", blockReason: "" },
+    { id: 3, title: "Attente commission OEC (3 mois)", phase: "phase1", duration: 90, critical: true, status: "progress", description: "Commission trimestrielle CROEC IDF. Delai incompressible.", blockReason: "" },
+    { id: 4, title: "Redaction statuts SASU", phase: "phase1", duration: 5, critical: false, status: "done", description: "Statuts adaptes cabinet EC. Clause objet social conforme art. 2 Ord. 1945.", blockReason: "" },
+    { id: 5, title: "Ouverture compte bancaire professionnel", phase: "phase1", duration: 14, critical: true, status: "done", description: "Depot capital. Comparatif banques pro realisee.", blockReason: "" },
+    { id: 6, title: "Publication annonce legale (JAL)", phase: "phase1", duration: 3, critical: false, status: "done", description: "Publication JAL agree.", blockReason: "" },
+    { id: 7, title: "Immatriculation RCS (guichet unique)", phase: "phase1", duration: 10, critical: true, status: "done", description: "Depot guichet unique INPI.", blockReason: "" },
+    { id: 8, title: "Declaration beneficiaires effectifs (RBE)", phase: "phase1", duration: 2, critical: false, status: "done", description: "Declaration en ligne Infogreffe.", blockReason: "" },
+    { id: 9, title: "Affiliation CAVEC", phase: "phase1", duration: 14, critical: false, status: "progress", description: "Affiliation obligatoire caisse retraite EC. Classe C minimale.", blockReason: "" },
+    { id: 10, title: "Choix domiciliation / adresse pro", phase: "phase1", duration: 3, critical: false, status: "done", description: "Domiciliation au domicile (Ile-de-France).", blockReason: "" },
+    // PHASE 2 : CONFORMITE
+    { id: 11, title: "Souscription assurance RCP", phase: "phase2", duration: 7, critical: true, status: "done", description: "Obligatoire art. 17 Ordonnance 1945. Inclusion couverture cyber.", blockReason: "" },
+    { id: 12, title: "Creation registre RGPD", phase: "phase2", duration: 3, critical: false, status: "done", description: "Modele CNIL. Art. 30 RGPD.", blockReason: "" },
+    { id: 13, title: "Redaction politique confidentialite", phase: "phase2", duration: 2, critical: false, status: "done", description: "Politique pour site web et clients.", blockReason: "" },
+    { id: 14, title: "Mise en place procedures LCB-FT", phase: "phase2", duration: 5, critical: false, status: "progress", description: "Guide CNOEC/TRACFIN. Classification risques.", blockReason: "" },
+    { id: 15, title: "Redaction modele lettre de mission", phase: "phase2", duration: 4, critical: false, status: "progress", description: "Conforme art. 151 CD et NPMQ §18-20. 3 versions (TPE, startup, premium). Clause dematerialisation.", blockReason: "" },
+    { id: 16, title: "Redaction CGV cabinet", phase: "phase2", duration: 3, critical: false, status: "todo", description: "Conformes au Code de commerce.", blockReason: "" },
+    { id: 17, title: "Formation LCB-FT obligatoire", phase: "phase2", duration: 1, critical: false, status: "done", description: "E-learning CNOEC.", blockReason: "" },
+    // PHASE 3 : INFRASTRUCTURE SI
+    { id: 18, title: "Benchmark logiciels production", phase: "phase3", duration: 14, critical: true, status: "done", description: "Comparatif solutions (voir Annexe 10).", blockReason: "" },
+    { id: 19, title: "Choix et souscription logiciel comptable", phase: "phase3", duration: 3, critical: true, status: "done", description: "Solution all-in-one retenue : production, GED, signature.", blockReason: "" },
+    { id: 20, title: "Parametrage initial logiciel", phase: "phase3", duration: 7, critical: false, status: "progress", description: "Plan comptable, journaux, modeles ecritures, parametres TVA.", blockReason: "" },
+    { id: 21, title: "Configuration GED / coffre-fort", phase: "phase3", duration: 3, critical: false, status: "todo", description: "Arborescence dossiers, droits acces.", blockReason: "" },
+    { id: 22, title: "Mise en place signature electronique", phase: "phase3", duration: 2, critical: false, status: "todo", description: "Conforme eIDAS. Niveaux simple et avancee.", blockReason: "" },
+    { id: 23, title: "Configuration Microsoft 365 / Suite bureautique", phase: "phase3", duration: 3, critical: false, status: "done", description: "Messagerie pro, Teams, OneDrive.", blockReason: "" },
+    { id: 24, title: "Mise en place sauvegarde 3-2-1", phase: "phase3", duration: 3, critical: true, status: "progress", description: "Principe 3-2-1 ANSSI.", blockReason: "" },
+    { id: 25, title: "Activation MFA tous les acces", phase: "phase3", duration: 1, critical: true, status: "done", description: "Microsoft Authenticator. Mesure prioritaire ANSSI.", blockReason: "" },
+    { id: 26, title: "Test de restauration sauvegarde", phase: "phase3", duration: 1, critical: false, status: "todo", description: "Test trimestriel a planifier.", blockReason: "" },
+    { id: 27, title: "Preparation conformite e-facture 2026", phase: "phase3", duration: 5, critical: false, status: "todo", description: "Reception obligatoire sept. 2026. Formats Factur-X.", blockReason: "" },
+    // PHASE 4 : COMMERCIAL & LANCEMENT
+    { id: 28, title: "Creation identite visuelle", phase: "phase4", duration: 7, critical: false, status: "done", description: "Logo + charte graphique. Art. 152 CD.", blockReason: "" },
+    { id: 29, title: "Developpement site web", phase: "phase4", duration: 21, critical: false, status: "progress", description: "Site vitrine conforme art. 152-154 CD.", blockReason: "" },
+    { id: 30, title: "Optimisation profil LinkedIn", phase: "phase4", duration: 3, critical: false, status: "done", description: "Profil professionnel optimise.", blockReason: "" },
+    { id: 31, title: "Strategie contenu LinkedIn", phase: "phase4", duration: 5, critical: false, status: "progress", description: "Calendrier editorial : 2 posts/semaine. Voir Annexe 12.", blockReason: "" },
+    { id: 32, title: "Activation reseau prescripteurs", phase: "phase4", duration: 30, critical: false, status: "todo", description: "Avocats, notaires, banquiers, incubateurs.", blockReason: "" },
+    { id: 33, title: "Adhesion CJEC / ANECS", phase: "phase4", duration: 2, critical: false, status: "todo", description: "Reseau jeunes experts-comptables.", blockReason: "" },
+    { id: 34, title: "Definition offres packagees", phase: "phase4", duration: 5, critical: false, status: "progress", description: "3 offres tarifaires adaptees aux segments.", blockReason: "" },
+    { id: 35, title: "Creation supports commerciaux", phase: "phase4", duration: 5, critical: false, status: "todo", description: "Plaquette, proposition de valeur.", blockReason: "" },
+    { id: 36, title: "Prospection premiers clients", phase: "phase4", duration: 60, critical: true, status: "todo", description: "Objectif : 2-3 clients avant lancement.", blockReason: "" },
+    { id: 37, title: "Signature premier client", phase: "phase4", duration: 1, critical: true, status: "todo", description: "Objectif : 1er client signe avant lancement commercial.", blockReason: "" },
+    { id: 38, title: "Mise en place CRM", phase: "phase4", duration: 3, critical: false, status: "todo", description: "Outil de suivi prospects et pipeline.", blockReason: "" }
+  ];
+}
+
+function getCabinetXDecisions() {
+  return [
+    { id: 1, date: '2026-01-10', type: 'planification', title: "Choix creation ex nihilo plutot que rachat", context: "Analyse des modes d'installation. Creation retenue pour maitrise totale du positionnement numerique.", impact: "Delai lancement 6 mois. Risque de tresorerie initial a maitriser." },
+    { id: 2, date: '2026-02-15', type: 'operationnel', title: "Selection solution logicielle all-in-one", context: "Benchmark de 8 solutions (voir Annexe 10). Criteres : integration, conformite e-facture, GED.", impact: "Stack integree. Simplification du SI. Un seul interlocuteur editeur." },
+    { id: 3, date: '2026-03-01', type: 'planification', title: "Positionnement cible startups et TPE digitalisees", context: "Analyse segments : entrepreneurs digitaux habitues au 100% en ligne.", impact: "Mission EC predominante + missions conseil DAF et juridique ponctuel." }
+  ];
+}
+
+function getCabinetXChecklist() {
+  return { c1: false, c2: true, c3: true, c4: false, c5: false, c6: false, a1: true, a2: true, a3: true, a4: true, a5: true, s1: true, s2: false, s3: false, s4: false, s5: false, s6: true, m1: true, m2: false, m3: true, m4: false };
+}
+
+function loadCabinetXExample() {
+  if (!confirm('Charger l\'exemple complet du Cabinet X (2026) ?\n\nCela remplacera toutes les donnees actuelles.')) return;
+  state.launchDate = '2026-06-01';
+  state.tasks = getCabinetXTasks();
+  state.decisions = getCabinetXDecisions();
+  state.checklist = getCabinetXChecklist();
+  state.taskIdCounter = 50;
+  state.isCabinetXLoaded = true;
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  renderAll();
+  toast('Exemple Cabinet X 2026 charge avec succes !', 'success');
+}
+
+// =====================================================
+// STORAGE / INIT
+// =====================================================
+function initDefaultTasks() {
+  state.tasks = []; state.taskIdCounter = 1; state.isCabinetXLoaded = false;
+  Object.keys(CHECKLIST_DATA).forEach(cat => { CHECKLIST_DATA[cat].forEach(item => { state.checklist[item.id] = false; }); });
+  state.launchDate = ''; state.decisions = [];
+}
+function saveState() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); toast('Sauvegarde effectuee', 'success'); } catch(e) { toast('Erreur de sauvegarde', 'error'); } }
+function loadState() { try { const saved = localStorage.getItem(STORAGE_KEY); if (saved) { state = JSON.parse(saved); } else { initDefaultTasks(); } } catch(e) { initDefaultTasks(); } }
+function resetAll() { if (!confirm('Reinitialiser toutes les donnees ? Cette action est irreversible.')) return; localStorage.removeItem(STORAGE_KEY); initDefaultTasks(); renderAll(); toast('Donnees reinitialisees'); }
+function exportJSON() { const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `annexe9-planification-${new Date().toISOString().split('T')[0]}.json`; a.click(); URL.revokeObjectURL(url); toast('JSON exporte'); }
+
+// =====================================================
+// UI HELPERS
+// =====================================================
+function showPanel(panelId) { document.querySelectorAll('.panel').forEach(p => p.classList.remove('active')); document.getElementById(panelId).classList.add('active'); document.querySelectorAll('.tab').forEach(t => t.classList.remove('active')); event.target.classList.add('active'); }
+function toast(msg, type = '') { const el = document.getElementById('toast'); el.textContent = msg; el.className = 'toast show' + (type ? ' ' + type : ''); setTimeout(() => el.classList.remove('show'), 2500); }
+function openModal(name) { const modal = document.getElementById('modal' + name.charAt(0).toUpperCase() + name.slice(1)); if (modal) modal.classList.add('show'); if (name === 'addTask') { document.getElementById('taskEditId').value = ''; document.getElementById('taskTitle').value = ''; document.getElementById('taskPhase').value = 'phase1'; document.getElementById('taskDuration').value = '7'; document.getElementById('taskCritical').value = 'no'; document.getElementById('taskDescription').value = ''; document.getElementById('taskBlockReason').value = ''; document.getElementById('modalTaskTitle').textContent = 'Nouvelle tache'; } if (name === 'addDecision') { document.getElementById('decisionDate').value = new Date().toISOString().split('T')[0]; document.getElementById('decisionType').value = 'operationnel'; document.getElementById('decisionTitle').value = ''; document.getElementById('decisionContext').value = ''; document.getElementById('decisionImpact').value = ''; } }
+function closeModal(e, id) { if (e && e.target.id !== id) return; document.getElementById(id).classList.remove('show'); }
+function closeModalDirect(id) { document.getElementById(id).classList.remove('show'); }
+function escapeHtml(str) { if (!str) return ''; return String(str).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m])); }
+
+// =====================================================
+// TASK MANAGEMENT
+// =====================================================
+function saveTask() {
+  const title = document.getElementById('taskTitle').value.trim();
+  if (!title) { toast('Intitule requis', 'error'); return; }
+  const editId = document.getElementById('taskEditId').value;
+  const taskData = { title, phase: document.getElementById('taskPhase').value, duration: parseInt(document.getElementById('taskDuration').value) || 7, critical: document.getElementById('taskCritical').value === 'yes', description: document.getElementById('taskDescription').value, blockReason: document.getElementById('taskBlockReason').value };
+  if (editId) { const task = state.tasks.find(t => t.id === parseInt(editId)); if (task) Object.assign(task, taskData); toast('Tache modifiee', 'success'); } else { state.tasks.push({ id: state.taskIdCounter++, ...taskData, status: 'todo' }); toast('Tache creee', 'success'); }
+  closeModalDirect('modalAddTask'); localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); renderAll();
+}
+function editTask(id) {
+  const task = state.tasks.find(t => t.id === id); if (!task) return;
+  document.getElementById('taskEditId').value = task.id; document.getElementById('taskTitle').value = task.title; document.getElementById('taskPhase').value = task.phase; document.getElementById('taskDuration').value = task.duration; document.getElementById('taskCritical').value = task.critical ? 'yes' : 'no'; document.getElementById('taskDescription').value = task.description || ''; document.getElementById('taskBlockReason').value = task.blockReason || ''; document.getElementById('modalTaskTitle').textContent = 'Modifier la tache'; document.getElementById('modalAddTask').classList.add('show');
+}
+function deleteTask(id) { if (confirm('Supprimer cette tache ?')) { state.tasks = state.tasks.filter(t => t.id !== id); localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); renderAll(); toast('Tache supprimee'); } }
+function moveTask(id, newStatus) { const task = state.tasks.find(t => t.id === id); if (task) { task.status = newStatus; localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); renderAll(); } }
+function saveDecision() { const title = document.getElementById('decisionTitle').value.trim(); if (!title) { toast('Decision requise', 'error'); return; } state.decisions.unshift({ id: Date.now(), date: document.getElementById('decisionDate').value, type: document.getElementById('decisionType').value, title, context: document.getElementById('decisionContext').value, impact: document.getElementById('decisionImpact').value }); closeModalDirect('modalAddDecision'); localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); renderDecisions(); toast('Decision enregistree', 'success'); }
+function toggleChecklist(id) { state.checklist[id] = !state.checklist[id]; localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); renderChecklist(); }
+function updateLaunchDate() { state.launchDate = document.getElementById('launchDate').value; localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); renderDaysRemaining(); }
+
+// =====================================================
+// CALCULATIONS
+// =====================================================
+function getStats() {
+  const total = state.tasks.length; const done = state.tasks.filter(t => t.status === 'done').length;
+  const progress = state.tasks.filter(t => t.status === 'progress').length; const blocked = state.tasks.filter(t => t.status === 'blocked').length;
+  const critical = state.tasks.filter(t => t.critical && t.status !== 'done').length;
+  const pct = total > 0 ? Math.round(done / total * 100) : 0;
+  return { total, done, progress, blocked, critical, pct };
+}
+function getPhaseStats() {
+  const phases = {};
+  Object.keys(PHASES).forEach(key => {
+    const phaseTasks = state.tasks.filter(t => t.phase === key);
+    const total = phaseTasks.length; const done = phaseTasks.filter(t => t.status === 'done').length;
+    const progress = phaseTasks.filter(t => t.status === 'progress').length; const blocked = phaseTasks.filter(t => t.status === 'blocked').length;
+    const pct = total > 0 ? Math.round(done / total * 100) : 0;
+    let status = 'upcoming'; if (pct === 100) status = 'completed'; else if (done > 0 || progress > 0) status = 'active';
+    phases[key] = { total, done, progress, blocked, pct, status };
+  });
+  return phases;
+}
+function getTop3Actions() {
+  const blocked = state.tasks.filter(t => t.status === 'blocked');
+  const critical = state.tasks.filter(t => t.critical && t.status !== 'done' && t.status !== 'blocked');
+  const inProgress = state.tasks.filter(t => t.status === 'progress' && !t.critical);
+  const todo = state.tasks.filter(t => t.status === 'todo' && !t.critical);
+  return [...blocked, ...critical, ...inProgress, ...todo].slice(0, 3);
+}
+
+// =====================================================
+// RENDERING
+// =====================================================
+function renderAll() { renderDashboard(); renderKanban(); renderBlocages(); renderSimulation(); renderChecklist(); renderDecisions(); updateBadges(); }
+
+function updateBadges() {
+  const stats = getStats();
+  document.getElementById('badgeProgress').textContent = `Avancement : ${stats.pct}%`;
+  document.getElementById('badgeTasks').textContent = `${stats.total} taches`;
+  document.getElementById('badgeBlocked').textContent = `${stats.blocked} bloquee${stats.blocked > 1 ? 's' : ''}`;
+  document.getElementById('badgeBlocked').className = stats.blocked > 0 ? 'badge badge-danger' : 'badge badge-success';
+  document.getElementById('badgeCritical').textContent = `${stats.critical} critique${stats.critical > 1 ? 's' : ''}`;
+  document.getElementById('badgeCritical').className = stats.critical > 0 ? 'badge badge-warning' : 'badge';
+}
+
+function renderDaysRemaining() {
+  if (state.launchDate) { const launch = new Date(state.launchDate); const today = new Date(); const diff = Math.ceil((launch - today) / (1000 * 60 * 60 * 24)); document.getElementById('daysRemaining').textContent = diff > 0 ? diff : 0; } else { document.getElementById('daysRemaining').textContent = '--'; }
+}
+
+function renderDashboard() {
+  document.getElementById('launchDate').value = state.launchDate || '';
+  renderDaysRemaining();
+  const stats = getStats();
+  document.getElementById('statTotal').textContent = stats.total;
+  document.getElementById('statDone').textContent = stats.done;
+  document.getElementById('statProgress').textContent = stats.progress;
+  document.getElementById('statBlocked').textContent = stats.blocked;
+  document.getElementById('globalProgressBar').style.width = stats.pct + '%';
+  document.getElementById('globalProgressBar').textContent = stats.pct + '%';
+  document.getElementById('progressSubtitle').textContent = `${stats.done} taches terminees sur ${stats.total}`;
+
+  // PHASE PROGRESS
+  const phaseStats = getPhaseStats();
+  let phaseHTML = '';
+  Object.keys(PHASES).forEach(key => {
+    const ps = phaseStats[key]; const phase = PHASES[key];
+    phaseHTML += `<div class="phase-row">
+      <div class="phase-label"><div class="phase-dot" style="background:${phase.color}"></div>${phase.name}</div>
+      <div class="phase-bar-container"><div class="phase-bar ${key}" style="width:${ps.pct}%">${ps.pct > 10 ? ps.pct + '%' : ''}</div></div>
+      <div class="phase-count">${ps.done}/${ps.total} (${ps.pct}%)</div>
+    </div>`;
+  });
+  document.getElementById('phaseProgressContent').innerHTML = phaseHTML;
+
+  // TIMELINE
+  let timelineHTML = '';
+  Object.keys(PHASES).forEach(key => {
+    const ps = phaseStats[key]; const phase = PHASES[key]; const pNum = key.replace('phase','');
+    const statusClass = ps.status === 'completed' ? 'completed' : ps.status === 'active' ? 'active' : 'upcoming';
+    const statusLabel = ps.status === 'completed' ? 'Termine' : ps.status === 'active' ? 'En cours' : 'A venir';
+    timelineHTML += `<div class="timeline-phase p${pNum}">
+      <div class="tp-title">Phase ${pNum}</div>
+      <div class="tp-period">${phase.period}</div>
+      <div class="tp-stat">${ps.pct}%</div>
+      <div class="tp-detail">${ps.done}/${ps.total} taches</div>
+      <span class="tp-status ${statusClass}">${statusLabel}</span>
+    </div>`;
+  });
+  document.getElementById('timelinePhases').innerHTML = timelineHTML;
+
+  // TOP 3 ACTIONS
+  const top3 = getTop3Actions();
+  if (top3.length === 0) {
+    document.getElementById('topActionsList').innerHTML = '<p style="color: var(--gray-500); font-style: italic;">Aucune tache enregistree. Cliquez sur "+ Nouvelle tache" ou chargez l\'exemple Cabinet X.</p>';
+  } else {
+    document.getElementById('topActionsList').innerHTML = top3.map((t, i) => {
+      const isBlocked = t.status === 'blocked'; const deadlineClass = isBlocked ? 'urgent' : '';
+      const deadlineText = isBlocked ? 'URGENT - Debloquer' : `${t.duration} jours`;
+      return `<div class="action-item"><div class="action-header"><span class="action-rank">${i + 1}</span><span class="action-title">${escapeHtml(t.title)}</span><span class="action-deadline ${deadlineClass}">${deadlineText}</span></div><div class="action-details"><strong>Phase :</strong> ${PHASES[t.phase].name}<br>${t.critical ? '<strong style="color: var(--danger);">Tache critique</strong><br>' : ''}${isBlocked && t.blockReason ? `<strong>Blocage :</strong> ${escapeHtml(t.blockReason)}` : ''}${t.description && !isBlocked ? `<strong>Notes :</strong> ${escapeHtml(t.description)}` : ''}</div></div>`;
+    }).join('');
+  }
+
+  // BLOCKED PREVIEW
+  const blocked = state.tasks.filter(t => t.status === 'blocked');
+  if (blocked.length === 0) { document.getElementById('blockedPreview').style.display = 'none'; }
+  else { document.getElementById('blockedPreview').style.display = 'block'; document.getElementById('blockedPreviewList').innerHTML = blocked.slice(0, 3).map(t => `<div class="blocage-item" style="margin-bottom: 12px;"><div class="blocage-header"><span class="blocage-title">${escapeHtml(t.title)}</span></div>${t.blockReason ? `<div class="blocage-cause"><strong>Cause :</strong> ${escapeHtml(t.blockReason)}</div>` : ''}</div>`).join(''); }
+}
+
+function renderKanban() {
+  const filterPhase = document.getElementById('filterPhase')?.value || '';
+  const search = (document.getElementById('searchTask')?.value || '').toLowerCase();
+  const statuses = ['todo', 'progress', 'done', 'blocked'];
+  statuses.forEach(status => {
+    const container = document.getElementById(`cards-${status}`); const countEl = document.getElementById(`count-${status}`);
+    container.innerHTML = '';
+    let filtered = state.tasks.filter(t => t.status === status);
+    if (filterPhase) filtered = filtered.filter(t => t.phase === filterPhase);
+    if (search) filtered = filtered.filter(t => t.title.toLowerCase().includes(search));
+    countEl.textContent = filtered.length;
+    filtered.forEach(task => {
+      const card = document.createElement('div'); card.className = `kanban-card ${task.phase} ${task.critical ? 'critical' : ''}`; card.draggable = true; card.dataset.taskId = task.id;
+      card.innerHTML = `<div class="kanban-card-title">${escapeHtml(task.title)}</div>
+        <div class="kanban-card-meta"><span class="tag tag-${task.phase}">${PHASES[task.phase].name.split(' ')[0]}</span><span class="tag tag-duration">${task.duration}j</span>${task.critical ? '<span class="tag tag-critical">Critique</span>' : ''}</div>
+        ${task.blockReason && status === 'blocked' ? `<div style="font-size:11px;color:#991b1b;margin-top:6px"><strong>Blocage:</strong> ${escapeHtml(task.blockReason)}</div>` : ''}
+        <div class="kanban-card-actions"><button class="card-btn" onclick="editTask(${task.id})">Modifier</button>${status !== 'done' ? `<button class="card-btn done" onclick="moveTask(${task.id}, 'done')">Fait</button>` : ''}${status !== 'blocked' && status !== 'done' ? `<button class="card-btn block" onclick="moveTask(${task.id}, 'blocked')">Bloquer</button>` : ''}${status === 'blocked' ? `<button class="card-btn" onclick="moveTask(${task.id}, 'progress')">Debloquer</button>` : ''}</div>`;
+      card.addEventListener('dragstart', () => card.classList.add('dragging'));
+      card.addEventListener('dragend', () => card.classList.remove('dragging'));
+      container.appendChild(card);
+    });
+    container.addEventListener('dragover', e => { e.preventDefault(); container.style.background = 'rgba(30,58,95,0.1)'; });
+    container.addEventListener('dragleave', () => { container.style.background = ''; });
+    container.addEventListener('drop', e => { e.preventDefault(); container.style.background = ''; const dragging = document.querySelector('.dragging'); if (dragging) moveTask(parseInt(dragging.dataset.taskId), status); });
+  });
+}
+
+function renderBlocages() {
+  const blocked = state.tasks.filter(t => t.status === 'blocked');
+  if (blocked.length === 0) { document.getElementById('blocagesList').innerHTML = '<p style="color: var(--gray-500); font-style: italic; text-align: center; padding: 20px;">Aucune tache bloquee actuellement.</p>'; return; }
+  document.getElementById('blocagesList').innerHTML = blocked.map(t => `<div class="blocage-item"><div class="blocage-header"><span class="blocage-title">${escapeHtml(t.title)}</span></div><div class="blocage-cause"><strong>Phase :</strong> ${PHASES[t.phase].name}<br><strong>Cause du blocage :</strong> ${escapeHtml(t.blockReason) || 'Non specifiee'}</div><div class="blocage-action"><strong>Action suggeree :</strong> ${getSuggestedAction(t)}</div><div style="margin-top:12px"><button class="btn btn-success" style="padding:8px 16px;font-size:13px" onclick="moveTask(${t.id},'progress')">Debloquer</button><button class="btn btn-secondary" style="padding:8px 16px;font-size:13px;margin-left:8px" onclick="editTask(${t.id})">Modifier</button></div></div>`).join('');
+}
+function getSuggestedAction(task) { if (!task.blockReason) return 'Identifier la cause du blocage'; const r = task.blockReason.toLowerCase(); if (r.includes('attente')) return 'Relancer sous 48h'; if (r.includes('commission') || r.includes('oec')) return 'Delai incompressible - preparer etapes suivantes'; if (r.includes('formation')) return 'Planifier session de formation'; return 'Contacter la personne concernee'; }
+
+function renderSimulation() {
+  const select = document.getElementById('simTask'); const currentValue = select.value;
+  select.innerHTML = '<option value="">Selectionner une tache...</option>';
+  state.tasks.filter(t => t.status !== 'done').forEach(t => { const option = document.createElement('option'); option.value = t.id; option.textContent = `${t.title} (${t.duration}j)${t.critical ? ' - CRITIQUE' : ''}`; select.appendChild(option); });
+  if (currentValue) select.value = currentValue;
+}
+function runSimulation() {
+  const taskId = parseInt(document.getElementById('simTask').value); const delay = parseInt(document.getElementById('simDelay').value) || 7;
+  if (!taskId) { document.getElementById('simulationResult').innerHTML = `<h5>Impact du retard</h5><p class="simulation-impact">Selectionnez une tache.</p>`; document.getElementById('simulationDetails').innerHTML = '<p style="color: var(--gray-500); font-style: italic;">Lancez une simulation.</p>'; return; }
+  const task = state.tasks.find(t => t.id === taskId); if (!task) return;
+  const impactOnLaunch = task.critical ? delay : 0;
+  let resultText = '';
+  if (impactOnLaunch > 0) { resultText = `<p class="simulation-impact danger">Retard de <strong>${delay} jours</strong> sur "${escapeHtml(task.title)}"</p><p class="simulation-impact danger">Impact sur le lancement : <strong>+${impactOnLaunch} jours</strong> (tache critique)</p><p class="simulation-impact danger">Nouvelle date estimee : ${getNewLaunchDate(delay)}</p>`; }
+  else { resultText = `<p class="simulation-impact success">Retard de <strong>${delay} jours</strong> sur "${escapeHtml(task.title)}"</p><p class="simulation-impact success">Impact sur le lancement : <strong>Aucun</strong> (tache non critique, marge absorbable)</p>`; }
+  document.getElementById('simulationResult').innerHTML = `<h5>Impact du retard</h5>${resultText}`;
+  document.getElementById('simulationDetails').innerHTML = `<div style="background: var(--gray-50); padding: 16px; border-radius: 8px;"><p><strong>Tache :</strong> ${escapeHtml(task.title)}</p><p><strong>Phase :</strong> ${PHASES[task.phase].name}</p><p><strong>Duree initiale :</strong> ${task.duration} jours</p><p><strong>Critique :</strong> ${task.critical ? 'Oui - sur le chemin critique' : 'Non - marge disponible'}</p></div>`;
+}
+function getNewLaunchDate(delay) { if (!state.launchDate) return 'Non definie'; const d = new Date(state.launchDate); d.setDate(d.getDate() + delay); return d.toLocaleDateString('fr-FR'); }
+
+function renderChecklist() {
+  const categories = [
+    { key: 'conformite', containerId: 'conformiteChecklist', progressId: 'conformiteProgress' },
+    { key: 'admin', containerId: 'adminChecklist', progressId: 'adminProgress' },
+    { key: 'si', containerId: 'siChecklist', progressId: 'siProgress' },
+    { key: 'commercial', containerId: 'commercialChecklist', progressId: 'commercialProgress' }
+  ];
+  categories.forEach(cat => {
+    const items = CHECKLIST_DATA[cat.key]; const container = document.getElementById(cat.containerId);
+    const progressEl = document.getElementById(cat.progressId);
+    const checked = items.filter(item => state.checklist[item.id]).length;
+    progressEl.textContent = `${checked}/${items.length} valides`;
+    container.innerHTML = items.map(item => {
+      const isChecked = state.checklist[item.id];
+      return `<div class="checklist-item ${isChecked ? 'checked' : ''}"><input type="checkbox" id="${item.id}" ${isChecked ? 'checked' : ''} onchange="toggleChecklist('${item.id}')"><label for="${item.id}">${escapeHtml(item.label)}</label><div class="item-ref">${item.ref}</div></div>`;
+    }).join('');
+  });
+}
+
+function renderDecisions() {
+  if (state.decisions.length === 0) { document.getElementById('decisionsList').innerHTML = '<p style="color: var(--gray-500); font-style: italic;">Aucune decision documentee.</p>'; return; }
+  document.getElementById('decisionsList').innerHTML = state.decisions.map(d => `<div class="decision-entry"><div class="date">${new Date(d.date).toLocaleDateString('fr-FR')}<span class="type-badge ${d.type}">${d.type}</span></div><div class="title">${escapeHtml(d.title)}</div>${d.context ? `<div class="details"><strong>Contexte :</strong> ${escapeHtml(d.context)}</div>` : ''}${d.impact ? `<div class="details"><strong>Impact :</strong> ${escapeHtml(d.impact)}</div>` : ''}</div>`).join('');
+}
+
+// =====================================================
+// PDF EXPORT — RECENTRÉ PLANIFICATION (SANS DONNÉES FINANCIÈRES)
+// =====================================================
+function showLoading() { document.getElementById('loadingOverlay').classList.add('show'); }
+function hideLoading() { document.getElementById('loadingOverlay').classList.remove('show'); }
+function cleanText(text) { if (!text) return ''; return String(text).replace(/[\u{1F300}-\u{1F9FF}]/gu, '').replace(/[\u{2600}-\u{26FF}]/gu, '').replace(/[\u{2700}-\u{27BF}]/gu, '').replace(/[éèêë]/g, 'e').replace(/[ÉÈÊË]/g, 'E').replace(/[àâä]/g, 'a').replace(/[ÀÂÄ]/g, 'A').replace(/[ùûü]/g, 'u').replace(/[ÙÛÜ]/g, 'U').replace(/[îï]/g, 'i').replace(/[ÎÏ]/g, 'I').replace(/[ôö]/g, 'o').replace(/[ÔÖ]/g, 'O').replace(/[ç]/g, 'c').replace(/[Ç]/g, 'C').replace(/[œ]/g, 'oe').replace(/[Œ]/g, 'OE').replace(/[æ]/g, 'ae').replace(/[Æ]/g, 'AE').replace(/€/g, 'EUR').replace(/['']/g, "'").replace(/[""]/g, '"').replace(/[…]/g, '...').replace(/[–—]/g, '-').replace(/[•]/g, '-').replace(/\u00A0/g, ' ').replace(/\u202F/g, ' ').replace(/[\u2000-\u200F]/g, ' ').trim(); }
+
+function exportPDF() {
+  showLoading();
+  setTimeout(function() {
+    try {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF('p', 'mm', 'a4');
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      const margin = 15; const contentWidth = pageWidth - 2 * margin;
+      let y = 0; let pageNum = 1;
+      const colors = { primary: [30, 58, 95], primaryLight: [45, 90, 138], secondary: [13, 148, 136], accent: [245, 158, 11], danger: [220, 38, 38], success: [5, 150, 105], warning: [217, 119, 6], gray700: [55, 65, 81], gray500: [107, 114, 128], gray200: [229, 231, 235], white: [255, 255, 255], phase1: [220, 38, 38], phase2: [124, 58, 237], phase3: [37, 99, 235], phase4: [5, 150, 105] };
+
+      function addFooter() { doc.setDrawColor(...colors.gray200); doc.setLineWidth(0.3); doc.line(margin, pageHeight - 15, pageWidth - margin, pageHeight - 15); doc.setFontSize(8); doc.setTextColor(...colors.gray500); doc.setFont('helvetica', 'normal'); doc.text('Annexe 9 - Planification des taches | Memoire DEC', margin, pageHeight - 10); doc.text('Page ' + pageNum, pageWidth - margin - 15, pageHeight - 10); }
+      function checkNewPage(neededHeight) { if (y + neededHeight > pageHeight - 25) { addFooter(); doc.addPage(); pageNum++; y = 20; return true; } return false; }
+      function drawSectionHeader(title, iconColor) { checkNewPage(15); doc.setFillColor(...(iconColor || colors.primary)); doc.roundedRect(margin, y, contentWidth, 10, 2, 2, 'F'); doc.setTextColor(...colors.white); doc.setFontSize(11); doc.setFont('helvetica', 'bold'); doc.text(cleanText(title), margin + 5, y + 7); y += 15; doc.setTextColor(...colors.gray700); }
+      function drawSubHeader(title) { checkNewPage(10); doc.setFontSize(10); doc.setFont('helvetica', 'bold'); doc.setTextColor(...colors.primary); doc.text(cleanText(title), margin, y); y += 7; doc.setTextColor(...colors.gray700); doc.setFont('helvetica', 'normal'); }
+      function drawText(text, indent = 0) { doc.setFontSize(9); doc.setFont('helvetica', 'normal'); doc.setTextColor(...colors.gray700); const lines = doc.splitTextToSize(cleanText(text), contentWidth - indent); lines.forEach(line => { checkNewPage(5); doc.text(line, margin + indent, y); y += 4.5; }); }
+      function drawTable(headers, rows, colWidths, options = {}) {
+        const { headerColor = colors.primary } = options; const tableWidth = colWidths.reduce((a, b) => a + b, 0);
+        const rowHeight = 7; const headerHeight = 8; checkNewPage(headerHeight + (rows.length * rowHeight) + 10);
+        let x = margin; doc.setFillColor(...headerColor); doc.rect(x, y, tableWidth, headerHeight, 'F');
+        doc.setFontSize(8); doc.setFont('helvetica', 'bold'); doc.setTextColor(...colors.white);
+        headers.forEach((header, i) => { doc.text(cleanText(header), x + 2, y + 5.5); x += colWidths[i]; }); y += headerHeight;
+        rows.forEach((row, rowIndex) => { checkNewPage(rowHeight); x = margin;
+          doc.setFillColor(rowIndex % 2 === 0 ? 250 : 255, rowIndex % 2 === 0 ? 251 : 255, rowIndex % 2 === 0 ? 252 : 255);
+          doc.rect(x, y, tableWidth, rowHeight, 'F'); doc.setFontSize(8); doc.setFont('helvetica', 'normal'); doc.setTextColor(...colors.gray700);
+          row.forEach((cell, colIndex) => { let cellText = cleanText(String(cell || '')); const maxWidth = colWidths[colIndex] - 4; while (doc.getTextWidth(cellText) > maxWidth && cellText.length > 3) { cellText = cellText.slice(0, -4) + '...'; } doc.text(cellText, x + 2, y + 5); x += colWidths[colIndex]; }); y += rowHeight; });
+        doc.setDrawColor(...colors.gray200); doc.setLineWidth(0.3); doc.rect(margin, y - (rows.length * rowHeight) - headerHeight, tableWidth, (rows.length * rowHeight) + headerHeight); y += 5;
+      }
+
+      // ==================== PAGE 1 : COUVERTURE ====================
+      doc.setFillColor(...colors.primary); doc.rect(0, 0, pageWidth, 50, 'F');
+      doc.setFillColor(...colors.primaryLight); doc.rect(pageWidth * 0.6, 0, pageWidth * 0.4, 50, 'F');
+      doc.setTextColor(...colors.white); doc.setFontSize(24); doc.setFont('helvetica', 'bold'); doc.text('ANNEXE 9', margin, 22);
+      doc.setFontSize(14); doc.setFont('helvetica', 'normal'); doc.text('Aide a la planification des taches', margin, 32);
+      doc.setFontSize(10); doc.text('Outil de pilotage operationnel - Creation cabinet EC', margin, 42);
+      y = 60;
+
+      const stats = getStats(); const phaseStats = getPhaseStats(); const top3 = getTop3Actions();
+
+      // SECTION 1 : SYNTHÈSE AVANCEMENT
+      drawSectionHeader('1. SYNTHESE DE L\'AVANCEMENT', colors.primary);
+      const kpiData = [ { label: 'Taches totales', value: String(stats.total), color: colors.primary }, { label: 'Terminees (' + stats.pct + '%)', value: String(stats.done), color: colors.success }, { label: 'En cours', value: String(stats.progress), color: colors.warning }, { label: 'Bloquees', value: String(stats.blocked), color: colors.danger } ];
+      const kpiWidth = (contentWidth - 15) / 4; let kpiX = margin;
+      kpiData.forEach((kpi) => { doc.setFillColor(...colors.white); doc.setDrawColor(...colors.gray200); doc.roundedRect(kpiX, y, kpiWidth, 22, 2, 2, 'FD'); doc.setFontSize(16); doc.setFont('helvetica', 'bold'); doc.setTextColor(...kpi.color); doc.text(kpi.value, kpiX + kpiWidth/2, y + 10, { align: 'center' }); doc.setFontSize(8); doc.setFont('helvetica', 'normal'); doc.setTextColor(...colors.gray500); doc.text(kpi.label, kpiX + kpiWidth/2, y + 17, { align: 'center' }); kpiX += kpiWidth + 5; });
+      y += 30;
+
+      // AVANCEMENT PAR PHASE
+      drawSubHeader('Avancement par phase');
+      drawTable(['Phase', 'Taches', 'Terminees', 'En cours', 'Bloquees', 'Avancement'],
+        Object.keys(PHASES).map(key => { const ps = phaseStats[key]; return [PHASES[key].name, String(ps.total), String(ps.done), String(ps.progress), String(ps.blocked), ps.pct + '%']; }),
+        [55, 20, 25, 22, 22, 26]);
+
+      if (state.launchDate) { const launch = new Date(state.launchDate); const today = new Date(); const daysRemaining = Math.ceil((launch - today) / (1000 * 60 * 60 * 24)); checkNewPage(15); doc.setFillColor(254, 243, 199); doc.roundedRect(margin, y, contentWidth, 12, 2, 2, 'F'); doc.setFontSize(10); doc.setFont('helvetica', 'bold'); doc.setTextColor(146, 64, 14); doc.text('Date de lancement : ' + launch.toLocaleDateString('fr-FR') + ' | J-' + (daysRemaining > 0 ? daysRemaining : 0), margin + 5, y + 8); y += 18; }
+
+      // ==================== PAGE 2 : TOP 3 + TÂCHES ====================
+      drawSectionHeader('2. TOP 3 ACTIONS PRIORITAIRES', colors.danger);
+      if (top3.length > 0) { top3.forEach((t, i) => { drawText((i+1) + '. ' + t.title + ' (' + PHASES[t.phase].name + ')' + (t.critical ? ' - CRITIQUE' : '') + (t.status === 'blocked' ? ' - BLOQUEE' : '')); }); } else { drawText('Aucune tache enregistree.'); }
+      y += 5;
+
+      drawSectionHeader('3. DETAIL DES TACHES PAR STATUT', colors.secondary);
+      const statusGroups = [ { key: 'blocked', label: 'Bloquees', color: colors.danger }, { key: 'progress', label: 'En cours', color: colors.warning }, { key: 'todo', label: 'A faire', color: colors.gray500 }, { key: 'done', label: 'Terminees', color: colors.success } ];
+      statusGroups.forEach(status => {
+        const tasks = state.tasks.filter(t => t.status === status.key); if (tasks.length === 0) return;
+        checkNewPage(15); doc.setFillColor(...status.color); doc.roundedRect(margin, y, contentWidth, 8, 1, 1, 'F');
+        doc.setTextColor(...colors.white); doc.setFontSize(9); doc.setFont('helvetica', 'bold'); doc.text(status.label + ' (' + tasks.length + ')', margin + 5, y + 5.5); y += 12;
+        drawTable(['Tache', 'Phase', 'Duree', 'Critique'],
+          tasks.slice(0, 15).map(t => [cleanText(t.title).substring(0, 45), PHASES[t.phase].name.split(' ')[0], t.duration + 'j', t.critical ? 'Oui' : 'Non']),
+          [80, 35, 25, 30], { headerColor: status.color });
+      });
+
+      // ==================== PAGE 3 : CHECKLIST ====================
+      addFooter(); doc.addPage(); pageNum++; y = 20;
+      drawSectionHeader('4. CHECKLIST DE CONFORMITE', colors.secondary);
+      const checklistCategories = [ { key: 'conformite', label: 'Conformite reglementaire', color: colors.phase2 }, { key: 'admin', label: 'Administratif & Juridique', color: colors.phase1 }, { key: 'si', label: 'Infrastructure SI', color: colors.phase3 }, { key: 'commercial', label: 'Commercial & Lancement', color: colors.phase4 } ];
+      checklistCategories.forEach(cat => {
+        const items = CHECKLIST_DATA[cat.key]; const checkedCount = items.filter(item => state.checklist[item.id]).length;
+        checkNewPage(15 + items.length * 7);
+        doc.setFillColor(...cat.color); doc.roundedRect(margin, y, contentWidth * 0.7, 7, 1, 1, 'F');
+        doc.setTextColor(...colors.white); doc.setFontSize(9); doc.setFont('helvetica', 'bold'); doc.text(cat.label, margin + 3, y + 5);
+        doc.setFillColor(...colors.white); doc.roundedRect(margin + contentWidth * 0.72, y, 25, 7, 1, 1, 'F');
+        doc.setTextColor(...cat.color); doc.setFontSize(8); doc.text(checkedCount + '/' + items.length, margin + contentWidth * 0.72 + 12.5, y + 5, { align: 'center' }); y += 12;
+        drawTable(['Element', 'Reference', 'Statut'],
+          items.map(item => [cleanText(item.label).substring(0, 50), cleanText(item.ref).substring(0, 35), state.checklist[item.id] ? 'OK' : 'A faire']),
+          [80, 55, 35], { headerColor: cat.color });
+      });
+
+      // ==================== PAGE 4 : HISTORIQUE DECISIONS ====================
+      if (state.decisions.length > 0) {
+        addFooter(); doc.addPage(); pageNum++; y = 20;
+        drawSectionHeader('5. HISTORIQUE DES DECISIONS', colors.primary);
+        drawText('Tracabilite des arbitrages et decisions operationnelles prises durant le projet de creation.'); y += 5;
+        drawTable(['Date', 'Type', 'Decision', 'Impact'],
+          state.decisions.slice(0, 15).map(d => [new Date(d.date).toLocaleDateString('fr-FR'), d.type, cleanText(d.title).substring(0, 35), cleanText(d.impact).substring(0, 35) || '-']),
+          [25, 25, 60, 60]);
+      }
+
+      addFooter();
+      doc.save('Annexe_9_Planification_Taches.pdf');
+      hideLoading(); toast('PDF exporte avec succes !', 'success');
+    } catch (e) { hideLoading(); console.error('Erreur PDF:', e); alert('Erreur lors de la generation du PDF : ' + e.message); }
+  }, 300);
+}
+
+// =====================================================
+// INIT
+// =====================================================
+document.addEventListener('DOMContentLoaded', function() { loadState(); renderAll(); });
+</script>
+</body>
+</html>

@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Annexe 19 — Fiche de poste détaillée en fonction du besoin et du profil recherché</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root{--p:#1e3a5f;--pl:#2d5a8a;--s:#0d9488;--sl:#14b8a6;--a:#f59e0b;--d:#dc2626;--ok:#059669;--w:#d97706;--inf:#2563eb;--pu:#7c3aed;--g50:#f9fafb;--g100:#f3f4f6;--g200:#e5e7eb;--g300:#d1d5db;--g500:#6b7280;--g700:#374151;--g800:#1f2937;--r:14px;--sh:0 4px 6px -1px rgb(0 0 0/.08),0 2px 4px -2px rgb(0 0 0/.05)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:linear-gradient(135deg,var(--g100),#e0e7ef);color:var(--g700);line-height:1.65;min-height:100vh;font-size:15px}
+.mx{max-width:1200px;margin:0 auto;padding:24px}
+
+/* HEADER */
+.hd{background:linear-gradient(135deg,var(--p),var(--pl));color:#fff;border-radius:var(--r);padding:28px 32px;margin-bottom:22px;position:relative;overflow:hidden}
+.hd::before{content:"";position:absolute;top:-50%;right:-10%;width:300px;height:300px;background:rgba(255,255,255,.04);border-radius:50%}
+.hd h1{font-size:22px;font-weight:700;margin-bottom:6px;position:relative}
+.hd p{opacity:.85;font-size:14px;position:relative;line-height:1.5}
+.badges{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.badge{background:rgba(255,255,255,.15);padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:.3px}
+.retour{display:inline-block;margin-top:12px;color:rgba(255,255,255,.7);font-size:13px;text-decoration:none;transition:color .15s}
+.retour:hover{color:#fff}
+
+/* PROGRESS BAR */
+.pbar-wrap{background:#fff;border-radius:var(--r);padding:14px 20px;margin-bottom:16px;box-shadow:var(--sh);display:flex;align-items:center;gap:16px}
+.pbar-wrap .plab{font-size:13px;font-weight:700;color:var(--p);white-space:nowrap}
+.pbar{flex:1;height:10px;background:var(--g200);border-radius:10px;overflow:hidden}
+.pbar-fill{height:100%;background:linear-gradient(90deg,var(--s),var(--sl));border-radius:10px;transition:width .4s ease}
+.ppct{font-size:15px;font-weight:700;color:var(--s);min-width:42px;text-align:right}
+
+/* FLUX */
+.flux{background:#fff;border-radius:var(--r);padding:16px 20px;margin-bottom:16px;box-shadow:var(--sh);display:flex;align-items:center;justify-content:center;gap:0;flex-wrap:wrap}
+.flux-item{text-align:center;padding:8px 18px}
+.flux-item .fx-n{font-size:12px;font-weight:700;color:var(--p);text-transform:uppercase;letter-spacing:.5px}
+.flux-item .fx-v{font-size:11px;color:var(--ok);font-weight:700;text-transform:uppercase;margin-top:2px}
+.flux-item .fx-t{font-size:13px;color:var(--g500)}
+.flux-item.cur{background:#eff6ff;border-radius:10px;border:2px solid var(--p)}
+.flux-item.cur .fx-t{color:var(--p);font-weight:600}
+.flux-arr{font-size:18px;color:var(--g300);padding:0 6px}
+
+/* STEP NAV */
+.steps{display:flex;background:#fff;border-radius:var(--r);box-shadow:var(--sh);margin-bottom:16px;overflow:hidden}
+.step{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:16px 10px;font-size:14px;font-weight:600;color:var(--g500);cursor:pointer;transition:all .2s;border-bottom:3px solid transparent;text-align:center}
+.step:hover{background:var(--g50)}
+.step.on{color:var(--p);border-bottom-color:var(--p);background:#eff6ff}
+.step.ok2{color:var(--ok);border-bottom-color:var(--ok)}
+.step .sn{width:28px;height:28px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;background:var(--g200);color:var(--g500);flex-shrink:0}
+.step.on .sn{background:var(--p);color:#fff}
+.step.ok2 .sn{background:var(--ok);color:#fff}
+
+/* TOOLBAR */
+.tb{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.bt{display:inline-flex;align-items:center;gap:6px;padding:10px 18px;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;transition:all .15s}
+.bp{background:var(--p);color:#fff}.bp:hover{background:var(--pl)}
+.bs{background:var(--g200);color:var(--g700)}.bs:hover{background:var(--g300)}
+.bw{background:var(--a);color:#fff;font-size:14px;padding:12px 22px}.bw:hover{background:#d97706}
+.bok{background:var(--ok);color:#fff}.bok:hover{opacity:.9}
+
+/* PANELS */
+.pn{display:none;animation:fi .25s ease}.pn.on{display:block}
+@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* CARDS */
+.cd{background:#fff;border-radius:var(--r);padding:22px;box-shadow:var(--sh);margin-bottom:18px}
+.cd h3{font-size:17px;font-weight:700;color:var(--g800);margin-bottom:6px}
+.cd .sub{font-size:13px;color:var(--g500);margin-bottom:14px;line-height:1.5}
+.gr{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:18px}
+
+/* HINTS */
+.hnt{padding:14px 18px;border-radius:10px;font-size:14px;margin-bottom:16px;display:flex;gap:12px;align-items:flex-start;line-height:1.55}
+.hnt .ico{font-size:20px;flex-shrink:0;line-height:1}
+.hnt.blue{background:#eff6ff;border:1px solid #bfdbfe}
+.hnt.green{background:#ecfdf5;border:1px solid #a7f3d0}
+.hnt.amber{background:#fef3c7;border:1px solid #fde68a}
+.hnt.purple{background:#f5f3ff;border:1px solid #ddd6fe}
+.hnt.red{background:#fef2f2;border:1px solid #fecaca}
+
+/* FORMS */
+.fg{margin-bottom:14px}
+.fg label{display:block;font-size:12px;font-weight:600;color:var(--g500);margin-bottom:5px;text-transform:uppercase;letter-spacing:.4px}
+.fg input,.fg select,.fg textarea{width:100%;padding:11px 14px;border:2px solid var(--g200);border-radius:10px;font-size:15px;font-family:inherit;transition:border .15s}
+.fg textarea{resize:vertical;min-height:55px}
+.fg input:focus,.fg select:focus,.fg textarea:focus{outline:none;border-color:var(--p)}
+.fr{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+
+/* TABLES */
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{background:var(--p);color:#fff;padding:11px 12px;text-align:left;font-weight:600;font-size:13px}
+th:first-child{border-radius:10px 0 0 0}th:last-child{border-radius:0 10px 0 0}
+td{padding:11px 12px;border-bottom:1px solid var(--g200)}
+tr:hover td{background:var(--g50)}
+
+/* PROFILE CARDS */
+.pgr{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.pc{padding:16px;border-radius:12px;border:2px solid var(--g200);cursor:pointer;transition:all .15s;text-align:center}
+.pc:hover{border-color:var(--pl);background:var(--g50);transform:translateY(-2px)}
+.pc.on{border-color:var(--s);background:#ecfdf5}
+.pc .pi{font-size:30px;margin-bottom:8px}
+.pc h4{font-size:14px;font-weight:700;color:var(--g800);margin-bottom:3px}
+.pc p{font-size:12px;color:var(--g500)}
+.pc .pb{display:inline-block;margin-top:6px;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600;background:var(--g100);color:var(--g500)}
+.pc.on .pb{background:#d1fae5;color:var(--ok)}
+.pc .ptag{display:inline-block;margin-top:4px;padding:2px 8px;border-radius:8px;font-size:9px;font-weight:700;text-transform:uppercase}
+.ptag.t1{background:#dbeafe;color:#1d4ed8}.ptag.t2{background:#fef3c7;color:#92400e}
+
+/* COMPETENCE TAGS */
+.ctags{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;margin-bottom:12px}
+.ctag{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;border:2px solid var(--g200);background:var(--g50);color:var(--g700);user-select:none}
+.ctag.on{border-color:var(--s);background:#ecfdf5;color:var(--s)}
+.ctag:hover{border-color:var(--pl)}
+.ctag.custom{border-style:dashed;position:relative}
+.ctag.custom.on{border-style:solid}
+.ctag .del-tag{display:none;margin-left:6px;color:var(--d);font-weight:700;cursor:pointer;font-size:14px;line-height:1}
+.ctag.custom .del-tag{display:inline}
+
+/* ADD TAG ROW */
+.add-tag-row{display:flex;gap:8px;margin-top:8px;align-items:center}
+.add-tag-row input{flex:1;padding:8px 12px;border:2px dashed var(--g300);border-radius:10px;font-size:13px;font-family:inherit;transition:border .15s;background:var(--g50)}
+.add-tag-row input:focus{outline:none;border-color:var(--s);background:#fff}
+.add-tag-row button{padding:8px 16px;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;background:var(--s);color:#fff;transition:all .15s;white-space:nowrap}
+.add-tag-row button:hover{background:var(--sl)}
+
+/* MISSION ROWS */
+.mr{display:flex;gap:10px;margin-bottom:8px;align-items:flex-start}
+.mr textarea{flex:1;min-height:40px;padding:10px 12px;border:2px solid var(--g200);border-radius:10px;font-size:14px;font-family:inherit;resize:vertical}
+.mr textarea:focus{border-color:var(--p);outline:none}
+.mr .md{width:30px;height:30px;border-radius:8px;border:none;background:var(--d);color:#fff;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:5px;opacity:.6;transition:opacity .15s}
+.mr .md:hover{opacity:1}
+
+/* CHECKLIST */
+.ck{display:flex;align-items:flex-start;gap:12px;padding:10px 12px;border-radius:10px;cursor:pointer;transition:all .15s;margin-bottom:4px}
+.ck:hover{background:var(--g50)}
+.ck.dn{background:#ecfdf5}
+.ckb{width:22px;height:22px;border:2px solid var(--g300);border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;font-size:13px;font-weight:700;color:#fff;transition:all .15s}
+.ck.dn .ckb{background:var(--ok);border-color:var(--ok)}
+.ck-t{font-size:14px;font-weight:600;color:var(--g800)}
+.ck-r{font-size:12px;color:var(--g500);font-style:italic}
+
+/* SUMMARY */
+.sum{background:linear-gradient(135deg,var(--p),var(--pl));color:#fff;border-radius:var(--r);padding:24px;margin-bottom:18px}
+.sum h3{color:#fff;margin-bottom:12px;font-size:17px}
+.sum-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.15);font-size:15px}
+.sum-row:last-child{border:none}
+.sum-l{opacity:.75}.sum-v{font-weight:600;text-align:right;max-width:60%}
+
+/* VERDICT */
+.verdict{border-radius:14px;padding:20px 24px;margin-bottom:18px;text-align:center}
+.verdict.go{background:linear-gradient(135deg,#ecfdf5,#d1fae5);border:2px solid #6ee7b7}
+.verdict.warn{background:linear-gradient(135deg,#fef3c7,#fde68a);border:2px solid #fbbf24}
+.verdict.nogo{background:linear-gradient(135deg,#fef2f2,#fecaca);border:2px solid #f87171}
+.verdict h3{font-size:20px;font-weight:700;margin-bottom:4px}
+.verdict p{font-size:14px;line-height:1.55}
+.verdict.go h3{color:#065f46}.verdict.go p{color:#047857}
+.verdict.warn h3{color:#92400e}.verdict.warn p{color:#a16207}
+.verdict.nogo h3{color:#991b1b}.verdict.nogo p{color:#dc2626}
+
+.nav{display:flex;justify-content:space-between;margin-top:18px;gap:10px}
+.to{position:fixed;bottom:24px;right:24px;background:var(--g800);color:#fff;padding:12px 20px;border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,.2);transform:translateY(80px);opacity:0;transition:all .25s;z-index:9999;font-size:14px;font-weight:500}
+.to.sh{transform:translateY(0);opacity:1}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:99999;display:none;align-items:center;justify-content:center}
+.ov.sh{display:flex}
+.ovc{background:#fff;padding:32px;border-radius:16px;text-align:center}
+.sp{width:40px;height:40px;margin:0 auto 14px;border:3px solid var(--g200);border-top-color:var(--p);border-radius:50%;animation:spn .8s linear infinite}
+@keyframes spn{to{transform:rotate(360deg)}}
+@media(max-width:768px){.mx{padding:14px}.gr,.fr,.pgr{grid-template-columns:1fr}.steps{flex-wrap:wrap}.step{font-size:12px;padding:12px 6px}.flux{flex-direction:column;gap:4px}.flux-arr{transform:rotate(90deg)}}
+</style>
+</head>
+<body>
+<div class="mx">
+
+<!-- HEADER -->
+<div class="hd">
+  <h1>Annexe 19 — Fiche de poste détaillée en fonction du besoin et du profil recherché</h1>
+  <p>Formaliser le besoin de recrutement : profil, compétences, conditions de travail et conformité réglementaire pour un cabinet 100 % numérique.</p>
+  <div class="badges">
+    <span class="badge">Partie III, Chap. 1, §1.1</span>
+    <span class="badge">Convention IDCC 0787</span>
+    <span class="badge">NPMQ §22, A22-1 à A22-4</span>
+    <span class="badge">Art. 148 Déontologie OEC</span>
+    <span class="badge">RGPD art. 5, 13, 17</span>
+  </div>
+  <a href="#" class="retour" title="Lien vers le corps du mémoire">&#8592; Retour au mémoire — Partie III, Chapitre 1, Section 1, §1.1</a>
+</div>
+
+<!-- PROGRESS BAR -->
+<div class="pbar-wrap">
+  <div class="plab">Avancement</div>
+  <div class="pbar"><div class="pbar-fill" id="pbarFill" style="width:0%"></div></div>
+  <div class="ppct" id="ppct">0 %</div>
+</div>
+
+<!-- FLUX ANNEXES -->
+<div class="flux">
+  <div class="flux-item cur"><div class="fx-n">Annexe 19</div><div class="fx-v">Définir</div><div class="fx-t">Fiche de poste</div></div>
+  <div class="flux-arr">&#10132;</div>
+  <div class="flux-item"><div class="fx-n">Annexe 18</div><div class="fx-v">Chercher</div><div class="fx-t">Plan de sourcing</div></div>
+  <div class="flux-arr">&#10132;</div>
+  <div class="flux-item"><div class="fx-n">Annexe 20</div><div class="fx-v">Évaluer</div><div class="fx-t">Tests et décision</div></div>
+  <div class="flux-arr">&#10132;</div>
+  <div class="flux-item"><div class="fx-n">Annexe 21</div><div class="fx-v">Intégrer</div><div class="fx-t">Onboarding</div></div>
+</div>
+
+<!-- STEP NAV -->
+<div class="steps" id="stepBar">
+  <div class="step on" onclick="go(1)"><span class="sn">1</span>Profil</div>
+  <div class="step" onclick="go(2)"><span class="sn">2</span>Poste & Missions</div>
+  <div class="step" onclick="go(3)"><span class="sn">3</span>Compétences</div>
+  <div class="step" onclick="go(4)"><span class="sn">4</span>Conditions</div>
+  <div class="step" onclick="go(5)"><span class="sn">5</span>Synthèse & Export</div>
+</div>
+
+<!-- TOOLBAR -->
+<div class="tb">
+  <button class="bt bw" onclick="loadCX()">&#9889; Cas pratique Cabinet X</button>
+  <button class="bt bp" onclick="xPDF()">&#128196; Export PDF</button>
+  <button class="bt bs" onclick="xJSON()">&#128190; JSON</button>
+  <input type="file" id="impF" accept=".json" style="display:none" onchange="iJSON(event)">
+  <button class="bt bs" onclick="document.getElementById('impF').click()">&#128194; Importer</button>
+  <button class="bt bs" onclick="resetAll()">&#8635; RAZ</button>
+</div>
+
+<!-- ═══════════ ÉTAPE 1 : PROFIL ═══════════ -->
+<div id="p1" class="pn on">
+  <div class="hnt blue"><div class="ico">&#128161;</div><div><strong>Choisissez un profil type</strong> pour pré-remplir la fiche, ou sélectionnez « Personnalisé » pour partir de zéro. Chaque profil correspond à un métier courant en cabinet 100 % numérique.</div></div>
+
+  <div class="hnt purple"><div class="ico">&#128279;</div><div><strong>Première étape du processus de recrutement.</strong> La fiche de poste formalisée ici alimentera directement le plan de sourcing (<strong>Annexe 18</strong>), puis l'évaluation des candidats (<strong>Annexe 20</strong>) et l'intégration (<strong>Annexe 21</strong>).</div></div>
+
+  <div class="cd">
+    <h3>Profils métier</h3>
+    <div class="sub">Cliquez sur un profil pour pré-remplir automatiquement les champs. Chaque champ reste entièrement modifiable.</div>
+    <div class="pgr" id="profGrid">
+      <div class="pc" onclick="selProf('assistant')" id="pr-assistant"><div class="pi">&#128214;</div><h4>Assistant comptable</h4><p>Junior (0-2 ans) — Saisie, lettrage, TVA</p><div class="pb">26 000 – 32 000 €</div><div class="ptag t1">1er recrutement</div></div>
+      <div class="pc" onclick="selProf('collaborateur')" id="pr-collaborateur"><div class="pi">&#128187;</div><h4>Collaborateur confirmé</h4><p>2-5 ans — Portefeuille autonome</p><div class="pb">34 000 – 42 000 €</div><div class="ptag t1">1er recrutement</div></div>
+      <div class="pc" onclick="selProf('senior')" id="pr-senior"><div class="pi">&#128200;</div><h4>Chef de mission</h4><p>Senior 5+ ans — Supervision, conseil</p><div class="pb">48 000 – 60 000 €</div><div class="ptag t2">Croissance</div></div>
+      <div class="pc" onclick="selProf('manager')" id="pr-manager"><div class="pi">&#128101;</div><h4>Manager</h4><p>8+ ans — Pilotage équipe et pôle</p><div class="pb">58 000 – 75 000 €</div><div class="ptag t2">Croissance</div></div>
+      <div class="pc" onclick="selProf('referent')" id="pr-referent"><div class="pi">&#9881;&#65039;</div><h4>Référent digital</h4><p>Expert — Transformation numérique</p><div class="pb">45 000 – 58 000 €</div><div class="ptag t2">Croissance</div></div>
+      <div class="pc" onclick="selProf('social')" id="pr-social"><div class="pi">&#128197;</div><h4>Gestionnaire paie</h4><p>Confirmé — SILAE, DSN, social</p><div class="pb">32 000 – 40 000 €</div><div class="ptag t1">1er recrutement</div></div>
+      <div class="pc" onclick="selProf('data')" id="pr-data"><div class="pi">&#128202;</div><h4>Data Analyst</h4><p>Expert — BI, automatisation</p><div class="pb">42 000 – 55 000 €</div><div class="ptag t2">Croissance</div></div>
+      <div class="pc" onclick="selProf('custom')" id="pr-custom"><div class="pi">&#9998;&#65039;</div><h4>Personnalisé</h4><p>Partir de zéro</p><div class="pb">Libre</div></div>
+    </div>
+    <div class="hnt green" style="margin-top:14px;margin-bottom:0"><div class="ico">&#128205;</div><div><strong>1er recrutement</strong> = profils adaptés à la phase de lancement (Annexe 4, Période 4 : M+6 à M+12). <strong>Croissance</strong> = profils de structuration ultérieure.</div></div>
+  </div>
+
+  <!-- MATRICE ADN NUMÉRIQUE -->
+  <div class="cd">
+    <h3>&#128300; Matrice des compétences numériques attendues par niveau</h3>
+    <div class="sub">Dans un cabinet 100 % numérique, chaque collaborateur doit maîtriser un socle digital proportionnel à son niveau de responsabilité. Source : NPMQ §22, A22-1 à A22-4.</div>
+    <div style="overflow-x:auto">
+    <table id="matNum">
+      <thead>
+        <tr>
+          <th style="width:18%">Niveau</th>
+          <th style="width:20%">Production cloud</th>
+          <th style="width:20%">Collaboration & relation client</th>
+          <th style="width:21%">Automatisation & data</th>
+          <th style="width:21%">Conformité & sécurité</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="font-weight:700;color:var(--p)">Junior</td>
+          <td>Utiliser les outils de production cloud (Pennylane, Dext). Déposer les pièces via portail. Maîtriser l'OCR.</td>
+          <td>Communiquer par Teams/Slack. Participer aux visios clients. Respecter la charte de communication.</td>
+          <td>Utiliser les modèles Excel du cabinet. Alimenter les tableaux de bord existants.</td>
+          <td>Appliquer les règles de sécurité de base (MFA, VPN). Respecter la politique RGPD interne.</td>
+        </tr>
+        <tr>
+          <td style="font-weight:700;color:var(--p)">Confirmé</td>
+          <td>Piloter un portefeuille full numérique. Paramétrer les workflows clients (collecte, rapprochement).</td>
+          <td>Gérer la relation client par visio et portail collaboratif. Animer les points périodiques.</td>
+          <td>Créer des automatisations simples (Zapier/Make). Exploiter Power Query pour les ETL clients.</td>
+          <td>Veiller au respect RGPD dans les échanges clients. Signaler les incidents cybersécurité.</td>
+        </tr>
+        <tr>
+          <td style="font-weight:700;color:var(--p)">Senior / Manager</td>
+          <td>Superviser la qualité numérique du pôle. Valider les paramétrages et automatisations.</td>
+          <td>Piloter des comités clients stratégiques en visio. Superviser la communication digitale du pôle.</td>
+          <td>Concevoir des tableaux de bord Power BI. Contrôler les indicateurs qualité NPMQ §22.</td>
+          <td>Mettre en œuvre les procédures de supervision (Art. 148). Conduire le changement numérique client.</td>
+        </tr>
+        <tr>
+          <td style="font-weight:700;color:var(--p)">Expert</td>
+          <td>Concevoir l'architecture SaaS du cabinet. Piloter les migrations d'outils et éditeurs.</td>
+          <td>Définir la stratégie de communication digitale du cabinet. Former les équipes aux outils.</td>
+          <td>Piloter les projets data, BI, IA. Concevoir les automatisations complexes (API, connecteurs).</td>
+          <td>Définir la politique cybersécurité (ANSSI). Piloter la conformité RGPD et facturation électronique.</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+  <div class="nav"><div></div><button class="bt bp" onclick="go(2)">Poste & Missions &#8594;</button></div>
+</div>
+
+<!-- ═══════════ ÉTAPE 2 : POSTE & MISSIONS ═══════════ -->
+<div id="p2" class="pn">
+  <div class="hnt blue"><div class="ico">&#128203;</div><div><strong>Informations du poste et missions.</strong> Les champs sont pré-remplis selon le profil sélectionné. Ajustez librement chaque information.</div></div>
+  <div class="gr">
+    <div class="cd">
+      <h3>Informations générales</h3>
+      <div class="fg"><label>Intitulé du poste</label><input type="text" id="fIntitule" placeholder="Ex : Collaborateur comptable confirmé — 100 % numérique"></div>
+      <div class="fr">
+        <div class="fg"><label>Service / Pôle</label><input type="text" id="fService" placeholder="Ex : Comptabilité"></div>
+        <div class="fg"><label>Niveau hiérarchique</label><select id="fNiveau"><option value="Junior">Junior</option><option value="Confirmé">Confirmé</option><option value="Senior">Senior</option><option value="Manager">Manager</option><option value="Expert">Expert</option></select></div>
+      </div>
+      <div class="fr">
+        <div class="fg"><label>Classification CC IDCC 0787</label><input type="text" id="fClassif" placeholder="Ex : T3 — Coef. 250"></div>
+        <div class="fg"><label>Rattachement hiérarchique</label><input type="text" id="fRattach" placeholder="Ex : Expert-comptable dirigeant"></div>
+      </div>
+      <div class="fg"><label>Type de contrat</label><select id="fContrat"><option value="CDI">CDI</option><option value="CDD">CDD</option><option value="Alternance (contrat d'apprentissage)">Alternance (apprentissage)</option><option value="Alternance (contrat de professionnalisation)">Alternance (professionnalisation)</option><option value="Stage">Stage</option></select></div>
+    </div>
+    <div class="cd">
+      <h3>Contexte</h3>
+      <div class="fg"><label>Présentation du cabinet</label><textarea id="fPresentation" rows="3" placeholder="Décrivez le cabinet, sa vision, son positionnement..."></textarea></div>
+      <div class="fg"><label>Contexte du recrutement</label><textarea id="fContexte" rows="3" placeholder="Pourquoi ce recrutement ? Croissance, remplacement, nouveau pôle..."></textarea></div>
+    </div>
+  </div>
+  <div class="gr">
+    <div class="cd">
+      <h3>Missions principales <button class="bt bs" onclick="addM('mP')" style="float:right;padding:5px 12px;font-size:12px">+ Ajouter</button></h3>
+      <div class="sub">Responsabilités clés du poste</div>
+      <div id="mP"></div>
+    </div>
+    <div class="cd">
+      <h3>Missions secondaires <button class="bt bs" onclick="addM('mS')" style="float:right;padding:5px 12px;font-size:12px">+ Ajouter</button></h3>
+      <div class="sub">Missions complémentaires et évolutives</div>
+      <div id="mS"></div>
+    </div>
+  </div>
+  <div class="nav"><button class="bt bs" onclick="go(1)">&#8592; Profil</button><button class="bt bp" onclick="go(3)">Compétences &#8594;</button></div>
+</div>
+
+<!-- ═══════════ ÉTAPE 3 : COMPÉTENCES ═══════════ -->
+<div id="p3" class="pn">
+  <div class="hnt blue"><div class="ico">&#128736;</div><div><strong>Sélectionnez les compétences requises.</strong> La NPMQ (§22, A22-1 à A22-4) impose à la structure de définir des procédures couvrant le recrutement, l'évaluation des compétences et la rémunération du personnel. <strong>Vous pouvez ajouter vos propres compétences</strong> via le champ « + Ajouter » sous chaque catégorie.</div></div>
+
+  <div class="cd">
+    <h3>Formation et expérience</h3>
+    <div class="fr">
+      <div class="fg"><label>Formation minimum requise</label><select id="fFormation"><option value="Bac+2 (BTS CG)">Bac+2 (BTS CG)</option><option value="Bac+3 (BUT GEA, DCG, Licence CCA)">Bac+3 (BUT GEA, DCG, Licence CCA)</option><option value="Bac+5 (DSCG, Master CCA)">Bac+5 (DSCG, Master CCA)</option><option value="DEC ou équivalent">DEC ou équivalent</option></select></div>
+      <div class="fg"><label>Expérience minimum en cabinet</label><select id="fExperience"><option value="Débutant accepté">Débutant accepté</option><option value="1 à 2 ans">1 à 2 ans</option><option value="2 à 3 ans">2 à 3 ans</option><option value="3 à 5 ans">3 à 5 ans</option><option value="5 ans et plus">5 ans et plus</option><option value="8 ans et plus">8 ans et plus</option></select></div>
+    </div>
+  </div>
+
+  <div class="cd">
+    <h3>Compétences techniques métier <span class="sub" id="cTech" style="float:right;margin:0"></span></h3>
+    <div class="ctags" id="tTech">
+      <div class="ctag" onclick="tTag(this)" data-g="tech">Normes PCG</div>
+      <div class="ctag" onclick="tTag(this)" data-g="tech">Fiscalité entreprises (TVA, IS, IR, CFE)</div>
+      <div class="ctag" onclick="tTag(this)" data-g="tech">Comptes annuels et liasses fiscales</div>
+      <div class="ctag" onclick="tTag(this)" data-g="tech">Révision comptable et contrôle de cohérence</div>
+      <div class="ctag" onclick="tTag(this)" data-g="tech">Droit des sociétés et formalités juridiques</div>
+      <div class="ctag" onclick="tTag(this)" data-g="tech">Paie et déclarations sociales (DSN)</div>
+    </div>
+    <div class="add-tag-row"><input type="text" id="addTech" placeholder="Ajouter une compétence technique..." onkeydown="if(event.key==='Enter')addCustomTag('tTech','addTech','tech')"><button onclick="addCustomTag('tTech','addTech','tech')">+ Ajouter</button></div>
+  </div>
+
+  <div class="cd">
+    <h3>Compétences numériques obligatoires <span class="sub" id="cNum" style="float:right;margin:0"></span></h3>
+    <div class="sub">Indispensables pour un cabinet 100 % dématérialisé</div>
+    <div class="ctags" id="tNum">
+      <div class="ctag" onclick="tTag(this)" data-g="num">Logiciels cloud (Pennylane, MyUnisoft, FULLL)</div>
+      <div class="ctag" onclick="tTag(this)" data-g="num">OCR et collecte (Dext, AutoEntry, Chaintrust)</div>
+      <div class="ctag" onclick="tTag(this)" data-g="num">Suite collaborative (Microsoft 365 / Google)</div>
+      <div class="ctag" onclick="tTag(this)" data-g="num">Excel avancé (TCD, Power Query)</div>
+      <div class="ctag" onclick="tTag(this)" data-g="num">Power BI / Data visualisation</div>
+      <div class="ctag" onclick="tTag(this)" data-g="num">Signature électronique (DocuSign, Yousign)</div>
+      <div class="ctag" onclick="tTag(this)" data-g="num">CRM (HubSpot, Salesforce)</div>
+      <div class="ctag" onclick="tTag(this)" data-g="num">IA générative (ChatGPT, Claude, Copilot)</div>
+      <div class="ctag" onclick="tTag(this)" data-g="num">Automatisation (Zapier, Make, Power Automate)</div>
+      <div class="ctag" onclick="tTag(this)" data-g="num">Paie cloud (SILAE, PayFit)</div>
+    </div>
+    <div class="add-tag-row"><input type="text" id="addNum" placeholder="Ajouter une compétence numérique..." onkeydown="if(event.key==='Enter')addCustomTag('tNum','addNum','num')"><button onclick="addCustomTag('tNum','addNum','num')">+ Ajouter</button></div>
+  </div>
+
+  <div class="cd">
+    <h3>Responsabilités numériques spécifiques <span class="sub" id="cResp" style="float:right;margin:0"></span></h3>
+    <div class="ctags" id="tResp">
+      <div class="ctag" onclick="tTag(this)" data-g="resp">Outils collaboratifs cloud (Teams, Slack, Notion)</div>
+      <div class="ctag" onclick="tTag(this)" data-g="resp">GED et coffre-fort numérique</div>
+      <div class="ctag" onclick="tTag(this)" data-g="resp">Visioconférences clients et reporting digital</div>
+      <div class="ctag" onclick="tTag(this)" data-g="resp">Paramétrage flux automatisés (API, connecteurs)</div>
+      <div class="ctag" onclick="tTag(this)" data-g="resp">Protocoles cybersécurité et RGPD</div>
+      <div class="ctag" onclick="tTag(this)" data-g="resp">Accompagnement facturation électronique 2026</div>
+    </div>
+    <div class="add-tag-row"><input type="text" id="addResp" placeholder="Ajouter une responsabilité numérique..." onkeydown="if(event.key==='Enter')addCustomTag('tResp','addResp','resp')"><button onclick="addCustomTag('tResp','addResp','resp')">+ Ajouter</button></div>
+  </div>
+
+  <div class="cd">
+    <h3>Savoir-être <span class="sub" id="cSoft" style="float:right;margin:0"></span></h3>
+    <div class="ctags" id="tSoft">
+      <div class="ctag" onclick="tTag(this)" data-g="soft">Autonomie et rigueur</div>
+      <div class="ctag" onclick="tTag(this)" data-g="soft">Communication à distance</div>
+      <div class="ctag" onclick="tTag(this)" data-g="soft">Esprit d'équipe en mode distribué</div>
+      <div class="ctag" onclick="tTag(this)" data-g="soft">Orientation client et pédagogie</div>
+      <div class="ctag" onclick="tTag(this)" data-g="soft">Curiosité technologique</div>
+      <div class="ctag" onclick="tTag(this)" data-g="soft">Capacité d'adaptation</div>
+      <div class="ctag" onclick="tTag(this)" data-g="soft">Gestion du temps et des priorités</div>
+      <div class="ctag" onclick="tTag(this)" data-g="soft">Proactivité et force de proposition</div>
+    </div>
+    <div class="add-tag-row"><input type="text" id="addSoft" placeholder="Ajouter un savoir-être..." onkeydown="if(event.key==='Enter')addCustomTag('tSoft','addSoft','soft')"><button onclick="addCustomTag('tSoft','addSoft','soft')">+ Ajouter</button></div>
+  </div>
+
+  <div class="cd" style="border-left:4px solid var(--s)">
+    <h3 style="color:var(--s)">&#128640; Appétences numériques — ADN cabinet 100 % digital <span class="sub" id="cApp" style="float:right;margin:0"></span></h3>
+    <div class="sub">Au-delà des compétences techniques, un cabinet 100 % numérique exige des appétences spécifiques : l'envie d'apprendre, de tester, d'adopter les nouvelles technologies. Ces critères sont aussi importants que les diplômes.</div>
+    <div class="ctags" id="tApp">
+      <div class="ctag" onclick="tTag(this)" data-g="app">Goût pour l'innovation et la veille technologique</div>
+      <div class="ctag" onclick="tTag(this)" data-g="app">Aisance avec les environnements full cloud (zéro papier)</div>
+      <div class="ctag" onclick="tTag(this)" data-g="app">Capacité à travailler sans bureau fixe (nomadisme digital)</div>
+      <div class="ctag" onclick="tTag(this)" data-g="app">Intérêt pour l'IA appliquée à la comptabilité</div>
+      <div class="ctag" onclick="tTag(this)" data-g="app">Volonté d'automatiser les tâches répétitives</div>
+      <div class="ctag" onclick="tTag(this)" data-g="app">Appétence pour la data et les indicateurs de pilotage</div>
+      <div class="ctag" onclick="tTag(this)" data-g="app">Sensibilité cybersécurité et protection des données</div>
+      <div class="ctag" onclick="tTag(this)" data-g="app">Capacité à accompagner les clients dans leur transition numérique</div>
+    </div>
+    <div class="add-tag-row"><input type="text" id="addApp" placeholder="Ajouter une appétence numérique..." onkeydown="if(event.key==='Enter')addCustomTag('tApp','addApp','app')"><button onclick="addCustomTag('tApp','addApp','app')">+ Ajouter</button></div>
+    <div class="hnt green" style="margin-top:12px;margin-bottom:0"><div class="ico">&#128161;</div><div>Ces appétences sont évaluées lors de l'entretien de savoir-être (<strong>Annexe 20</strong>). Elles constituent un critère différenciant pour un cabinet 100 % numérique.</div></div>
+  </div>
+
+  <div class="nav"><button class="bt bs" onclick="go(2)">&#8592; Poste</button><button class="bt bp" onclick="go(4)">Conditions &#8594;</button></div>
+</div>
+
+<!-- ═══════════ ÉTAPE 4 : CONDITIONS ═══════════ -->
+<div id="p4" class="pn">
+  <div class="hnt amber"><div class="ico">&#9888;&#65039;</div><div><strong>Conformité obligatoire :</strong> Respecter les minima conventionnels IDCC 0787. Accord n° 48 du 5 décembre 2025, revalorisation +2,9 % applicable au 1er janvier 2026. Vérifier les coefficients et minima avant publication.</div></div>
+
+  <div class="gr">
+    <div class="cd">
+      <h3>Organisation du travail</h3>
+      <div class="fg"><label>Lieu de travail</label><select id="fLieu"><option value="100 % télétravail (full remote)">100 % télétravail (full remote)</option><option value="Télétravail majoritaire (3-4 jours/semaine)">Télétravail majoritaire (3-4j/sem)</option><option value="Hybride (2 jours télétravail/semaine)">Hybride (2j télétravail/sem)</option><option value="Coworking + télétravail">Coworking + télétravail</option></select></div>
+      <div class="fg"><label>Temps de travail</label><select id="fTemps"><option value="35 heures/semaine">35 heures/semaine</option><option value="39 heures + RTT">39 heures + RTT</option><option value="Forfait jours (218 jours/an)">Forfait jours (218 jours/an)</option><option value="Temps partiel (80 %)">Temps partiel (80 %)</option></select></div>
+    </div>
+    <div class="cd">
+      <h3>Rémunération</h3>
+      <div class="sub">Sources : Robert Half, <em>Guide des salaires 2026</em> (publié oct. 2025) ; Hays, <em>Étude de rémunération 2025</em> — IDF. Minima conventionnels : accord n° 48 du 5 déc. 2025, +2,9 % pour 2026. Ajuster –10 à –15 % en province.</div>
+      <div class="fr">
+        <div class="fg"><label>Salaire brut annuel MIN (€)</label><input type="number" id="fSalMin" placeholder="Ex : 35000"></div>
+        <div class="fg"><label>Salaire brut annuel MAX (€)</label><input type="number" id="fSalMax" placeholder="Ex : 42000"></div>
+      </div>
+      <div class="fg"><label>Variable / Primes</label><input type="text" id="fPrimes" placeholder="Ex : Prime sur objectifs 10 %, intéressement"></div>
+    </div>
+  </div>
+
+  <div class="cd">
+    <h3>Avantages proposés</h3>
+    <div class="sub">Sélectionnez les avantages existants et/ou ajoutez les vôtres. Un package attractif est un levier de différenciation majeur pour un cabinet 100 % numérique (Enquête Annexe 24, Q13).</div>
+    <div class="ctags" id="tAvant">
+      <div class="ctag" onclick="tTag(this)" data-g="avant">Mutuelle entreprise (50 % minimum)</div>
+      <div class="ctag" onclick="tTag(this)" data-g="avant">Tickets restaurant / Carte Swile</div>
+      <div class="ctag" onclick="tTag(this)" data-g="avant">Indemnité télétravail mensuelle</div>
+      <div class="ctag" onclick="tTag(this)" data-g="avant">Équipement complet fourni (PC, écrans, casque)</div>
+      <div class="ctag" onclick="tTag(this)" data-g="avant">Formation continue et certifications</div>
+      <div class="ctag" onclick="tTag(this)" data-g="avant">RTT</div>
+      <div class="ctag" onclick="tTag(this)" data-g="avant">Horaires flexibles</div>
+      <div class="ctag" onclick="tTag(this)" data-g="avant">Abonnement coworking pris en charge</div>
+      <div class="ctag" onclick="tTag(this)" data-g="avant">Budget formation individuel annuel</div>
+      <div class="ctag" onclick="tTag(this)" data-g="avant">Team buildings et événements d'équipe</div>
+    </div>
+    <div class="add-tag-row"><input type="text" id="addAvant" placeholder="Ajouter un avantage personnalisé..." onkeydown="if(event.key==='Enter')addCustomTag('tAvant','addAvant','avant')"><button onclick="addCustomTag('tAvant','addAvant','avant')">+ Ajouter</button></div>
+  </div>
+
+  <div class="cd">
+    <h3>Perspectives d'évolution</h3>
+    <div class="fg"><textarea id="fPersp" rows="3" placeholder="Décrivez les perspectives de carrière au sein du cabinet..."></textarea></div>
+  </div>
+
+  <div class="nav"><button class="bt bs" onclick="go(3)">&#8592; Compétences</button><button class="bt bp" onclick="go(5)">Synthèse &#8594;</button></div>
+</div>
+
+<!-- ═══════════ ÉTAPE 5 : SYNTHÈSE & EXPORT ═══════════ -->
+<div id="p5" class="pn">
+  <div class="hnt green"><div class="ico">&#9989;</div><div><strong>Récapitulatif de la fiche de poste.</strong> Vérifiez les informations, complétez la checklist de conformité, puis exportez en PDF pour publication ou archivage. La fiche finalisée alimentera le plan de sourcing (<strong>Annexe 18</strong>).</div></div>
+
+  <div class="sum" id="sumBox">
+    <h3>Fiche de poste — Récapitulatif</h3>
+    <div class="sum-row"><span class="sum-l">Intitulé</span><span class="sum-v" id="sInt">—</span></div>
+    <div class="sum-row"><span class="sum-l">Service / Pôle</span><span class="sum-v" id="sSvc">—</span></div>
+    <div class="sum-row"><span class="sum-l">Niveau</span><span class="sum-v" id="sNiv">—</span></div>
+    <div class="sum-row"><span class="sum-l">Classification</span><span class="sum-v" id="sCla">—</span></div>
+    <div class="sum-row"><span class="sum-l">Contrat</span><span class="sum-v" id="sCtr">—</span></div>
+    <div class="sum-row"><span class="sum-l">Lieu</span><span class="sum-v" id="sLi">—</span></div>
+    <div class="sum-row"><span class="sum-l">Rémunération</span><span class="sum-v" id="sSal">—</span></div>
+    <div class="sum-row"><span class="sum-l">Formation</span><span class="sum-v" id="sFor">—</span></div>
+    <div class="sum-row"><span class="sum-l">Expérience</span><span class="sum-v" id="sExp">—</span></div>
+    <div class="sum-row"><span class="sum-l">Conformité</span><span class="sum-v" id="sConf">—</span></div>
+  </div>
+
+  <div class="gr">
+    <div class="cd"><h3>Missions principales</h3><div id="sMp" style="font-size:14px">—</div></div>
+    <div class="cd"><h3>Missions secondaires</h3><div id="sMs" style="font-size:14px">—</div></div>
+  </div>
+  <div class="gr">
+    <div class="cd"><h3>Compétences techniques et numériques</h3><div id="sComp" style="font-size:14px">—</div></div>
+    <div class="cd"><h3>Savoir-être</h3><div id="sSoft" style="font-size:14px">—</div></div>
+  </div>
+  <div class="cd" style="border-left:4px solid var(--s)">
+    <h3 style="color:var(--s)">Appétences numériques — ADN 100 % digital</h3>
+    <div id="sApp" style="font-size:14px">—</div>
+  </div>
+  <div class="cd">
+    <h3>Avantages proposés</h3>
+    <div id="sAvant" style="font-size:14px">—</div>
+  </div>
+
+  <!-- CONFORMITÉ -->
+  <div class="cd">
+    <h3>Conformité de la fiche de poste <span style="font-size:14px;font-weight:400;color:var(--g500)" id="ckLbl">0/8</span></h3>
+    <div class="sub">Vérifiez chaque point avant diffusion. Le nombre de vérifications s'adapte au niveau du profil sélectionné.</div>
+    <div id="cCk"></div>
+  </div>
+
+  <!-- VERDICT -->
+  <div id="verdictBox"></div>
+
+  <!-- NEXT STEP -->
+  <div class="hnt purple"><div class="ico">&#128279;</div><div><strong>Étape suivante :</strong> La fiche de poste finalisée sert de base au plan de sourcing de l'<strong>Annexe 18</strong>, puis à l'évaluation des candidats dans l'<strong>Annexe 20</strong> et l'intégration dans l'<strong>Annexe 21</strong>.</div></div>
+
+  <div class="gr">
+    <div class="cd" style="text-align:center;padding:24px">
+      <h3 style="margin-bottom:8px">&#128196; Exporter la fiche de poste</h3>
+      <p style="font-size:13px;color:var(--g500);margin-bottom:12px">PDF professionnel prêt à publier</p>
+      <button class="bt bp" onclick="xPDF()">Télécharger le PDF</button>
+    </div>
+    <div class="cd" style="text-align:center;padding:24px">
+      <h3 style="margin-bottom:8px">&#128190; Sauvegarder les données</h3>
+      <p style="font-size:13px;color:var(--g500);margin-bottom:12px">Exportez en JSON pour réutilisation</p>
+      <button class="bt bs" onclick="xJSON()">Télécharger le JSON</button>
+    </div>
+  </div>
+
+  <div class="nav"><button class="bt bs" onclick="go(4)">&#8592; Conditions</button></div>
+</div>
+
+</div><!-- /mx -->
+
+<div id="ov" class="ov"><div class="ovc"><div class="sp"></div><div style="font-size:14px;font-weight:600;color:var(--g700)">Génération PDF...</div></div></div>
+<div id="toE" class="to"></div>
+
+<script>
+/* ═══ PROFILE TEMPLATES ═══ */
+var T={
+assistant:{intitule:"Collaborateur comptable junior — Cabinet 100 % numérique",service:"Comptabilité",niveau:"Junior",classif:"T2 — Coef. 220",rattach:"Chef de mission / Manager de pôle",
+  mp:["Saisie et révision des écritures comptables via logiciels cloud (Pennylane, MyUnisoft)","Lettrage des comptes clients et fournisseurs avec outils automatisés","Préparation des déclarations de TVA mensuelles et trimestrielles","Collecte et intégration des pièces comptables via outils OCR (Dext, AutoEntry)","Rapprochements bancaires automatisés et contrôle des flux"],
+  ms:["Assistance sur les dossiers de révision annuelle","Participation aux réunions clients en visioconférence","Mise à jour des tableaux de bord clients"],
+  formation:"Bac+2 (BTS CG)",experience:"Débutant accepté",salMin:26000,salMax:32000,
+  tech:["Normes PCG","Fiscalité entreprises (TVA, IS, IR, CFE)"],
+  num:["Logiciels cloud (Pennylane, MyUnisoft, FULLL)","OCR et collecte (Dext, AutoEntry, Chaintrust)","Suite collaborative (Microsoft 365 / Google)"],
+  resp:["Outils collaboratifs cloud (Teams, Slack, Notion)","GED et coffre-fort numérique"],
+  soft:["Autonomie et rigueur","Communication à distance","Curiosité technologique"],
+  app:["Aisance avec les environnements full cloud (zéro papier)","Goût pour l'innovation et la veille technologique","Sensibilité cybersécurité et protection des données"]
+},
+collaborateur:{intitule:"Collaborateur comptable confirmé — Expert outils SaaS",service:"Comptabilité",niveau:"Confirmé",classif:"T3 — Coef. 250",rattach:"Chef de mission / Expert-comptable",
+  mp:["Gestion autonome d'un portefeuille TPE/PME et startups (30-40 dossiers)","Établissement des déclarations fiscales (TVA, IS, CVAE, CFE, liasses)","Préparation et révision des bilans annuels avec supervision","Relation client directe via outils collaboratifs (Teams, portail client)","Paramétrage et optimisation des flux automatisés clients","Conseil fiscal de premier niveau et accompagnement pilotage"],
+  ms:["Accompagnement des collaborateurs juniors sur les outils","Participation aux projets de transformation digitale du cabinet","Missions exceptionnelles (création, cession, évaluation)"],
+  formation:"Bac+3 (BUT GEA, DCG, Licence CCA)",experience:"2 à 3 ans",salMin:34000,salMax:42000,
+  tech:["Normes PCG","Fiscalité entreprises (TVA, IS, IR, CFE)","Comptes annuels et liasses fiscales","Révision comptable et contrôle de cohérence"],
+  num:["Logiciels cloud (Pennylane, MyUnisoft, FULLL)","OCR et collecte (Dext, AutoEntry, Chaintrust)","Suite collaborative (Microsoft 365 / Google)","Excel avancé (TCD, Power Query)","Signature électronique (DocuSign, Yousign)"],
+  resp:["Outils collaboratifs cloud (Teams, Slack, Notion)","GED et coffre-fort numérique","Visioconférences clients et reporting digital","Accompagnement facturation électronique 2026"],
+  soft:["Autonomie et rigueur","Communication à distance","Esprit d'équipe en mode distribué","Orientation client et pédagogie","Proactivité et force de proposition"],
+  app:["Aisance avec les environnements full cloud (zéro papier)","Goût pour l'innovation et la veille technologique","Volonté d'automatiser les tâches répétitives","Capacité à accompagner les clients dans leur transition numérique","Sensibilité cybersécurité et protection des données"]
+},
+senior:{intitule:"Chef de mission digital — Supervision et Data",service:"Comptabilité",niveau:"Senior",classif:"C1 — Coef. 330",rattach:"Expert-comptable associé",
+  mp:["Supervision technique d'un portefeuille clients premium (startups, scale-ups)","Établissement et validation des comptes annuels complexes","Conseil stratégique aux dirigeants (pilotage, prévisionnels, levées de fonds)","Relation client haut niveau : comités de pilotage mensuels en visio","Création et analyse de tableaux de bord Power BI pour les clients","Encadrement technique d'une équipe de 3-5 collaborateurs"],
+  ms:["Missions de conseil à forte valeur ajoutée (évaluation, due diligence)","Veille réglementaire et formation de l'équipe","Contribution à l'amélioration des process internes"],
+  formation:"Bac+5 (DSCG, Master CCA)",experience:"5 ans et plus",salMin:48000,salMax:60000,
+  tech:["Normes PCG","Fiscalité entreprises (TVA, IS, IR, CFE)","Comptes annuels et liasses fiscales","Révision comptable et contrôle de cohérence","Droit des sociétés et formalités juridiques"],
+  num:["Logiciels cloud (Pennylane, MyUnisoft, FULLL)","OCR et collecte (Dext, AutoEntry, Chaintrust)","Suite collaborative (Microsoft 365 / Google)","Excel avancé (TCD, Power Query)","Power BI / Data visualisation","Signature électronique (DocuSign, Yousign)"],
+  resp:["Outils collaboratifs cloud (Teams, Slack, Notion)","GED et coffre-fort numérique","Visioconférences clients et reporting digital","Paramétrage flux automatisés (API, connecteurs)","Protocoles cybersécurité et RGPD","Accompagnement facturation électronique 2026"],
+  soft:["Autonomie et rigueur","Communication à distance","Esprit d'équipe en mode distribué","Orientation client et pédagogie","Gestion du temps et des priorités","Proactivité et force de proposition"],
+  app:["Aisance avec les environnements full cloud (zéro papier)","Goût pour l'innovation et la veille technologique","Volonté d'automatiser les tâches répétitives","Appétence pour la data et les indicateurs de pilotage","Capacité à accompagner les clients dans leur transition numérique","Sensibilité cybersécurité et protection des données"]
+},
+manager:{intitule:"Manager / Responsable de pôle — Pilotage transformation",service:"Comptabilité",niveau:"Manager",classif:"C2 — Coef. 385",rattach:"Expert-comptable dirigeant",
+  mp:["Management d'une équipe de 5-10 collaborateurs en environnement distribué","Pilotage de la rentabilité et de la qualité du pôle","Développement commercial et fidélisation du portefeuille clients","Validation des dossiers complexes et situations exceptionnelles","Reporting à la direction : indicateurs de performance, KPI","Animation des rituels d'équipe (daily, weekly) en mode remote"],
+  ms:["Recrutement, intégration et formation des nouveaux collaborateurs","Participation au comité de direction","Pilotage de projets transverses (outils, process, offres)"],
+  formation:"Bac+5 (DSCG, Master CCA)",experience:"8 ans et plus",salMin:58000,salMax:75000,
+  tech:["Normes PCG","Fiscalité entreprises (TVA, IS, IR, CFE)","Comptes annuels et liasses fiscales","Révision comptable et contrôle de cohérence","Droit des sociétés et formalités juridiques","Paie et déclarations sociales (DSN)"],
+  num:["Logiciels cloud (Pennylane, MyUnisoft, FULLL)","OCR et collecte (Dext, AutoEntry, Chaintrust)","Suite collaborative (Microsoft 365 / Google)","Excel avancé (TCD, Power Query)","Power BI / Data visualisation","CRM (HubSpot, Salesforce)","Automatisation (Zapier, Make, Power Automate)"],
+  resp:["Outils collaboratifs cloud (Teams, Slack, Notion)","GED et coffre-fort numérique","Visioconférences clients et reporting digital","Paramétrage flux automatisés (API, connecteurs)","Protocoles cybersécurité et RGPD","Accompagnement facturation électronique 2026"],
+  soft:["Autonomie et rigueur","Communication à distance","Esprit d'équipe en mode distribué","Orientation client et pédagogie","Curiosité technologique","Capacité d'adaptation","Gestion du temps et des priorités","Proactivité et force de proposition"],
+  app:["Aisance avec les environnements full cloud (zéro papier)","Goût pour l'innovation et la veille technologique","Volonté d'automatiser les tâches répétitives","Intérêt pour l'IA appliquée à la comptabilité","Appétence pour la data et les indicateurs de pilotage","Capacité à accompagner les clients dans leur transition numérique","Sensibilité cybersécurité et protection des données","Capacité à travailler sans bureau fixe (nomadisme digital)"]
+},
+referent:{intitule:"Référent digital et transformation — Cabinet 100 % numérique",service:"Digital",niveau:"Expert",classif:"C1 — Coef. 330",rattach:"Expert-comptable dirigeant",
+  mp:["Pilotage de la stratégie de transformation digitale du cabinet","Sélection, déploiement et paramétrage des outils SaaS (production, collecte, CRM)","Formation et accompagnement des équipes aux nouveaux outils","Accompagnement des clients dans leur transition numérique (e-facture)","Optimisation des workflows et automatisations (Zapier, Make, Power Automate)","Veille technologique et benchmark des solutions du marché"],
+  ms:["Gestion de projet SI en lien avec les éditeurs","Mise en conformité RGPD et protocoles cybersécurité","Animation de la communauté interne sur les sujets digitaux"],
+  formation:"Bac+5 (DSCG, Master CCA)",experience:"5 ans et plus",salMin:45000,salMax:58000,
+  tech:["Normes PCG","Fiscalité entreprises (TVA, IS, IR, CFE)","Révision comptable et contrôle de cohérence"],
+  num:["Logiciels cloud (Pennylane, MyUnisoft, FULLL)","OCR et collecte (Dext, AutoEntry, Chaintrust)","Suite collaborative (Microsoft 365 / Google)","Excel avancé (TCD, Power Query)","Power BI / Data visualisation","Signature électronique (DocuSign, Yousign)","CRM (HubSpot, Salesforce)","IA générative (ChatGPT, Claude, Copilot)","Automatisation (Zapier, Make, Power Automate)"],
+  resp:["Outils collaboratifs cloud (Teams, Slack, Notion)","GED et coffre-fort numérique","Visioconférences clients et reporting digital","Paramétrage flux automatisés (API, connecteurs)","Protocoles cybersécurité et RGPD","Accompagnement facturation électronique 2026"],
+  soft:["Autonomie et rigueur","Communication à distance","Esprit d'équipe en mode distribué","Curiosité technologique","Capacité d'adaptation","Proactivité et force de proposition"],
+  app:["Aisance avec les environnements full cloud (zéro papier)","Goût pour l'innovation et la veille technologique","Volonté d'automatiser les tâches répétitives","Intérêt pour l'IA appliquée à la comptabilité","Appétence pour la data et les indicateurs de pilotage","Capacité à accompagner les clients dans leur transition numérique","Sensibilité cybersécurité et protection des données","Capacité à travailler sans bureau fixe (nomadisme digital)"]
+},
+social:{intitule:"Gestionnaire de paie digital — Expert SILAE/DSN",service:"Social",niveau:"Confirmé",classif:"T3 — Coef. 250",rattach:"Responsable pôle social",
+  mp:["Établissement des bulletins de paie multi-conventions via SILAE","Gestion complète des déclarations sociales (DSN, charges sociales)","Administration du personnel : entrées, sorties, contrats, avenants","Conseil social clients sur les problématiques RH courantes","Veille sociale et mise à jour des paramétrages conventions"],
+  ms:["Audits sociaux et régularisations","Accompagnement des procédures disciplinaires simples","Formation clients aux outils SIRH"],
+  formation:"Bac+2 (BTS CG)",experience:"2 à 3 ans",salMin:32000,salMax:40000,
+  tech:["Paie et déclarations sociales (DSN)"],
+  num:["Suite collaborative (Microsoft 365 / Google)","Paie cloud (SILAE, PayFit)"],
+  resp:["Outils collaboratifs cloud (Teams, Slack, Notion)","GED et coffre-fort numérique","Protocoles cybersécurité et RGPD"],
+  soft:["Autonomie et rigueur","Communication à distance","Orientation client et pédagogie","Gestion du temps et des priorités"],
+  app:["Aisance avec les environnements full cloud (zéro papier)","Volonté d'automatiser les tâches répétitives","Sensibilité cybersécurité et protection des données"]
+},
+data:{intitule:"Data Analyst cabinet — BI et automatisation",service:"Data",niveau:"Expert",classif:"C1 — Coef. 330",rattach:"Expert-comptable / Direction",
+  mp:["Conception et déploiement de tableaux de bord Power BI pour le cabinet et les clients","Exploitation et analyse des données comptables pour le conseil stratégique","Mise en place de processus d'automatisation des flux de données (ETL, API)","Développement de reportings automatisés et alertes intelligentes","Accompagnement des équipes dans l'utilisation des outils de data visualisation","Contribution à la stratégie data du cabinet"],
+  ms:["Formation des collaborateurs à Power BI et Power Query","Veille sur les solutions d'IA et machine learning appliquées à la comptabilité","Documentation des processus et bonnes pratiques data"],
+  formation:"Bac+5 (DSCG, Master CCA)",experience:"3 à 5 ans",salMin:42000,salMax:55000,
+  tech:["Normes PCG","Révision comptable et contrôle de cohérence"],
+  num:["Logiciels cloud (Pennylane, MyUnisoft, FULLL)","Suite collaborative (Microsoft 365 / Google)","Excel avancé (TCD, Power Query)","Power BI / Data visualisation","IA générative (ChatGPT, Claude, Copilot)","Automatisation (Zapier, Make, Power Automate)"],
+  resp:["Outils collaboratifs cloud (Teams, Slack, Notion)","Paramétrage flux automatisés (API, connecteurs)","Protocoles cybersécurité et RGPD"],
+  soft:["Autonomie et rigueur","Curiosité technologique","Capacité d'adaptation","Proactivité et force de proposition"],
+  app:["Goût pour l'innovation et la veille technologique","Intérêt pour l'IA appliquée à la comptabilité","Volonté d'automatiser les tâches répétitives","Appétence pour la data et les indicateurs de pilotage","Aisance avec les environnements full cloud (zéro papier)","Capacité à travailler sans bureau fixe (nomadisme digital)"]
+},
+custom:{intitule:"",service:"",niveau:"Junior",classif:"",rattach:"",mp:[],ms:[],formation:"Bac+3 (BUT GEA, DCG, Licence CCA)",experience:"2 à 3 ans",salMin:"",salMax:"",tech:[],num:[],resp:[],soft:[],app:[]}
+};
+
+/* ═══ CONFORMITÉ DYNAMIQUE ═══ */
+var CK_BASE=[
+  {id:"k1",t:"Intitulé de poste non discriminatoire (genre neutre ou H/F mentionné)",r:"Art. L.1132-1 Code du travail"},
+  {id:"k2",t:"Classification conforme à la convention collective IDCC 0787",r:"Convention collective cabinets EC"},
+  {id:"k3",t:"Salaire respecte les minima conventionnels en vigueur",r:"Accord n° 48 du 5 déc. 2025 — IDCC 0787"},
+  {id:"k4",t:"Mention du lieu de travail et des conditions de télétravail",r:"Art. L.1222-9 Code du travail"},
+  {id:"k5",t:"Compétences requises identifiées et documentées",r:"NPMQ §22, A22-1 à A22-4 (Réf. normatif OEC 2025)"},
+  {id:"k6",t:"Plan de supervision prévu pour le collaborateur",r:"Art. 148 Code de déontologie OEC (Décret n° 2012-432)"},
+  {id:"k7",t:"Mention d'ouverture aux personnes en situation de handicap",r:"Art. L.5212-1 Code du travail"},
+  {id:"k8",t:"Mention RGPD sur le traitement des candidatures",r:"RGPD art. 13 + CNIL, Guide recrutement, éd. 2024"}
+];
+var CK_LEVEL={
+  "Junior":[
+    {id:"k9j",t:"Niveau de supervision renforcé prévu (encadrement quotidien en remote)",r:"NPMQ §22, A22-2 : supervision selon l'expérience"},
+    {id:"k10j",t:"Formation aux outils de production cloud mentionnée (Pennylane, Dext, OCR)",r:"Cabinet 100 % numérique — socle digital obligatoire"}
+  ],
+  "Confirmé":[
+    {id:"k9c",t:"Capacité à piloter un portefeuille en autonomie full numérique exigée",r:"Cabinet 100 % numérique — autonomie digitale confirmée"},
+    {id:"k10c",t:"Maîtrise des outils collaboratifs et de la relation client à distance requise",r:"Cabinet 100 % numérique — relation client dématérialisée"}
+  ],
+  "Senior":[
+    {id:"k9s",t:"Responsabilité de supervision des collaborateurs junior/confirmé documentée",r:"Art. 148 Code de déontologie OEC + NPMQ §22, A22-2"},
+    {id:"k10s",t:"Compétences en pilotage des indicateurs qualité numérique (Power BI, KPI NPMQ)",r:"Cabinet 100 % numérique — supervision qualité digitale"}
+  ],
+  "Manager":[
+    {id:"k9m",t:"Responsabilité de supervision de l'ensemble du pôle documentée",r:"Art. 148 Code de déontologie OEC + NPMQ §22, A22-2"},
+    {id:"k10m",t:"Rôle dans la conduite du changement numérique (clients et équipe) formalisé",r:"Cabinet 100 % numérique — transformation digitale"},
+    {id:"k11m",t:"Compétences en pilotage des automatisations et de la qualité numérique",r:"NPMQ §22, A22-3 : développement des compétences de l'équipe"}
+  ],
+  "Expert":[
+    {id:"k9e",t:"Responsabilité de conception de la politique cybersécurité documentée",r:"Recommandations ANSSI 2024 + RGPD art. 32"},
+    {id:"k10e",t:"Pilotage de la conformité facturation électronique sept. 2026 formalisé",r:"Art. 91 Loi de finances 2024 — obligation e-facture"},
+    {id:"k11e",t:"Mission de formation des équipes aux outils numériques intégrée",r:"NPMQ §22, A22-3 : formation initiale et continue"}
+  ]
+};
+function getCK(){var niv=gV("fNiveau")||"Junior";var extra=CK_LEVEL[niv]||[];return CK_BASE.concat(extra)}
+var CP={};
+
+function rCk(){var ck=getCK();var c=document.getElementById("cCk");if(!c)return;c.innerHTML="";
+  ck.forEach(function(ch){var dn=CP[ch.id]?" dn":"";
+    c.innerHTML+='<div class="ck'+dn+'" onclick="tC(\''+ch.id+'\')"><div class="ckb">'+(CP[ch.id]?"\u2713":"")+'</div><div><div class="ck-t">'+ch.t+'</div><div class="ck-r">'+ch.r+'</div></div></div>'
+  });uCk();updVerdict()}
+function tC(id){CP[id]=!CP[id];rCk();updProgress();autoSave()}
+function uCk(){var ck=getCK();var n=0;ck.forEach(function(c){if(CP[c.id])n++});var tot=ck.length;document.getElementById("ckLbl").textContent=n+"/"+tot+(n===tot?" \u2713":"")}
+
+/* ═══ VERDICT ═══ */
+function updVerdict(){
+  var ck=getCK();var cn=0;ck.forEach(function(c){if(CP[c.id])cn++});var ckT=ck.length;
+  var hasIntitule=!!gV("fIntitule");var hasMissions=getMissions("mP").length>=1;
+  var hasComp=getTags("tTech").length+getTags("tNum").length>=2;var hasSal=gV("fSalMin")&&gV("fSalMax");
+  var box=document.getElementById("verdictBox");if(!box)return;
+  var score=0,total=4;if(hasIntitule)score++;if(hasMissions)score++;if(hasComp)score++;if(hasSal)score++;
+  var confOk=cn===ckT;
+  if(score===4&&confOk){
+    box.innerHTML='<div class="verdict go"><h3>&#9989; FICHE PRÊTE À DIFFUSER</h3><p>Tous les champs obligatoires sont remplis et la conformité est validée ('+cn+'/'+ckT+'). Cette fiche peut alimenter le plan de sourcing (Annexe 18).</p></div>'
+  }else if(score>=2){
+    var missing=[];if(!hasIntitule)missing.push("intitulé du poste");if(!hasMissions)missing.push("missions principales");if(!hasComp)missing.push("compétences (min. 2)");if(!hasSal)missing.push("rémunération");if(!confOk)missing.push("conformité ("+cn+"/"+ckT+")");
+    box.innerHTML='<div class="verdict warn"><h3>&#9888;&#65039; FICHE EN COURS — À compléter</h3><p>Éléments manquants : '+missing.join(", ")+'. Complétez ces points avant de passer à l\'Annexe 18.</p></div>'
+  }else{
+    box.innerHTML='<div class="verdict nogo"><h3>&#10060; FICHE INCOMPLÈTE</h3><p>Trop d\'éléments manquants pour exploiter cette fiche. Sélectionnez un profil type ou remplissez manuellement les champs.</p></div>'
+  }
+}
+
+/* ═══ NAVIGATION ═══ */
+var curProf=null;
+function go(n){for(var i=1;i<=5;i++){var p=document.getElementById("p"+i);if(p)p.classList.toggle("on",i===n)}
+  document.querySelectorAll(".step").forEach(function(s,i){s.classList.remove("on","ok2");if(i<n-1)s.classList.add("ok2");if(i===n-1)s.classList.add("on")});
+  if(n===5){updSum();updVerdict()}updProgress();window.scrollTo({top:0,behavior:"smooth"})}
+
+/* ═══ PROFILE SELECTION ═══ */
+function selProf(k){
+  curProf=k;
+  document.querySelectorAll(".pc").forEach(function(c){c.classList.remove("on")});
+  var el=document.getElementById("pr-"+k);if(el)el.classList.add("on");
+  var t=T[k];if(!t)return;
+  sV("fIntitule",t.intitule);sV("fService",t.service);
+  if(t.niveau)document.getElementById("fNiveau").value=t.niveau;
+  sV("fClassif",t.classif);sV("fRattach",t.rattach);
+  if(t.formation)setSel("fFormation",t.formation);
+  if(t.experience)setSel("fExperience",t.experience);
+  if(t.salMin)sV("fSalMin",t.salMin);if(t.salMax)sV("fSalMax",t.salMax);
+  fillM("mP",t.mp);fillM("mS",t.ms);
+  setTags("tTech",t.tech);setTags("tNum",t.num);setTags("tResp",t.resp);setTags("tSoft",t.soft);setTags("tApp",t.app||[]);
+  rCk();updProgress();autoSave();toast("Profil \u00ab "+k+" \u00bb charg\u00e9")
+}
+
+function setTags(cid,arr){document.querySelectorAll("#"+cid+" .ctag").forEach(function(t){t.classList.toggle("on",arr.indexOf(t.textContent.replace(/\u00d7$/,"").trim())>=0)})}
+function setSel(id,v){var el=document.getElementById(id);if(!el)return;for(var i=0;i<el.options.length;i++){if(el.options[i].value===v){el.selectedIndex=i;return}}}
+
+/* ═══ CUSTOM TAGS ═══ */
+function addCustomTag(containerId,inputId,group){
+  var inp=document.getElementById(inputId);if(!inp)return;
+  var val=inp.value.trim();if(!val)return;
+  /* Check duplicate */
+  var existing=getTags(containerId);
+  var allTags=[];document.querySelectorAll("#"+containerId+" .ctag").forEach(function(t){allTags.push(t.textContent.replace(/\u00d7$/,"").trim())});
+  if(allTags.indexOf(val)>=0){toast("Cette compétence existe déjà");return}
+  var container=document.getElementById(containerId);
+  var tag=document.createElement("div");
+  tag.className="ctag custom on";
+  tag.setAttribute("data-g",group);
+  tag.setAttribute("data-custom","1");
+  tag.innerHTML=val+'<span class="del-tag" onclick="event.stopPropagation();this.parentElement.remove();updProgress();autoSave()">\u00d7</span>';
+  tag.onclick=function(e){if(e.target.classList.contains("del-tag"))return;tTag(this)};
+  container.appendChild(tag);
+  inp.value="";
+  updProgress();autoSave();toast("Ajouté : "+val)
+}
+
+/* ═══ MISSIONS (dynamic rows) ═══ */
+function fillM(cid,arr){var c=document.getElementById(cid);c.innerHTML="";
+  if(!arr||!arr.length){addM(cid);return}
+  arr.forEach(function(m){addMR(cid,m)})}
+function addM(cid){addMR(cid,"")}
+function addMR(cid,v){var c=document.getElementById(cid);
+  var d=document.createElement("div");d.className="mr";
+  var ta=document.createElement("textarea");ta.value=v||"";ta.placeholder="Décrivez la mission...";ta.rows=1;
+  ta.addEventListener("input",function(){updProgress();autoSave()});
+  var btn=document.createElement("button");btn.className="md";btn.innerHTML="&times;";btn.onclick=function(){if(c.children.length>1)d.remove();else ta.value="";updProgress();autoSave()};
+  d.appendChild(ta);d.appendChild(btn);c.appendChild(d)}
+
+/* ═══ COMPETENCE TAGS ═══ */
+function tTag(el){el.classList.toggle("on");updProgress();autoSave()}
+function getTags(cid){var r=[];document.querySelectorAll("#"+cid+" .ctag.on").forEach(function(t){r.push(t.textContent.replace(/\u00d7$/,"").trim())});return r}
+function getAllTags(cid){var r=[];document.querySelectorAll("#"+cid+" .ctag").forEach(function(t){r.push({text:t.textContent.replace(/\u00d7$/,"").trim(),on:t.classList.contains("on"),custom:t.hasAttribute("data-custom")})});return r}
+
+/* ═══ PROGRESS ═══ */
+function updProgress(){
+  var total=0,done=0;
+  total++;if(curProf)done++;
+  ["fIntitule","fService","fClassif","fRattach"].forEach(function(id){total++;if(gV(id))done++});
+  total++;if(getMissions("mP").length>=1)done++;
+  total++;var allC=[].concat(getTags("tTech"),getTags("tNum"),getTags("tResp"),getTags("tSoft"));if(allC.length>=3)done++;
+  total++;if(getTags("tApp").length>=2)done++;
+  total++;if(gV("fSalMin")&&gV("fSalMax"))done++;
+  total++;if(getTags("tAvant").length>=1)done++;
+  var ck=getCK();ck.forEach(function(c){total++;if(CP[c.id])done++});
+  var pct=total>0?Math.round(done/total*100):0;
+  document.getElementById("pbarFill").style.width=pct+"%";
+  document.getElementById("ppct").textContent=pct+" %";
+}
+
+/* ═══ UTILS ═══ */
+function gV(id){var el=document.getElementById(id);return el?el.value.trim():""}
+function sV(id,v){var el=document.getElementById(id);if(el)el.value=v||""}
+function getMissions(cid){var r=[];document.querySelectorAll("#"+cid+" textarea").forEach(function(t){if(t.value.trim())r.push(t.value.trim())});return r}
+function fN(){var d=new Date();return String(d.getDate()).padStart(2,"0")+"."+String(d.getMonth()+1).padStart(2,"0")+"."+d.getFullYear()}
+function toast(m){var el=document.getElementById("toE");el.textContent=m;el.classList.add("sh");setTimeout(function(){el.classList.remove("sh")},2200)}
+function fmt(n){return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g," ")}
+
+/* ═══ SUMMARY ═══ */
+function updSum(){
+  document.getElementById("sInt").textContent=gV("fIntitule")||"\u2014";
+  document.getElementById("sSvc").textContent=gV("fService")||"\u2014";
+  document.getElementById("sNiv").textContent=gV("fNiveau")||"\u2014";
+  document.getElementById("sCla").textContent=gV("fClassif")||"\u2014";
+  document.getElementById("sCtr").textContent=gV("fContrat")||"\u2014";
+  document.getElementById("sLi").textContent=gV("fLieu")||"\u2014";
+  var mn=gV("fSalMin"),mx=gV("fSalMax");
+  document.getElementById("sSal").textContent=(mn&&mx)?fmt(mn)+" \u2013 "+fmt(mx)+" \u20ac brut/an":"Selon profil";
+  document.getElementById("sFor").textContent=gV("fFormation")||"\u2014";
+  document.getElementById("sExp").textContent=gV("fExperience")||"\u2014";
+  var mp=getMissions("mP");
+  document.getElementById("sMp").innerHTML=mp.length?mp.map(function(m){return "<div style='padding:4px 0;border-bottom:1px solid #eee;font-size:14px'>"+m+"</div>"}).join(""):"\u2014";
+  var ms=getMissions("mS");
+  document.getElementById("sMs").innerHTML=ms.length?ms.map(function(m){return "<div style='padding:4px 0;border-bottom:1px solid #eee;font-size:14px'>"+m+"</div>"}).join(""):"\u2014";
+  var allC=[].concat(getTags("tTech"),getTags("tNum"),getTags("tResp"));
+  document.getElementById("sComp").innerHTML=allC.length?allC.map(function(c){return "<span style='display:inline-block;padding:3px 10px;margin:3px;background:#ecfdf5;border-radius:12px;font-size:12px'>"+c+"</span>"}).join(""):"\u2014";
+  var softC=getTags("tSoft");
+  document.getElementById("sSoft").innerHTML=softC.length?softC.map(function(c){return "<span style='display:inline-block;padding:3px 10px;margin:3px;background:#eff6ff;border-radius:12px;font-size:12px'>"+c+"</span>"}).join(""):"\u2014";
+  var appC=getTags("tApp");
+  document.getElementById("sApp").innerHTML=appC.length?appC.map(function(c){return "<span style='display:inline-block;padding:3px 10px;margin:3px;background:#ecfdf5;border:1px solid #a7f3d0;border-radius:12px;font-size:12px;color:#047857'>"+c+"</span>"}).join(""):"\u2014";
+  var avC=getTags("tAvant");
+  document.getElementById("sAvant").innerHTML=avC.length?avC.map(function(c){return "<span style='display:inline-block;padding:3px 10px;margin:3px;background:#fef3c7;border-radius:12px;font-size:12px;color:#92400e'>"+c+"</span>"}).join(""):"\u2014";
+  var ck=getCK();var cn=0;ck.forEach(function(c){if(CP[c.id])cn++});
+  document.getElementById("sConf").textContent=cn+"/"+ck.length+(cn===ck.length?" \u2014 Conforme":" \u2014 \u00c0 compl\u00e9ter")
+}
+
+/* ═══ LOCALSTORAGE ═══ */
+function autoSave(){
+  try{
+    var customTags={tech:getCustomTags("tTech"),num:getCustomTags("tNum"),resp:getCustomTags("tResp"),soft:getCustomTags("tSoft"),app:getCustomTags("tApp"),avant:getCustomTags("tAvant")};
+    var d={v:"4.0",profil:curProf,
+      poste:{intitule:gV("fIntitule"),service:gV("fService"),niveau:gV("fNiveau"),classif:gV("fClassif"),rattach:gV("fRattach"),contrat:gV("fContrat"),presentation:gV("fPresentation"),contexte:gV("fContexte")},
+      missions:{principales:getMissions("mP"),secondaires:getMissions("mS")},
+      competences:{tech:getTags("tTech"),num:getTags("tNum"),resp:getTags("tResp"),soft:getTags("tSoft"),app:getTags("tApp"),formation:gV("fFormation"),experience:gV("fExperience")},
+      conditions:{lieu:gV("fLieu"),temps:gV("fTemps"),salMin:gV("fSalMin"),salMax:gV("fSalMax"),primes:gV("fPrimes"),avantages:getTags("tAvant"),perspectives:gV("fPersp")},
+      customTags:customTags,
+      compliance:CP};
+    localStorage.setItem("annexe19_data",JSON.stringify(d))
+  }catch(e){}
+}
+
+function getCustomTags(cid){var r=[];document.querySelectorAll("#"+cid+" .ctag[data-custom]").forEach(function(t){r.push({text:t.textContent.replace(/\u00d7$/,"").trim(),on:t.classList.contains("on")})});return r}
+
+function restoreCustomTags(cid,group,tags){
+  if(!tags||!tags.length)return;
+  var container=document.getElementById(cid);
+  tags.forEach(function(t){
+    var tag=document.createElement("div");
+    tag.className="ctag custom"+(t.on?" on":"");
+    tag.setAttribute("data-g",group);
+    tag.setAttribute("data-custom","1");
+    tag.innerHTML=t.text+'<span class="del-tag" onclick="event.stopPropagation();this.parentElement.remove();updProgress();autoSave()">\u00d7</span>';
+    tag.onclick=function(e){if(e.target.classList.contains("del-tag"))return;tTag(this)};
+    container.appendChild(tag)
+  })
+}
+
+function loadFromStorage(){
+  try{
+    var raw=localStorage.getItem("annexe19_data");if(!raw)return;
+    var d=JSON.parse(raw);
+    if(d.profil&&T[d.profil])selProf(d.profil);
+    if(d.poste){sV("fIntitule",d.poste.intitule);sV("fService",d.poste.service);if(d.poste.niveau)document.getElementById("fNiveau").value=d.poste.niveau;sV("fClassif",d.poste.classif);sV("fRattach",d.poste.rattach);if(d.poste.contrat)setSel("fContrat",d.poste.contrat);sV("fPresentation",d.poste.presentation);sV("fContexte",d.poste.contexte)}
+    if(d.missions){fillM("mP",d.missions.principales);fillM("mS",d.missions.secondaires)}
+    if(d.customTags){restoreCustomTags("tTech","tech",d.customTags.tech);restoreCustomTags("tNum","num",d.customTags.num);restoreCustomTags("tResp","resp",d.customTags.resp);restoreCustomTags("tSoft","soft",d.customTags.soft);restoreCustomTags("tApp","app",d.customTags.app);restoreCustomTags("tAvant","avant",d.customTags.avant)}
+    if(d.competences){setTags("tTech",d.competences.tech||[]);setTags("tNum",d.competences.num||[]);setTags("tResp",d.competences.resp||[]);setTags("tSoft",d.competences.soft||[]);setTags("tApp",d.competences.app||[]);if(d.competences.formation)setSel("fFormation",d.competences.formation);if(d.competences.experience)setSel("fExperience",d.competences.experience)}
+    if(d.conditions){if(d.conditions.lieu)setSel("fLieu",d.conditions.lieu);if(d.conditions.temps)setSel("fTemps",d.conditions.temps);sV("fSalMin",d.conditions.salMin);sV("fSalMax",d.conditions.salMax);sV("fPrimes",d.conditions.primes);setTags("tAvant",d.conditions.avantages||[]);sV("fPersp",d.conditions.perspectives)}
+    if(d.compliance){CP=d.compliance;rCk()}
+    updProgress();toast("Données restaurées")
+  }catch(e){}
+}
+document.addEventListener("input",function(){autoSave();updProgress()});
+document.addEventListener("change",function(e){if(e.target.tagName==="SELECT"){autoSave();updProgress();if(e.target.id==="fNiveau")rCk()}});
+
+/* ═══ CABINET X DEMO ═══ */
+function loadCX(){
+  selProf("collaborateur");
+  sV("fPresentation","Cabinet X est un cabinet d'expertise comptable 100 % numérique, inscrit au Tableau de l'Ordre. Structuré autour de Pennylane, Dext et Microsoft Teams, le cabinet accompagne une clientèle de TPE-PME et startups dans un environnement entièrement dématérialisé.");
+  sV("fContexte","Dans le cadre du développement du cabinet et de l'accompagnement des clients vers la facturation électronique obligatoire (septembre 2026), un collaborateur capable d'évoluer dans un environnement 100 % dématérialisé est recherché, maîtrisant les outils SaaS de nouvelle génération et orienté conseil client.");
+  setSel("fLieu","100 % télétravail (full remote)");
+  setSel("fTemps","39 heures + RTT");
+  sV("fPrimes","Prime sur objectifs 10 %, intéressement, prime de bilan");
+  setTags("tAvant",["Mutuelle entreprise (50 % minimum)","Indemnité télétravail mensuelle","Équipement complet fourni (PC, écrans, casque)","Formation continue et certifications","RTT","Horaires flexibles"]);
+  sV("fPersp","Au sein du Cabinet X en croissance, les opportunités d'évolution sont réelles et rapides : montée en responsabilité sur des dossiers complexes (startups, levées de fonds), spécialisation possible (référent digital, data analyst, direction financière externalisée), évolution vers des fonctions de management ou d'association à moyen terme, formation continue aux nouvelles technologies et certifications.");
+  getCK().forEach(function(ch){CP[ch.id]=true});rCk();
+  go(1);autoSave();toast("Cas pratique Cabinet X — profil collaborateur confirmé")
+}
+
+/* ═══ RESET ═══ */
+function resetAll(){if(!confirm("Réinitialiser l'ensemble de la fiche ?"))return;
+  document.querySelectorAll("input[type=text],input[type=number],textarea").forEach(function(el){el.value=""});
+  document.querySelectorAll("select").forEach(function(el){el.selectedIndex=0});
+  document.querySelectorAll(".ctag").forEach(function(t){if(t.hasAttribute("data-custom")){t.remove()}else{t.classList.remove("on")}});
+  document.querySelectorAll(".pc").forEach(function(c){c.classList.remove("on")});
+  curProf=null;CP={};rCk();fillM("mP",[]);fillM("mS",[]);
+  try{localStorage.removeItem("annexe19_data")}catch(e){}
+  updProgress();toast("Fiche réinitialisée")}
+
+/* ═══ JSON ═══ */
+function xJSON(){
+  var customTags={tech:getCustomTags("tTech"),num:getCustomTags("tNum"),resp:getCustomTags("tResp"),soft:getCustomTags("tSoft"),app:getCustomTags("tApp"),avant:getCustomTags("tAvant")};
+  var d={v:"4.0",annexe:"19",titre:"Fiche de poste détaillée",date:new Date().toISOString(),profil:curProf,
+    poste:{intitule:gV("fIntitule"),service:gV("fService"),niveau:gV("fNiveau"),classif:gV("fClassif"),rattach:gV("fRattach"),contrat:gV("fContrat"),presentation:gV("fPresentation"),contexte:gV("fContexte")},
+    missions:{principales:getMissions("mP"),secondaires:getMissions("mS")},
+    competences:{tech:getTags("tTech"),num:getTags("tNum"),resp:getTags("tResp"),soft:getTags("tSoft"),app:getTags("tApp"),formation:gV("fFormation"),experience:gV("fExperience")},
+    conditions:{lieu:gV("fLieu"),temps:gV("fTemps"),salMin:gV("fSalMin"),salMax:gV("fSalMax"),primes:gV("fPrimes"),avantages:getTags("tAvant"),perspectives:gV("fPersp")},
+    customTags:customTags,
+    compliance:CP};
+  var bl=new Blob([JSON.stringify(d,null,2)],{type:"application/json"});
+  var a=document.createElement("a");a.href=URL.createObjectURL(bl);a.download="annexe19_fiche_poste_"+new Date().toISOString().split("T")[0]+".json";a.click();toast("JSON exporté")}
+
+function iJSON(ev){var f=ev.target.files[0];if(!f)return;
+  var r=new FileReader();r.onload=function(e){try{var d=JSON.parse(e.target.result);
+    if(d.profil&&T[d.profil])selProf(d.profil);
+    if(d.poste){sV("fIntitule",d.poste.intitule);sV("fService",d.poste.service);if(d.poste.niveau)document.getElementById("fNiveau").value=d.poste.niveau;sV("fClassif",d.poste.classif);sV("fRattach",d.poste.rattach);if(d.poste.contrat)setSel("fContrat",d.poste.contrat);sV("fPresentation",d.poste.presentation);sV("fContexte",d.poste.contexte)}
+    if(d.missions){fillM("mP",d.missions.principales);fillM("mS",d.missions.secondaires)}
+    /* Remove old custom tags first */
+    document.querySelectorAll(".ctag[data-custom]").forEach(function(t){t.remove()});
+    if(d.customTags){restoreCustomTags("tTech","tech",d.customTags.tech);restoreCustomTags("tNum","num",d.customTags.num);restoreCustomTags("tResp","resp",d.customTags.resp);restoreCustomTags("tSoft","soft",d.customTags.soft);restoreCustomTags("tApp","app",d.customTags.app);restoreCustomTags("tAvant","avant",d.customTags.avant)}
+    if(d.competences){setTags("tTech",d.competences.tech||[]);setTags("tNum",d.competences.num||[]);setTags("tResp",d.competences.resp||[]);setTags("tSoft",d.competences.soft||[]);setTags("tApp",d.competences.app||[]);if(d.competences.formation)setSel("fFormation",d.competences.formation);if(d.competences.experience)setSel("fExperience",d.competences.experience)}
+    if(d.conditions){if(d.conditions.lieu)setSel("fLieu",d.conditions.lieu);if(d.conditions.temps)setSel("fTemps",d.conditions.temps);sV("fSalMin",d.conditions.salMin);sV("fSalMax",d.conditions.salMax);sV("fPrimes",d.conditions.primes);setTags("tAvant",d.conditions.avantages||[]);sV("fPersp",d.conditions.perspectives)}
+    if(d.compliance){CP=d.compliance;rCk()}
+    updProgress();autoSave();toast("Importé avec succès")
+  }catch(err){toast("Fichier invalide")}};r.readAsText(f)}
+
+/* ═══ PDF ═══ */
+function xPDF(){
+  document.getElementById("ov").classList.add("sh");
+  setTimeout(function(){try{
+    var J=window.jspdf.jsPDF,doc=new J("p","mm","a4");
+    var pw=210,ph=297,mg=14,cw=pw-2*mg,y=0,pg=1,PC=[30,58,95],LH=3.3;
+
+    function safe(t){if(!t)return"";return String(t).replace(/[\u{1F300}-\u{1FAFF}]/gu,"").replace(/[\u{2600}-\u{27BF}]/gu,"").replace(/[\u00A0\u202F]/g," ").replace(/\u2026/g,"...").replace(/[\u2013\u2014]/g,"-").replace(/\u2192/g,"->").replace(/\u20ac/g,"EUR").replace(/\u00d7/g,"").replace(/[^\x20-\x7E\u00A1-\u00FF]/g,"").trim()}
+    function ft(){doc.setDrawColor(180);doc.setLineWidth(.2);doc.line(mg,ph-12,pw-mg,ph-12);doc.setFontSize(6.5);doc.setTextColor(130);doc.setFont("helvetica","normal");doc.text("Annexe 19 - Fiche de poste | Confidentiel | Cabinet X",mg,ph-8);doc.text("Page "+pg,pw-mg-10,ph-8)}
+    function np(){ft();doc.addPage();pg++;y=14}
+    function chk(n){if(y+n>ph-18)np()}
+    function hdr(t){chk(13);doc.setFillColor(PC[0],PC[1],PC[2]);doc.rect(mg,y,cw,8,"F");doc.setTextColor(255);doc.setFontSize(9.5);doc.setFont("helvetica","bold");doc.text(safe(t),mg+3,y+5.8);y+=12;doc.setTextColor(0)}
+    function row(l,v){doc.setFontSize(8);doc.setFont("helvetica","bold");doc.setTextColor(100);chk(5);doc.text(safe(l),mg,y);doc.setFont("helvetica","normal");doc.setTextColor(40);var ls=doc.splitTextToSize(safe(v),cw-42);doc.text(ls,mg+42,y);y+=Math.max(5,ls.length*3.5)}
+    function txt(t,sz){doc.setFontSize(sz||7.5);doc.setFont("helvetica","normal");doc.setTextColor(50);var ls=doc.splitTextToSize(safe(t),cw);for(var i=0;i<ls.length;i++){chk(LH+1);doc.text(ls[i],mg,y);y+=LH}}
+    function lst(items,label){if(!items||!items.length)return;chk(8);doc.setFontSize(8);doc.setFont("helvetica","bold");doc.setTextColor(PC[0],PC[1],PC[2]);doc.text(safe(label),mg,y);y+=5;
+      items.forEach(function(it){doc.setFontSize(7.5);doc.setFont("helvetica","normal");doc.setTextColor(50);var ls=doc.splitTextToSize("  - "+safe(it),cw-4);chk(ls.length*LH+1);for(var i=0;i<ls.length;i++){doc.text(ls[i],mg,y);y+=LH}});y+=2}
+    function chips(items,label){if(!items||!items.length)return;chk(10);doc.setFontSize(8);doc.setFont("helvetica","bold");doc.setTextColor(PC[0],PC[1],PC[2]);doc.text(safe(label),mg,y);y+=5;
+      doc.setFontSize(7);doc.setFont("helvetica","normal");doc.setTextColor(50);var line="";
+      items.forEach(function(it,i){line+=safe(it);if(i<items.length-1)line+="  |  "});
+      var ls=doc.splitTextToSize(line,cw);for(var i=0;i<ls.length;i++){chk(LH+1);doc.text(ls[i],mg,y);y+=LH}y+=3}
+
+    // HEADER
+    doc.setFillColor(PC[0],PC[1],PC[2]);doc.rect(0,0,pw,28,"F");
+    doc.setTextColor(255);doc.setFontSize(14);doc.setFont("helvetica","bold");
+    doc.text("FICHE DE POSTE",mg,13);
+    doc.setFontSize(9);doc.setFont("helvetica","normal");
+    doc.text(safe(gV("fIntitule")||"Poste a definir"),mg,20);
+    doc.setFontSize(7);doc.text("Cabinet X | "+safe(fN())+" | Confidentiel",mg,25);y=34;
+
+    // 1. INFORMATIONS GÉNÉRALES
+    hdr("1. INFORMATIONS GENERALES");
+    row("Intitule :",gV("fIntitule")||"--");
+    row("Service :",gV("fService")||"--");
+    row("Niveau :",gV("fNiveau")||"--");
+    row("Classification :",gV("fClassif")||"--");
+    row("Rattachement :",gV("fRattach")||"--");
+    row("Contrat :",gV("fContrat")||"--");y+=3;
+
+    // 2. PRÉSENTATION
+    if(gV("fPresentation")){hdr("2. PRESENTATION DU CABINET");txt(gV("fPresentation"));y+=3}
+
+    // 3. CONTEXTE
+    if(gV("fContexte")){hdr("3. CONTEXTE DU RECRUTEMENT");txt(gV("fContexte"));y+=3}
+
+    // 4. MISSIONS
+    var mp=getMissions("mP"),ms=getMissions("mS");
+    if(mp.length||ms.length){hdr("4. MISSIONS");lst(mp,"Missions principales");lst(ms,"Missions secondaires")}
+
+    // 5. PROFIL RECHERCHÉ
+    chk(40);
+    hdr("5. PROFIL RECHERCHE");
+    row("Formation :",gV("fFormation")||"--");
+    row("Experience :",gV("fExperience")||"--");y+=3;
+    chips(getTags("tTech"),"Competences techniques metier");
+    chips(getTags("tNum"),"Competences numeriques");
+    chips(getTags("tResp"),"Responsabilites numeriques");
+    chips(getTags("tSoft"),"Savoir-etre");
+    chips(getTags("tApp"),"Appetences numeriques - ADN cabinet 100 % digital");
+
+    // 6. CONDITIONS
+    hdr("6. CONDITIONS DE TRAVAIL ET REMUNERATION");
+    row("Lieu :",gV("fLieu")||"--");
+    row("Temps :",gV("fTemps")||"--");
+    var mn=gV("fSalMin"),mx=gV("fSalMax");
+    row("Remuneration :",(mn&&mx)?mn+" - "+mx+" EUR brut/an":"Selon profil et experience");
+    if(gV("fPrimes"))row("Variable :",gV("fPrimes"));y+=2;
+    chips(getTags("tAvant"),"Avantages");
+    if(gV("fPersp")){chk(10);doc.setFontSize(8);doc.setFont("helvetica","bold");doc.setTextColor(PC[0],PC[1],PC[2]);doc.text("Perspectives d'evolution",mg,y);y+=5;txt(gV("fPersp"));y+=3}
+
+
+
+    ft();
+    doc.save("Fiche_poste_"+(safe(gV("fIntitule"))||"poste").replace(/[^a-zA-Z0-9]/g,"_").substring(0,40)+"_"+new Date().toISOString().split("T")[0]+".pdf");
+    document.getElementById("ov").classList.remove("sh");toast("PDF téléchargé")
+  }catch(e){console.error(e);document.getElementById("ov").classList.remove("sh");toast("Erreur : "+e.message)}},300)
+}
+
+/* ═══ INIT ═══ */
+document.addEventListener("DOMContentLoaded",function(){rCk();fillM("mP",[]);fillM("mS",[]);loadFromStorage();updProgress()});
+</script>
+</body>
+</html>

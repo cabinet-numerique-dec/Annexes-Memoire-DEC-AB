@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Annexe 16 — Matrice de sélection des technologies de communication client</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root{--p:#1a2e44;--pl:#2c4a6e;--s:#0d7377;--sl:#10a3a8;--ac:#e5a00d;--dg:#c0392b;--ok:#27866a;--wr:#c77d15;--inf:#2563eb;--pu:#6c3fa0;--g50:#f8f9fb;--g100:#f0f2f5;--g200:#dfe2e8;--g300:#c8cdd5;--g500:#6b7280;--g700:#3b4252;--g800:#222b3a;--r:10px;--sh:0 2px 8px rgba(0,0,0,.08)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#eef1f5;color:var(--g700);line-height:1.65;min-height:100vh;font-size:14px}
+.wrap{max-width:1340px;margin:0 auto;padding:20px}
+.hd{background:linear-gradient(135deg,var(--p) 0%,var(--pl) 60%,var(--s) 100%);color:#fff;border-radius:var(--r);padding:24px 28px;margin-bottom:18px;position:relative;overflow:hidden}
+.hd::after{content:"";position:absolute;top:-40%;right:-5%;width:250px;height:250px;background:rgba(255,255,255,.04);border-radius:50%}
+.hd h1{font-size:22px;font-weight:700;position:relative;z-index:1}
+.hd p{opacity:.88;font-size:14px;max-width:850px;margin-top:4px;position:relative;z-index:1}
+.badges{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap;position:relative;z-index:1}
+.badge{background:rgba(255,255,255,.13);padding:4px 10px;border-radius:16px;font-size:12px;font-weight:600}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:10px 18px;border:none;border-radius:8px;font-size:13.5px;font-weight:600;cursor:pointer;transition:all .2s;font-family:inherit}
+.btn-p{background:var(--p);color:#fff}.btn-p:hover{background:var(--pl)}
+.btn-s{background:#fff;color:var(--g700);border:1px solid var(--g200)}.btn-s:hover{background:var(--g100)}
+.btn-w{background:var(--ac);color:#fff}.btn-w:hover{opacity:.9}
+.tabs{display:flex;gap:2px;background:#fff;padding:5px;border-radius:var(--r);box-shadow:var(--sh);margin-bottom:16px;flex-wrap:wrap}
+.tab{padding:10px 16px;border:none;background:transparent;font-size:13.5px;font-weight:600;color:var(--g500);border-radius:7px;cursor:pointer;transition:all .15s;white-space:nowrap;font-family:inherit}
+.tab:hover{background:var(--g100);color:var(--g700)}.tab.active{background:var(--p);color:#fff}
+.tab .dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-left:5px;vertical-align:middle}
+.dot-red{background:#e74c3c}.dot-green{background:#2ecc71}.dot-orange{background:#f39c12}
+.pn{display:none;animation:fadeIn .25s ease}.pn.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.card{background:#fff;border-radius:var(--r);padding:20px;box-shadow:var(--sh);margin-bottom:14px}
+.card-h{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--g200)}
+.card-ico{width:40px;height:40px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff;flex-shrink:0}
+.card h3{font-size:16px;font-weight:700;color:var(--g800)}
+.card-sub{font-size:12.5px;color:var(--g500)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.fg{margin-bottom:12px}
+.fg label{display:block;font-size:12.5px;font-weight:600;color:var(--g500);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px}
+.fg select,.fg input{width:100%;padding:10px 13px;border:1.5px solid var(--g200);border-radius:7px;font-size:14px;font-family:inherit;transition:border-color .2s;background:#fff}
+.fg select:focus,.fg input:focus{outline:none;border-color:var(--p);box-shadow:0 0 0 3px rgba(26,46,68,.08)}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{background:var(--p);color:#fff;padding:10px 12px;text-align:left;font-weight:600;font-size:13px}
+th:first-child{border-radius:7px 0 0 0}th:last-child{border-radius:0 7px 0 0}
+td{padding:10px 12px;border-bottom:1px solid var(--g200);vertical-align:top}
+tr:hover td{background:var(--g50)}
+.tag{display:inline-flex;align-items:center;gap:3px;padding:3px 9px;border-radius:14px;font-size:12px;font-weight:600}
+.t-ok{background:#d4efdf;color:var(--ok)}.t-wr{background:#fdebd0;color:var(--wr)}.t-dg{background:#fadbd8;color:var(--dg)}.t-inf{background:#d6eaf8;color:var(--inf)}.t-pu{background:#e8daef;color:var(--pu)}
+.ib{padding:14px 18px;border-radius:0 8px 8px 0;margin:12px 0;font-size:14px;line-height:1.6}
+.ib strong{display:block;margin-bottom:3px;color:var(--g800)}
+.ib-i{background:#edf2fa;border-left:3px solid var(--inf)}
+.ib-w{background:#fef5e7;border-left:3px solid var(--ac)}
+.ib-o{background:#e8f8f5;border-left:3px solid var(--ok)}
+.ib-e{background:#fce4e4;border-left:3px solid var(--dg)}
+.ck-item{display:flex;align-items:flex-start;gap:10px;padding:9px 11px;border-radius:7px;cursor:pointer;transition:all .15s;border:1px solid transparent;margin-bottom:3px}
+.ck-item:hover{background:var(--g50);border-color:var(--g200)}
+.ck-item.done{background:#e8f8f5;border-color:#a2d9ce}
+.ck-box{width:20px;height:20px;border:2px solid var(--g300);border-radius:5px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11px;font-weight:700;color:#fff;transition:all .15s;margin-top:1px}
+.ck-item.done .ck-box{background:var(--ok);border-color:var(--ok)}
+.ck-label{font-size:13.5px;font-weight:500}.ck-ref{font-size:12px;color:var(--g500);margin-top:1px}
+.gauge{width:100%;height:8px;background:var(--g200);border-radius:4px;overflow:hidden;margin-top:6px}
+.gauge-fill{height:100%;border-radius:4px;transition:width .4s ease}
+.result{background:linear-gradient(135deg,var(--p),var(--pl));color:#fff;border-radius:var(--r);padding:20px;margin-top:14px}
+.result.hidden{display:none}
+.result h4{margin-bottom:10px;font-size:16px}
+.result-stats{display:flex;gap:18px;flex-wrap:wrap;margin-top:12px}
+.result-stat{text-align:center}.result-stat .v{font-size:22px;font-weight:800}.result-stat .l{font-size:12px;opacity:.88;margin-top:2px}
+.charte-preview{background:#fff;border:2px solid var(--p);border-radius:var(--r);padding:24px;margin-top:14px}
+.charte-preview h2{font-size:18px;color:var(--p);border-bottom:2px solid var(--p);padding-bottom:8px;margin-bottom:14px}
+.charte-section{margin-bottom:16px}
+.charte-section h4{font-size:14.5px;color:var(--p);margin-bottom:6px;padding-left:8px;border-left:3px solid var(--s)}
+.charte-rule{display:flex;gap:8px;font-size:13.5px;padding:5px 0;align-items:flex-start}
+.charte-rule .ico{flex-shrink:0;font-size:15px;margin-top:1px}
+.charte-editable{border:1px dashed var(--g300);border-radius:5px;padding:8px 12px;font-size:13.5px;min-height:32px;cursor:text;transition:border-color .2s}
+.charte-editable:focus{outline:none;border-color:var(--s);background:#f7fffe}
+/* Deploy phase */
+.phase{border-left:3px solid var(--g300);padding-left:14px;margin-bottom:18px}
+.phase-h{font-size:14.5px;font-weight:700;color:var(--p);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.phase-badge{font-size:11px;padding:3px 10px;border-radius:10px;font-weight:600;color:#fff}
+.deploy-item{display:flex;align-items:flex-start;gap:10px;padding:8px 12px;border-radius:6px;cursor:pointer;transition:all .15s;margin-bottom:2px;font-size:13.5px}
+.deploy-item:hover{background:var(--g50)}
+.deploy-item.done{color:var(--ok);font-weight:500}
+.deploy-item.done .d-box{background:var(--ok);border-color:var(--ok);color:#fff}
+.d-box{width:18px;height:18px;border:2px solid var(--g300);border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:10px;font-weight:700;transition:all .15s;margin-top:1px}
+.ref{font-size:11.5px;color:var(--g500);margin-top:5px;font-style:italic}
+.toast{position:fixed;bottom:20px;right:20px;padding:11px 18px;border-radius:8px;box-shadow:0 8px 30px rgba(0,0,0,.18);transform:translateY(80px);opacity:0;transition:all .3s;z-index:9999;font-size:13.5px;font-weight:500;color:#fff;background:var(--ok)}
+.toast.show{transform:translateY(0);opacity:1}
+.overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:99999;display:none;align-items:center;justify-content:center}
+.overlay.show{display:flex}
+.overlay-c{background:#fff;padding:28px;border-radius:14px;text-align:center;min-width:260px}
+.spinner{width:36px;height:36px;margin:0 auto 14px;border:3px solid var(--g200);border-top-color:var(--p);border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media(max-width:768px){.wrap{padding:12px}.hd h1{font-size:16px}.grid{grid-template-columns:1fr}}
+@media print{.tabs,.toolbar,.btn{display:none!important}.pn{display:block!important}.card{box-shadow:none;border:1px solid #ddd;break-inside:avoid}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hd">
+  <h1>Annexe 16 — Matrice de sélection des technologies de communication client</h1>
+  <p>Outil d'aide à la décision : du diagnostic à la charte de communication digitale personnalisée, prête à annexer à la lettre de mission.</p>
+  <div class="badges">
+    <span class="badge">Partie II, Chap. 2, §2.1</span>
+    <span class="badge">7 familles technologiques</span>
+    <span class="badge">Ord. 1945 art. 21 | Art. 147 et 152 CD | RGPD</span>
+    <span class="badge">Annexe 15 → 16 → 17</span>
+  </div>
+</div>
+
+<div class="toolbar">
+  <button class="btn btn-p" onclick="exportPDF()">📄 Export PDF</button>
+  <button class="btn btn-w" onclick="loadCabinetX()">📘 Cas pratique Cabinet X</button>
+  <button class="btn btn-s" onclick="exportJSON()">💾 Export JSON</button>
+  <input type="file" id="impFile" accept=".json" style="display:none" onchange="importJSON(event)">
+  <button class="btn btn-s" onclick="document.getElementById('impFile').click()">📂 Importer</button>
+  <button class="btn btn-s" onclick="resetAll()">🔄 Réinitialiser</button>
+</div>
+
+<div class="tabs" id="tabBar">
+  <button class="tab active" data-t="t1">1. Diagnostic<span class="dot dot-red" id="dot1"></span></button>
+  <button class="tab" data-t="t2">2. Sélection<span class="dot dot-red" id="dot2"></span></button>
+  <button class="tab" data-t="t3">3. Conformité<span class="dot dot-red" id="dot3"></span></button>
+  <button class="tab" data-t="t4">4. Charte générée<span class="dot dot-red" id="dot4"></span></button>
+  <button class="tab" data-t="t5">5. Déploiement<span class="dot dot-red" id="dot5"></span></button>
+</div>
+
+<!-- ═══════════ 1. DIAGNOSTIC ═══════════ -->
+<div id="t1" class="pn active">
+  <div class="ib ib-i"><strong>Démarche :</strong> Paramétrez le profil du cabinet. Les recommandations générées alimentent automatiquement la sélection (onglet 2) et la charte (onglet 4). Le référentiel des sept familles technologiques sert de base à l'évaluation.</div>
+
+  <!-- CORRECTION #3 : Note secret vs discrétion -->
+  <div class="ib ib-w"><strong>Double obligation — secret professionnel et discrétion :</strong> L'expert-comptable est soumis à deux régimes distincts. Le <em>secret professionnel</em> (ordonnance n° 45-2138, art. 21 ; art. 226-13 CP) est absolu et pénalement sanctionné : il couvre les informations confidentielles confiées par le client dans le cadre de la mission. Le <em>devoir de discrétion</em> (art. 147 CD) est plus large : il couvre « toutes les informations dont [l'expert-comptable] a connaissance dans le cadre de son activité », y compris l'existence même de la relation professionnelle. La classification des canaux dans cet outil repose sur le <strong>cumul des deux obligations</strong> : un canal est interdit s'il ne garantit pas le respect de l'une ou l'autre.</div>
+
+  <div class="grid">
+    <div class="card">
+      <div class="card-h"><div class="card-ico" style="background:linear-gradient(135deg,var(--s),var(--sl))">⚙️</div><div><h3>Profil du cabinet</h3><div class="card-sub">Paramétrage contextuel</div></div></div>
+      <div class="fg"><label>Taille du cabinet *</label><select id="dTaille" onchange="checkDiag()"><option value="">— Sélectionner —</option><option value="solo">Solo (1 EC)</option><option value="petit">Petit (2-5 pers.)</option><option value="moyen">Moyen (6-15 pers.)</option></select></div>
+      <div class="fg"><label>Clientèle dominante *</label><select id="dClient" onchange="checkDiag()"><option value="">— Sélectionner —</option><option value="tpe">TPE traditionnelles</option><option value="startup">Startups / Tech</option><option value="pme">PME structurées</option><option value="liberal">Professions libérales</option><option value="mixte">Portefeuille mixte</option></select></div>
+      <div class="fg"><label>Maturité digitale clients *</label><select id="dMaturite" onchange="checkDiag()"><option value="">— Sélectionner —</option><option value="faible">Faible</option><option value="moyenne">Moyenne</option><option value="elevee">Élevée (tech-native)</option></select></div>
+      <div class="fg"><label>Budget communication annuel</label><select id="dBudget"><option value="minimal">Minimal (&lt;500 €/an)</option><option value="modere">Modéré (500-2 000 €)</option><option value="confortable">Confortable (2 000-5 000 €)</option></select></div>
+      <div class="fg"><label>Objectif prioritaire</label><select id="dObjectif"><option value="reactivite">Réactivité perçue</option><option value="pedagogie">Pédagogie / valeur perçue</option><option value="autonomie">Autonomie client</option><option value="proximite">Proximité relationnelle</option></select></div>
+      <div class="fg"><label>Exigence conformité</label><select id="dConf"><option value="standard">Standard (RGPD base)</option><option value="renforce">Renforcé (clients sensibles)</option><option value="maximum">Maximum (secteurs réglementés)</option></select></div>
+      <button class="btn btn-p" onclick="genRecos()" style="margin-top:6px;width:100%">Générer les recommandations →</button>
+    </div>
+    <div class="card">
+      <div class="card-h"><div class="card-ico" style="background:linear-gradient(135deg,var(--inf),#3b82f6)">📋</div><div><h3>Référentiel — 7 familles technologiques</h3><div class="card-sub">Tableau de synthèse, Partie II, §2.1</div></div></div>
+      <div style="overflow-x:auto"><table>
+        <thead><tr><th>Famille</th><th>Cas d'usage cabinet</th><th>Risques et contrôles</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Portail client / GED</strong></td><td>Dépôt pièces, accès documents, échanges archivés</td><td>MFA, droits d'accès, journalisation</td></tr>
+          <tr><td><strong>Ticketing / helpdesk</strong></td><td>Suivi demandes, priorisation, SLA</td><td>Catégorisation, gouvernance, archivage</td></tr>
+          <tr><td><strong>Visioconférence</strong></td><td>Bilans, points pilotage, RDV prospects</td><td>Consentement enregistrement, CR</td></tr>
+          <tr><td><strong>Prise de RDV</strong></td><td>Planification, rappels auto J-1/H-1</td><td>Pas de données sensibles dans l'outil</td></tr>
+          <tr><td><strong>Signature électronique</strong></td><td>Lettres de mission, avenants, mandats</td><td>Niveau eIDAS avancé min., conservation probatoire</td></tr>
+          <tr><td><strong>CRM / automatisation</strong></td><td>Rappels, échéances, newsletters</td><td>Consentement RGPD, désabonnement</td></tr>
+          <tr><td><strong>Messagerie encadrée</strong></td><td>Questions courtes, rappels RDV</td><td>Canal autorisé, traçabilité requise</td></tr>
+        </tbody>
+      </table></div>
+      <!-- CORRECTION #2 : Ordonnance 1945 ajoutée + CORRECTION #4 : NPMQ arrêté 2024 -->
+      <p class="ref">Réf. : Ord. n° 45-2138 du 19 sept. 1945, art. 21 (secret professionnel) | Art. 147 CD (discrétion) | Art. 152 CD (communication) | RGPD UE 2016/679 | ANSSI 2024 | NPMQ (arrêté 30 mai 2024, JO 17 juil. 2024), §45</p>
+    </div>
+  </div>
+  <div class="result hidden" id="recoBox"><h4>💡 Recommandations personnalisées</h4><div id="recoCt"></div></div>
+</div>
+
+<!-- ═══════════ 2. SÉLECTION ═══════════ -->
+<div id="t2" class="pn">
+  <div class="ib ib-i"><strong>Matrice multicritères :</strong> Cochez les technologies. Budget calculé en temps réel. Cinq critères métier : secret professionnel (/5), traçabilité (/5), expérience client (/5), charge interne, coût. Score global sur 10.</div>
+  <div class="card">
+    <div style="overflow-x:auto"><table>
+      <thead><tr><th style="width:28px">✓</th><th>Technologie</th><th>Famille</th><th>Usage principal</th><th>Secret<br>/5</th><th>Traça.<br>/5</th><th>Exp.<br>/5</th><th>Coût<br>€/mois</th><th>Score<br>/10</th></tr></thead>
+      <tbody id="selBody"></tbody>
+    </table></div>
+    <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+      <button class="btn btn-p" onclick="calcStack()">Calculer ma stack</button>
+      <button class="btn btn-s" onclick="autoSelect()">Sélection recommandée</button>
+      <button class="btn btn-s" onclick="clearSel()">Tout décocher</button>
+    </div>
+  </div>
+  <div class="card" id="coverageCard" style="display:none">
+    <div class="card-h"><div class="card-ico" style="background:linear-gradient(135deg,var(--pu),#a78bfa)">📊</div><div><h3>Couverture des familles technologiques</h3></div></div>
+    <div id="coverageGrid" class="grid3"></div>
+  </div>
+  <div class="result hidden" id="stackBox"><h4>🎯 Stack technologique retenue</h4><div id="stackCt"></div><div class="result-stats" id="stackStats"></div></div>
+</div>
+
+<!-- ═══════════ 3. CONFORMITÉ ═══════════ -->
+<div id="t3" class="pn">
+  <!-- CORRECTION #3 bis : rappel double obligation -->
+  <div class="ib ib-w"><strong>Fondement de la classification :</strong> L'interdiction de certains canaux repose sur le <em>cumul</em> de deux obligations : le secret professionnel (ord. 1945, art. 21 ; art. 226-13 CP) pour les données couvertes par ce régime, et le devoir de discrétion (art. 147 CD) pour l'ensemble des autres informations — y compris la simple existence d'une relation professionnelle.</div>
+
+  <div class="grid">
+    <div class="card">
+      <div class="card-h"><div class="card-ico" style="background:linear-gradient(135deg,var(--dg),#e74c3c)">🔒</div><div><h3>Classification des canaux</h3><div class="card-sub">Ord. 1945, art. 21 | Art. 147 CD | Art. 226-13 CP</div></div></div>
+      <table>
+        <thead><tr><th>Canal</th><th>Statut</th><th>Condition d'usage</th></tr></thead>
+        <tbody>
+          <tr><td>Portail client sécurisé</td><td><span class="tag t-ok">✓ Autorisé</span></td><td>Chiffrement TLS, MFA, journalisation</td></tr>
+          <tr><td>Email professionnel chiffré</td><td><span class="tag t-ok">✓ Autorisé</span></td><td>TLS obligatoire, domaine professionnel</td></tr>
+          <tr><td>Visio (Teams/Meet/Zoom EU)</td><td><span class="tag t-ok">✓ Autorisé</span></td><td>Consentement enregistrement, CR obligatoire</td></tr>
+          <tr><td>Messagerie Teams/Slack</td><td><span class="tag t-ok">✓ Autorisé</span></td><td>Espace dédié, droits configurés</td></tr>
+          <tr><td>Calendly / Cal.com</td><td><span class="tag t-ok">✓ Autorisé</span></td><td>Pas de données sensibles</td></tr>
+          <!-- CORRECTION #1 : WhatsApp renforcé -->
+          <tr style="background:#fef9ed"><td>WhatsApp Business</td><td><span class="tag t-wr">⚠ Restreint</span></td><td>Logistique uniquement. <strong>Contenu limité à « Rappel : RDV demain à [heure] »</strong> — sans mention du cabinet, du sujet de la mission ou de toute donnée identifiable. N° professionnel dédié obligatoire.</td></tr>
+          <tr><td>SMS</td><td><span class="tag t-wr">⚠ Restreint</span></td><td>Rappels RDV uniquement, même restriction</td></tr>
+          <tr><td>WhatsApp perso / Messenger</td><td><span class="tag t-dg">✗ Interdit</span></td><td>Aucune traçabilité, non archivable</td></tr>
+          <tr><td>SMS contenant des données</td><td><span class="tag t-dg">✗ Interdit</span></td><td>Non chiffré, non archivé</td></tr>
+        </tbody>
+      </table>
+      <!-- CORRECTION #1 bis -->
+      <div class="ib ib-e" style="margin-top:10px"><strong>Point de vigilance — WhatsApp Business :</strong> Bien que chiffré de bout en bout, WhatsApp Business appartient à Meta (société américaine). Le DPA proposé par Meta n'offre pas le même contrôle qu'un DPA classique au sens de l'art. 28 du RGPD. L'usage est toléré en mode <em>strictement logistique</em>, à condition que le message ne permette pas d'identifier la nature de la relation professionnelle. <strong>En cas de doute (client sensible, mission à risque ou secteur réglementé), ce canal restreint est désactivé et remplacé par le portail sécurisé + email professionnel</strong> — arbitrage qui garantit la maîtrise opérationnelle du dispositif.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-h"><div class="card-ico" style="background:linear-gradient(135deg,var(--inf),#3b82f6)">☑️</div><div><h3>Checklist de conformité — 10 points</h3></div></div>
+      <div id="checklistCt"></div>
+      <div style="margin-top:12px">
+        <div style="display:flex;justify-content:space-between;font-size:13.5px;font-weight:600"><span>Score conformité</span><span id="confScore">0 / 10</span></div>
+        <div class="gauge"><div class="gauge-fill" id="confGauge" style="width:0%;background:var(--dg)"></div></div>
+        <div id="confVerdict" style="margin-top:6px;font-size:13px;font-weight:600;color:var(--dg)">Non évalué</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:14px">
+    <div class="card-h"><div class="card-ico" style="background:linear-gradient(135deg,var(--pu),#a78bfa)">📊</div><div><h3>Conformité par outil sélectionné</h3></div></div>
+    <div style="overflow-x:auto"><table>
+      <thead><tr><th>Outil</th><th>Héberg. UE</th><th>Chiffrement</th><th>MFA</th><th>DPA</th><th>Statut</th></tr></thead>
+      <tbody id="confGrid"></tbody>
+    </table></div>
+    <div id="confGridEmpty" class="ib ib-w" style="display:none"><strong>Aucun outil sélectionné.</strong> Complétez l'onglet 2 pour constituer votre stack.</div>
+  </div>
+</div>
+
+<!-- ═══════════ 4. CHARTE GÉNÉRÉE ═══════════ -->
+<div id="t4" class="pn">
+  <div class="ib ib-o"><strong>Livrable central :</strong> Charte générée automatiquement à partir de vos choix (onglets 1-3). Conçue pour être annexée à la lettre de mission (art. 151 CD). Zones en pointillés éditables. Exportez en PDF une fois finalisée.</div>
+
+  <div id="charteEmpty" class="card" style="text-align:center;padding:40px">
+    <div style="font-size:40px;margin-bottom:12px">📋</div>
+    <h3 style="margin-bottom:8px">Charte non encore générée</h3>
+    <p style="font-size:13px;color:var(--g500);margin-bottom:16px">Complétez les onglets 1 à 3 pour générer la charte de communication digitale.</p>
+    <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+      <button class="btn btn-p" onclick="switchTab('t1')">1. Diagnostic</button>
+      <button class="btn btn-s" onclick="switchTab('t2')">2. Sélection</button>
+    </div>
+  </div>
+
+  <div id="charteContent" style="display:none">
+    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+      <button class="btn btn-p" onclick="exportPDF()">📄 Exporter en PDF</button>
+      <button class="btn btn-s" onclick="generateCharte()">🔄 Regénérer</button>
+    </div>
+    <div class="charte-preview" id="chartePreview">
+      <div style="text-align:center;margin-bottom:16px">
+        <div style="font-size:12.5px;color:var(--g500);text-transform:uppercase;letter-spacing:1px">Annexe à la lettre de mission — Art. 151 Code de déontologie (décret n° 2012-432)</div>
+        <h2 style="border:none;padding:0;margin:8px 0 4px">CHARTE DE COMMUNICATION DIGITALE</h2>
+        <div style="font-size:13px;color:var(--g500)" id="charteDate"></div>
+      </div>
+      <div class="charte-section"><h4>Article 1 — Objet et périmètre</h4><div class="charte-editable" contenteditable="true" id="ch_objet"></div></div>
+      <div class="charte-section"><h4>Article 2 — Canaux autorisés et gradation</h4><div id="ch_canaux"></div></div>
+      <div class="charte-section"><h4>Article 3 — Outils retenus et engagements</h4><div id="ch_outils"></div></div>
+      <div class="charte-section"><h4>Article 4 — Délais de réponse (SLA)</h4><div id="ch_sla"></div></div>
+      <div class="charte-section"><h4>Article 5 — Sécurité des échanges</h4><div id="ch_securite"></div></div>
+      <!-- CORRECTION #7 : Déconnexion = engagement contractuel, pas L. 3121-64 -->
+      <div class="charte-section"><h4>Article 6 — Engagement de disponibilité et de déconnexion</h4><div class="charte-editable" contenteditable="true" id="ch_deconnexion"></div></div>
+      <div class="charte-section"><h4>Article 7 — Rendez-vous et visioconférence</h4><div id="ch_rdv"></div></div>
+      <!-- CORRECTION #2 : Ordonnance 1945 dans les références -->
+      <div class="charte-section"><h4>Article 8 — Références réglementaires</h4><div id="ch_refs"></div></div>
+
+      <div style="margin-top:20px;padding-top:14px;border-top:2px solid var(--g200);display:flex;justify-content:space-between">
+        <div><div style="font-size:12.5px;color:var(--g500)">Pour le cabinet</div><div style="border-bottom:1px solid var(--g300);width:180px;height:30px;margin-top:4px"></div><div style="font-size:11px;color:var(--g500);margin-top:2px">Date et signature</div></div>
+        <div><div style="font-size:12.5px;color:var(--g500)">Pour le client</div><div style="border-bottom:1px solid var(--g300);width:180px;height:30px;margin-top:4px"></div><div style="font-size:11px;color:var(--g500);margin-top:2px">Date et signature</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ 5. DÉPLOIEMENT ═══════════ -->
+<div id="t5" class="pn">
+  <div class="ib ib-i"><strong>Plan de déploiement :</strong> Checklist opérationnelle en trois phases, générée automatiquement à partir des outils sélectionnés (onglet 2). Cochez chaque action au fur et à mesure de l'avancement.</div>
+
+  <div id="deployEmpty" class="card" style="text-align:center;padding:30px">
+    <h3 style="margin-bottom:8px">Aucun outil sélectionné</h3>
+    <p style="font-size:13px;color:var(--g500);margin-bottom:12px">Complétez l'onglet 2 pour générer le plan de déploiement.</p>
+    <button class="btn btn-p" onclick="switchTab('t2')">Aller à la sélection</button>
+  </div>
+
+  <div id="deployContent" style="display:none">
+    <div class="grid">
+      <div class="card">
+        <div class="card-h"><div class="card-ico" style="background:linear-gradient(135deg,var(--inf),#3b82f6)">🚀</div><div><h3>Plan de déploiement en 3 phases</h3><div class="card-sub">Adapté à votre stack — <span id="deployCount">0</span> actions</div></div></div>
+        <div id="deployPhases"></div>
+        <div style="margin-top:12px;display:flex;justify-content:space-between;font-size:13.5px;font-weight:600">
+          <span>Progression</span><span id="deployProgress">0 %</span>
+        </div>
+        <div class="gauge"><div class="gauge-fill" id="deployGauge" style="width:0%;background:var(--inf)"></div></div>
+      </div>
+
+      <div class="card">
+        <div class="card-h"><div class="card-ico" style="background:linear-gradient(135deg,var(--ok),#34d399)">📅</div><div><h3>Configuration des types de RDV</h3><div class="card-sub">Pour paramétrer Calendly / Cal.com</div></div></div>
+        <table>
+          <thead><tr><th>Type de RDV</th><th>Durée</th><th>Canal</th><th>Rappels auto</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Découverte prospect</strong></td><td>30 min</td><td>Visio</td><td>J-1 + H-1</td></tr>
+            <tr><td><strong>Point onboarding</strong></td><td>15 min</td><td>Visio ou tél.</td><td>J-2 + J-1</td></tr>
+            <tr><td><strong>Bilan trimestriel</strong></td><td>45 min</td><td>Visio (écran partagé)</td><td>J-7 + J-1 + H-1</td></tr>
+            <tr><td><strong>Callback</strong></td><td>10 min</td><td>Téléphone rappel</td><td>Confirmation SMS</td></tr>
+            <tr><td><strong>Clôture annuelle</strong></td><td>60 min</td><td>Visio présentation</td><td>J-14 + J-7 + J-1</td></tr>
+            <tr><td><strong>Urgence</strong></td><td>Variable</td><td>Tél. + visio</td><td>Immédiat</td></tr>
+          </tbody>
+        </table>
+        <p class="ref">Intégrer le lien Calendly dans : signature email, page d'accueil du portail client, profil WhatsApp Business.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+<div id="overlay" class="overlay"><div class="overlay-c"><div class="spinner"></div><div style="font-size:14px;font-weight:600;color:var(--g700)">Génération en cours…</div></div></div>
+<div id="toastEl" class="toast"></div>
+
+<script>
+/* ══════════════════════════════════════ DATA ══════════════════════════════════════ */
+var TOOLS=[
+  {id:"pennylane",n:"Portail Pennylane",cat:"portail",u:"Portail client intégré, dépôt, accès temps réel",sec:5,tra:5,exp:4,co:0,sc:9.5,ue:true,chif:true,mfa:true,dpa:true},
+  {id:"dext",n:"Dext Collaborate",cat:"portail",u:"Collecte pièces + messagerie intégrée",sec:5,tra:5,exp:4,co:0,sc:8.5,ue:true,chif:true,mfa:true,dpa:true},
+  {id:"mycompany",n:"MyCompanyFiles",cat:"portail",u:"GED sécurisée, hébergement FR",sec:5,tra:5,exp:3,co:15,sc:8,ue:true,chif:true,mfa:true,dpa:true},
+  {id:"freshdesk",n:"Freshdesk",cat:"ticketing",u:"Helpdesk, suivi demandes, SLA",sec:4,tra:5,exp:4,co:0,sc:7.5,ue:true,chif:true,mfa:true,dpa:true},
+  {id:"crisp",n:"Crisp",cat:"ticketing",u:"Chat + ticketing site web",sec:4,tra:4,exp:4,co:0,sc:7,ue:true,chif:true,mfa:false,dpa:true},
+  /* CORRECTION #5 : Zoom EU Data Residency — flag ue:true */
+  {id:"zoom",n:"Zoom Pro (EU Data Residency)",cat:"visio",u:"Visioconférence, enregistrement — datacenter UE activé",sec:4,tra:4,exp:5,co:14,sc:9,ue:true,chif:true,mfa:true,dpa:true},
+  {id:"teams",n:"Microsoft Teams",cat:"visio",u:"Messagerie + visio + partage fichiers",sec:5,tra:5,exp:5,co:10.5,sc:9.5,ue:true,chif:true,mfa:true,dpa:true},
+  {id:"meet",n:"Google Meet",cat:"visio",u:"Visio simple (Google Workspace)",sec:4,tra:4,exp:4,co:0,sc:7,ue:true,chif:true,mfa:true,dpa:true},
+  {id:"calendly",n:"Calendly",cat:"rdv",u:"RDV en ligne, rappels auto J-1 H-1",sec:4,tra:4,exp:5,co:0,sc:9,ue:true,chif:true,mfa:false,dpa:true},
+  {id:"calcom",n:"Cal.com",cat:"rdv",u:"RDV open source, auto-hébergeable",sec:5,tra:4,exp:4,co:0,sc:8,ue:true,chif:true,mfa:false,dpa:true},
+  {id:"yousign",n:"Yousign",cat:"signature",u:"Signature eIDAS avancée, héberg. FR",sec:5,tra:5,exp:4,co:9,sc:9,ue:true,chif:true,mfa:true,dpa:true},
+  {id:"brevo",n:"Brevo (ex-Sendinblue)",cat:"crm",u:"Newsletters, automatisation, héberg. FR",sec:4,tra:4,exp:4,co:19,sc:8,ue:true,chif:true,mfa:true,dpa:true},
+  {id:"loom",n:"Loom",cat:"crm",u:"Vidéos explicatives personnalisées",sec:3,tra:3,exp:5,co:12,sc:8.5,ue:false,chif:true,mfa:true,dpa:true},
+  {id:"axonaut",n:"Axonaut CRM",cat:"crm",u:"CRM français + facturation intégrée",sec:5,tra:5,exp:3,co:35,sc:7.5,ue:true,chif:true,mfa:true,dpa:true},
+  {id:"slack",n:"Slack",cat:"messagerie",u:"Messagerie par canaux, intégrations",sec:4,tra:4,exp:4,co:7.25,sc:8,ue:true,chif:true,mfa:true,dpa:true},
+  {id:"whatsapp",n:"WhatsApp Business",cat:"messagerie",u:"Rappels RDV uniquement (RESTREINT — art. 147 CD)",sec:2,tra:2,exp:5,co:0,sc:6,ue:false,chif:true,mfa:false,dpa:false}
+];
+var CAT_LABELS={portail:"Portail / GED",ticketing:"Ticketing",visio:"Visioconférence",rdv:"Prise de RDV",signature:"Signature élec.",crm:"CRM / Automatisation",messagerie:"Messagerie"};
+var ALL_CATS=["portail","ticketing","visio","rdv","signature","crm","messagerie"];
+
+/* CORRECTION #2 : Ordonnance 1945 dans checklist */
+var CHECKS=[
+  {id:"c1",t:"Hébergement des données en UE vérifié pour chaque outil",r:"RGPD art. 44-49"},
+  {id:"c2",t:"Politique de conservation documentée par canal",r:"RGPD art. 5(1)(e)"},
+  {id:"c3",t:"Authentification forte (MFA) activée sur tous les outils",r:"ANSSI 2024, recommandation n° 19"},
+  {id:"c4",t:"Mentions RGPD intégrées dans les communications clients",r:"RGPD art. 13-14"},
+  {id:"c5",t:"Équipe formée à la confidentialité des échanges numériques",r:"Ord. 1945 art. 21 ; Art. 147 CD"},
+  {id:"c6",t:"Canaux non sécurisés formellement interdits (procédure écrite)",r:"Ord. 1945 art. 21 ; Art. 226-13 CP"},
+  {id:"c7",t:"Consentement client documenté pour chaque canal utilisé",r:"RGPD art. 6-7"},
+  {id:"c8",t:"Procédure de droit d'accès RGPD opérationnelle",r:"RGPD art. 15-20"},
+  {id:"c9",t:"DPA signé avec chaque sous-traitant (hors WhatsApp — cf. vigilance)",r:"RGPD art. 28"},
+  {id:"c10",t:"Communication conforme à l'art. 152 du Code de déontologie",r:"CD (éd. janvier 2026)"}
+];
+
+/* STATE */
+var STATE={diag:{taille:"",client:"",maturite:"",budget:"minimal",objectif:"reactivite",conf:"standard"},selected:{},checks:{},deploy:{},charteGenerated:false};
+
+/* ══════════════════════════════════════ INIT ══════════════════════════════════════ */
+function init(){
+  document.querySelectorAll('.tab').forEach(function(t){t.addEventListener('click',function(){switchTab(t.dataset.t)})});
+  buildSelTable();buildChecklist();updateDots();
+}
+function switchTab(id){
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active')});
+  document.querySelectorAll('.pn').forEach(function(p){p.classList.remove('active')});
+  document.querySelector('[data-t="'+id+'"]').classList.add('active');
+  document.getElementById(id).classList.add('active');
+  if(id==='t4')tryGenerateCharte();
+  if(id==='t3')updateConfGrid();
+  if(id==='t5')buildDeploy();
+}
+
+/* ══════════════════════════════════════ TAB 1 ══════════════════════════════════════ */
+function checkDiag(){STATE.diag.taille=gv('dTaille');STATE.diag.client=gv('dClient');STATE.diag.maturite=gv('dMaturite');updateDots();}
+function genRecos(){
+  var d=STATE.diag;d.taille=gv('dTaille');d.client=gv('dClient');d.maturite=gv('dMaturite');d.budget=gv('dBudget');d.objectif=gv('dObjectif');d.conf=gv('dConf');
+  if(!d.taille||!d.client||!d.maturite){toast("Renseignez les 3 champs obligatoires (*)","warn");return;}
+  var r=[];
+  if(d.taille==='solo')r.push({i:"📂",t:"<strong>Portail :</strong> Pennylane (intégré) + Dext pour la collecte. MyCompanyFiles en alternative si hébergement 100 % français requis."});
+  else r.push({i:"📂",t:"<strong>Portail :</strong> Pennylane + Dext en standard. Ajouter MyCompanyFiles pour les clients sensibles."});
+  if(d.maturite==='faible')r.push({i:"📹",t:"<strong>Visio :</strong> Google Meet (gratuit, pas d'installation). Transition vers Teams à M+3. Accompagnement client au premier appel."});
+  else if(d.maturite==='elevee')r.push({i:"📹",t:"<strong>Visio :</strong> Microsoft Teams (écosystème complet). Enregistrement avec consentement pour archivage CR."});
+  else r.push({i:"📹",t:"<strong>Visio :</strong> Zoom Pro (EU Data Residency activé) ou Teams. Lien Calendly dans chaque invitation."});
+  r.push({i:"📅",t:"<strong>Prise de RDV :</strong> Calendly (gratuit) — lien dans la signature email + portail client. Rappels J-1 + H-1. Cal.com en alternative (auto-hébergement)."});
+  if(d.conf==='maximum')r.push({i:"💬",t:"<strong>Messagerie :</strong> Teams uniquement (traçabilité). WhatsApp Business <strong>exclu</strong> pour les clients de secteurs réglementés (ord. 1945, art. 21)."});
+  else r.push({i:"💬",t:"<strong>Messagerie :</strong> WhatsApp Business en usage <strong>strictement restreint</strong> — rappels RDV neutres uniquement (« Rappel : RDV demain à 14h »), jamais de mention de mission. Teams ou Slack pour les échanges structurés."});
+  if(d.taille==='solo')r.push({i:"🎫",t:"<strong>Ticketing :</strong> Crisp (gratuit, chat intégré). Passage à Freshdesk au-delà de 20 clients."});
+  else r.push({i:"🎫",t:"<strong>Ticketing :</strong> Freshdesk (plan gratuit) pour structurer les demandes. SLA configurables."});
+  if(d.objectif==='pedagogie')r.push({i:"📧",t:"<strong>CRM / Pédagogie :</strong> Loom pour vidéos explicatives (3-5 min). Brevo pour newsletter (Annexe 17). Attention : Loom hébergé hors UE — réserver aux contenus non confidentiels."});
+  else if(d.budget==='minimal')r.push({i:"📧",t:"<strong>CRM :</strong> Brevo gratuit (300 emails/jour). Reporter l'investissement CRM complet à la deuxième année."});
+  else r.push({i:"📧",t:"<strong>CRM :</strong> Axonaut (CRM français + facturation) ou Brevo (newsletter + automatisation)."});
+  r.push({i:"✍️",t:"<strong>Signature :</strong> Yousign — signature eIDAS avancée au minimum pour la lettre de mission (règlement UE n° 910/2014). Hébergement FR. Cf. Annexe 14."});
+  if(d.budget==='minimal')r.push({i:"💰",t:"<strong>Budget :</strong> Stack gratuite possible (Pennylane + Dext + Calendly + Crisp + Brevo gratuit + Meet). Coût additionnel : 0 €."});
+  var h='';r.forEach(function(x){h+='<div style="display:flex;gap:10px;padding:8px 12px;background:rgba(255,255,255,.1);border-radius:8px;margin-bottom:6px;align-items:flex-start;font-size:13.5px"><span style="font-size:18px;flex-shrink:0">'+x.i+'</span><span>'+x.t+'</span></div>';});
+  document.getElementById('recoCt').innerHTML=h;document.getElementById('recoBox').classList.remove('hidden');updateDots();toast("Recommandations générées");
+}
+
+/* ══════════════════════════════════════ TAB 2 ══════════════════════════════════════ */
+function buildSelTable(){
+  var h='';TOOLS.forEach(function(t){
+    h+='<tr id="row_'+t.id+'" onclick="toggleSel(\''+t.id+'\')" style="cursor:pointer">';
+    h+='<td><div class="ck-box" id="cb_'+t.id+'" style="width:18px;height:18px;border-radius:4px"></div></td>';
+    h+='<td><strong>'+t.n+'</strong>'+(t.id==='whatsapp'?' <span class="tag t-wr" style="font-size:9px">Restreint</span>':'')+'</td>';
+    h+='<td><span class="tag t-inf">'+CAT_LABELS[t.cat]+'</span></td>';
+    h+='<td style="font-size:12.5px">'+t.u+'</td>';
+    h+='<td style="text-align:center">'+t.sec+'</td><td style="text-align:center">'+t.tra+'</td><td style="text-align:center">'+t.exp+'</td>';
+    h+='<td style="text-align:center">'+(t.co===0?'Gratuit':t.co+' €')+'</td>';
+    h+='<td style="text-align:center;font-weight:700">'+t.sc+'</td></tr>';
+  });document.getElementById('selBody').innerHTML=h;
+}
+function toggleSel(id){
+  STATE.selected[id]=!STATE.selected[id];
+  var row=document.getElementById('row_'+id),cb=document.getElementById('cb_'+id);
+  if(STATE.selected[id]){row.style.background='#e8f8f5';cb.style.background='var(--ok)';cb.style.borderColor='var(--ok)';cb.innerHTML='✓';cb.style.color='#fff';}
+  else{row.style.background='';cb.style.background='';cb.style.borderColor='var(--g300)';cb.innerHTML='';}
+  updateDots();
+}
+function calcStack(){
+  var sel=TOOLS.filter(function(t){return STATE.selected[t.id]});
+  if(!sel.length){toast("Sélectionnez au moins un outil","warn");return;}
+  var cost=sel.reduce(function(s,t){return s+t.co},0);
+  var cats={};sel.forEach(function(t){cats[t.cat]=true});
+  var covered=ALL_CATS.filter(function(c){return cats[c]}).length;
+  var h='<div style="overflow-x:auto;margin-top:8px"><table style="background:rgba(255,255,255,.1);border-radius:8px"><thead><tr style="background:rgba(255,255,255,.15)"><th style="background:transparent;color:#fff">Outil</th><th style="background:transparent;color:#fff">Famille</th><th style="background:transparent;color:#fff">Secret</th><th style="background:transparent;color:#fff">Coût/mois</th><th style="background:transparent;color:#fff">Score</th></tr></thead><tbody>';
+  sel.forEach(function(t){h+='<tr><td style="color:#fff;border-color:rgba(255,255,255,.15)"><strong>'+t.n+'</strong></td><td style="color:#fff;border-color:rgba(255,255,255,.15)">'+CAT_LABELS[t.cat]+'</td><td style="color:#fff;border-color:rgba(255,255,255,.15);text-align:center">'+t.sec+'/5</td><td style="color:#fff;border-color:rgba(255,255,255,.15);text-align:center">'+(t.co===0?'Gratuit':t.co+' €')+'</td><td style="color:#fff;border-color:rgba(255,255,255,.15);text-align:center;font-weight:700">'+t.sc+'</td></tr>';});
+  h+='</tbody></table></div>';
+  document.getElementById('stackCt').innerHTML=h;
+  document.getElementById('stackStats').innerHTML='<div class="result-stat"><div class="v">'+sel.length+'</div><div class="l">Outils</div></div><div class="result-stat"><div class="v">'+cost.toFixed(0)+' €</div><div class="l">Budget /mois</div></div><div class="result-stat"><div class="v">'+(cost*12).toFixed(0)+' €</div><div class="l">Budget /an</div></div><div class="result-stat"><div class="v">'+covered+'/7</div><div class="l">Familles couvertes</div></div>';
+  document.getElementById('stackBox').classList.remove('hidden');
+  var cg='';ALL_CATS.forEach(function(c){var ok=cats[c];cg+='<div style="background:#fff;border-radius:var(--r);padding:12px;box-shadow:var(--sh);text-align:center;border-top:3px solid '+(ok?'var(--ok)':'var(--dg)')+'"><div style="font-size:20px;margin-bottom:4px">'+(ok?'✅':'❌')+'</div><div style="font-size:12.5px;font-weight:700;color:'+(ok?'var(--ok)':'var(--dg)')+'">'+CAT_LABELS[c]+'</div></div>';});
+  document.getElementById('coverageGrid').innerHTML=cg;document.getElementById('coverageCard').style.display='block';
+  updateDots();toast("Stack : "+sel.length+" outils, "+cost.toFixed(0)+" €/mois");
+}
+function autoSelect(){var rec=["pennylane","dext","calendly","teams","yousign","freshdesk","brevo"];clearSel();rec.forEach(function(id){STATE.selected[id]=true;var r=document.getElementById('row_'+id),c=document.getElementById('cb_'+id);if(r){r.style.background='#e8f8f5';c.style.background='var(--ok)';c.style.borderColor='var(--ok)';c.innerHTML='✓';c.style.color='#fff';}});calcStack();}
+function clearSel(){TOOLS.forEach(function(t){STATE.selected[t.id]=false;var r=document.getElementById('row_'+t.id),c=document.getElementById('cb_'+t.id);if(r){r.style.background='';c.style.background='';c.style.borderColor='var(--g300)';c.innerHTML='';}});document.getElementById('stackBox').classList.add('hidden');document.getElementById('coverageCard').style.display='none';updateDots();}
+
+/* ══════════════════════════════════════ TAB 3 ══════════════════════════════════════ */
+function buildChecklist(){
+  var h='';CHECKS.forEach(function(c){h+='<div class="ck-item" id="ck_'+c.id+'" onclick="toggleCheck(\''+c.id+'\')"><div class="ck-box" id="ckb_'+c.id+'"></div><div><div class="ck-label">'+c.t+'</div><div class="ck-ref">'+c.r+'</div></div></div>';});
+  document.getElementById('checklistCt').innerHTML=h;
+}
+function toggleCheck(id){STATE.checks[id]=!STATE.checks[id];var el=document.getElementById('ck_'+id),b=document.getElementById('ckb_'+id);if(STATE.checks[id]){el.classList.add('done');b.innerHTML='✓';}else{el.classList.remove('done');b.innerHTML='';}updateConfScore();updateDots();}
+function updateConfScore(){
+  var done=0;CHECKS.forEach(function(c){if(STATE.checks[c.id])done++});
+  document.getElementById('confScore').textContent=done+' / 10';
+  var p=done*10,g=document.getElementById('confGauge');g.style.width=p+'%';g.style.background=p===100?'var(--ok)':p>=70?'var(--wr)':'var(--dg)';
+  var v=document.getElementById('confVerdict');
+  if(p===100){v.textContent='✓ CONFORME — 10/10 points validés';v.style.color='var(--ok)';}
+  else if(p>=70){v.textContent='⚠ EN COURS — '+done+'/10';v.style.color='var(--wr)';}
+  else{v.textContent='✗ À COMPLÉTER — '+done+'/10';v.style.color='var(--dg)';}
+}
+function updateConfGrid(){
+  var sel=TOOLS.filter(function(t){return STATE.selected[t.id]});
+  if(!sel.length){document.getElementById('confGrid').innerHTML='';document.getElementById('confGridEmpty').style.display='block';return;}
+  document.getElementById('confGridEmpty').style.display='none';
+  var h='';sel.forEach(function(t){
+    var ok=t.ue&&t.chif&&t.mfa&&t.dpa;
+    h+='<tr><td><strong>'+t.n+'</strong></td>';
+    h+='<td>'+(t.ue?'<span class="tag t-ok">UE ✓</span>':'<span class="tag t-dg">Hors UE</span>')+'</td>';
+    h+='<td>'+(t.chif?'<span class="tag t-ok">TLS ✓</span>':'<span class="tag t-dg">Non</span>')+'</td>';
+    h+='<td>'+(t.mfa?'<span class="tag t-ok">Oui</span>':'<span class="tag t-wr">Non</span>')+'</td>';
+    h+='<td>'+(t.dpa?'<span class="tag t-ok">Signé</span>':'<span class="tag t-dg">Absent</span>')+'</td>';
+    h+='<td>'+(ok?'<span class="tag t-ok">Conforme</span>':'<span class="tag t-wr">À vérifier</span>')+'</td></tr>';
+  });document.getElementById('confGrid').innerHTML=h;
+}
+
+/* ══════════════════════════════════════ TAB 4 : CHARTE ══════════════════════════════════════ */
+function tryGenerateCharte(){
+  var sel=TOOLS.filter(function(t){return STATE.selected[t.id]});
+  if(!sel.length){document.getElementById('charteEmpty').style.display='block';document.getElementById('charteContent').style.display='none';return;}
+  generateCharte();
+}
+function generateCharte(){
+  var sel=TOOLS.filter(function(t){return STATE.selected[t.id]});
+  if(!sel.length){toast("Sélectionnez des outils à l'onglet 2","warn");return;}
+  document.getElementById('charteEmpty').style.display='none';document.getElementById('charteContent').style.display='block';
+  var d=STATE.diag,now=new Date();
+  document.getElementById('charteDate').textContent='Établie le '+now.toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'});
+
+  /* Art. 1 — CORRECTION #3 : double obligation explicitée */
+  document.getElementById('ch_objet').innerHTML='La présente charte définit les règles de communication entre le cabinet et ses clients dans le cadre des missions confiées. Elle s\'inscrit dans le respect du secret professionnel (ordonnance n° 45-2138 du 19 septembre 1945, art. 21 ; art. 226-13 du Code pénal) et du devoir de discrétion (art. 147 du Code de déontologie, décret n° 2012-432). Le secret professionnel, pénalement sanctionné, couvre les informations confidentielles confiées dans le cadre de la mission. Le devoir de discrétion, d\'ordre déontologique, couvre toutes les informations dont l\'expert-comptable a connaissance — y compris l\'existence même de la relation professionnelle. La classification des canaux ci-après repose sur le cumul de ces deux obligations.';
+
+  /* Art. 2 — Canaux */
+  var hasWA=STATE.selected['whatsapp'],hasPortail=STATE.selected['pennylane']||STATE.selected['dext']||STATE.selected['mycompany'],hasVisio=STATE.selected['zoom']||STATE.selected['teams']||STATE.selected['meet'],hasCal=STATE.selected['calendly']||STATE.selected['calcom'],hasLoom=STATE.selected['loom'];
+  var c2='<div style="margin-bottom:8px">';
+  c2+='<div class="charte-rule"><span class="ico">🔴</span><span><strong>Urgence critique</strong> → Téléphone + SMS de confirmation</span></div>';
+  if(hasPortail)c2+='<div class="charte-rule"><span class="ico">🟠</span><span><strong>Question rapide</strong> → Messagerie du portail client'+(hasWA?' ou notification WhatsApp Business':'')+' (délai : < 4h ouvrées)</span></div>';
+  if(hasVisio){var vn=STATE.selected['teams']?'Teams':STATE.selected['zoom']?'Zoom (EU Data Residency)':'Google Meet';c2+='<div class="charte-rule"><span class="ico">🟢</span><span><strong>Échange de fond</strong> → Visioconférence '+vn+(hasCal?' programmée via '+(STATE.selected['calendly']?'Calendly':'Cal.com'):'')+' — ordre du jour transmis 48h avant, compte-rendu sous 24h, durée maximale 1h</span></div>';}
+  if(hasLoom)c2+='<div class="charte-rule"><span class="ico">🔵</span><span><strong>Pédagogie différée</strong> → Vidéo Loom personnalisée (3-5 min max, contenu non confidentiel uniquement)</span></div>';
+  c2+='<div class="charte-rule"><span class="ico">📞</span><span><strong>Callback</strong> → Demande via portail'+(hasWA?' ou WhatsApp Business':'')+'. Rappel sous 2h ouvrées.</span></div></div>';
+  /* CORRECTION #1 : WhatsApp restriction renforcée */
+  c2+='<div style="margin-top:8px;padding:8px 12px;background:#fce4e4;border-radius:6px;font-size:13px"><strong>Canaux interdits :</strong> WhatsApp personnel, Messenger, SMS pour documents comptables, fiscaux ou confidentiels. Tout échange de données sensibles transite exclusivement par le portail sécurisé.</div>';
+  if(hasWA)c2+='<div style="margin-top:6px;padding:8px 12px;background:#fef5e7;border-radius:6px;font-size:13px"><strong>WhatsApp Business — usage strictement encadré :</strong> Le contenu des messages se limite à des formulations neutres ne permettant pas d\'identifier la nature de la relation professionnelle (ex. : « Rappel : RDV demain à 14h »). Aucune mention du cabinet, du sujet de la mission ou de toute donnée identifiable. Numéro professionnel dédié obligatoire. Ce canal est exclu pour les clients de secteurs réglementés. <strong>En cas de doute (client sensible / mission à risque), le canal restreint est désactivé et remplacé par le portail sécurisé + email professionnel.</strong></div>';
+  document.getElementById('ch_canaux').innerHTML=c2;
+
+  /* Art. 3 — Outils — CORRECTION #6 : eIDAS niveau avancé */
+  var c3='<table style="font-size:13.5px"><thead><tr><th>Outil</th><th>Usage</th><th>Garanties</th></tr></thead><tbody>';
+  sel.forEach(function(t){
+    var g=[];if(t.ue)g.push('Héberg. UE');if(t.mfa)g.push('MFA');if(t.dpa)g.push('DPA');
+    if(t.id==='yousign')g.push('eIDAS avancée');
+    if(t.id==='whatsapp')g=['E2E','DPA Meta limité'];
+    c3+='<tr><td><strong>'+t.n+'</strong></td><td>'+t.u+'</td><td>'+g.join(', ')+'</td></tr>';
+  });
+  c3+='</tbody></table>';
+  if(STATE.selected['yousign'])c3+='<div style="margin-top:6px;font-size:12.5px;color:var(--g500)">La lettre de mission est signée au minimum au niveau avancé au sens du règlement eIDAS (UE n° 910/2014, art. 26).</div>';
+  document.getElementById('ch_outils').innerHTML=c3;
+
+  /* Art. 4 — SLA */
+  var c4='';
+  if(d.taille==='solo'){c4='<div class="charte-rule"><span class="ico">⏱️</span><span><strong>Plages synchrones :</strong> 9h-12h / 14h-17h (lundi au vendredi)</span></div><div class="charte-rule"><span class="ico">📨</span><span><strong>Réponse asynchrone :</strong> 4 heures ouvrées maximum</span></div><div class="charte-rule"><span class="ico">📞</span><span><strong>Callback :</strong> rappel sous 2 heures ouvrées</span></div>';}
+  else{c4='<div class="charte-rule"><span class="ico">⏱️</span><span><strong>Plages synchrones :</strong> 9h-12h30 / 14h-17h30 (lundi au vendredi)</span></div><div class="charte-rule"><span class="ico">📨</span><span><strong>Réponse asynchrone :</strong> 2 heures ouvrées maximum</span></div><div class="charte-rule"><span class="ico">📞</span><span><strong>Callback :</strong> rappel sous 1 heure ouvrée</span></div>';}
+  document.getElementById('ch_sla').innerHTML=c4;
+
+  /* Art. 5 — Sécurité */
+  var c5='<div class="charte-rule"><span class="ico">🔒</span><span>Tous les outils utilisés disposent d\'un chiffrement TLS des données en transit.</span></div>';
+  c5+='<div class="charte-rule"><span class="ico">🛡️</span><span>Authentification multifacteur (MFA) '+(d.conf==='maximum'?'obligatoire sur l\'ensemble des accès.':'activée sur les outils contenant des données sensibles.')+'</span></div>';
+  c5+='<div class="charte-rule"><span class="ico">📋</span><span>Un DPA (Data Processing Agreement) est signé avec chaque sous-traitant technique conformément à l\'art. 28 du RGPD.</span></div>';
+  if(hasWA)c5+='<div style="margin-top:6px;padding:8px 12px;background:#fef5e7;border-radius:6px;font-size:13px"><strong>WhatsApp Business :</strong> Ce canal appartient à Meta (société américaine). Le DPA proposé par Meta n\'offre pas le même niveau de contrôle qu\'un DPA classique (art. 28 RGPD). L\'usage est toléré en mode strictement logistique, sous les conditions définies à l\'article 2. En cas de doute (client sensible / mission à risque), le canal restreint est désactivé et remplacé par le portail sécurisé + email professionnel.</div>';
+  document.getElementById('ch_securite').innerHTML=c5;
+
+  /* CORRECTION #7 : Art. 6 — Engagement contractuel, pas L. 3121-64 CT */
+  document.getElementById('ch_deconnexion').innerHTML='Le cabinet s\'engage à ne pas solliciter de réponse en dehors des plages horaires définies à l\'article 4. Les messages reçus hors de ces plages seront traités dès la prochaine plage ouvrée. Cet engagement s\'applique à l\'ensemble des canaux de communication, y compris WhatsApp Business et la messagerie du portail. Il constitue un engagement contractuel du cabinet envers le client, indépendant des obligations employeur-salarié du Code du travail.';
+
+  /* Art. 7 — RDV */
+  var c7='<table style="font-size:13.5px"><thead><tr><th>Type</th><th>Durée</th><th>Canal</th><th>Rappels</th></tr></thead><tbody>';
+  c7+='<tr><td>Découverte prospect</td><td>30 min</td><td>Visio</td><td>J-1 + H-1</td></tr>';
+  c7+='<tr><td>Point onboarding</td><td>15 min</td><td>Visio ou tél.</td><td>J-2 + J-1</td></tr>';
+  c7+='<tr><td>Bilan trimestriel</td><td>45 min</td><td>Visio (écran partagé)</td><td>J-7 + J-1 + H-1</td></tr>';
+  c7+='<tr><td>Clôture annuelle</td><td>60 min</td><td>Visio présentation</td><td>J-14 + J-7 + J-1</td></tr>';
+  c7+='<tr><td>Urgence</td><td>Variable</td><td>Tél. + visio</td><td>Immédiat</td></tr></tbody></table>';
+  if(hasCal)c7+='<div style="margin-top:6px;font-size:12.5px;color:var(--g500)">Prise de RDV via '+(STATE.selected['calendly']?'Calendly':'Cal.com')+'. Lien intégré dans la signature email et le portail client.</div>';
+  document.getElementById('ch_rdv').innerHTML=c7;
+
+  /* CORRECTION #2 + #4 : Art. 8 — Références complètes */
+  var c8='<table style="font-size:13px"><tbody>';
+  c8+='<tr><td style="width:45%"><strong>Ordonnance n° 45-2138 du 19 sept. 1945</strong></td><td>Art. 21 — Secret professionnel de l\'expert-comptable</td></tr>';
+  c8+='<tr><td><strong>Code de déontologie (décret n° 2012-432)</strong></td><td>Art. 147 (discrétion), 151 (lettre de mission), 152 (communication) — Éd. janvier 2026</td></tr>';
+  c8+='<tr><td><strong>RGPD (UE 2016/679)</strong></td><td>Art. 5, 6, 13-14, 15-20, 28, 44-49</td></tr>';
+  c8+='<tr><td><strong>NPMQ (arrêté 30 mai 2024, JO 17 juil. 2024)</strong></td><td>§45 — Évaluation du système de management de la qualité</td></tr>';
+  c8+='<tr><td><strong>ANSSI 2024</strong></td><td>Recommandations cybersécurité, MFA (recommandation n° 19)</td></tr>';
+  c8+='<tr><td><strong>Code pénal</strong></td><td>Art. 226-13 — Violation du secret professionnel</td></tr>';
+  c8+='<tr><td><strong>Règlement eIDAS (UE n° 910/2014)</strong></td><td>Art. 26 — Signature électronique avancée</td></tr>';
+  c8+='</tbody></table>';
+  document.getElementById('ch_refs').innerHTML=c8;
+
+  STATE.charteGenerated=true;updateDots();toast("Charte générée — 8 articles");
+}
+
+/* ══════════════════════════════════════ TAB 5 : DÉPLOIEMENT ══════════════════════════════════════ */
+function buildDeploy(){
+  var sel=TOOLS.filter(function(t){return STATE.selected[t.id]});
+  if(!sel.length){document.getElementById('deployEmpty').style.display='block';document.getElementById('deployContent').style.display='none';return;}
+  document.getElementById('deployEmpty').style.display='none';document.getElementById('deployContent').style.display='block';
+
+  var phases=[
+    {name:"Phase 1 — Semaine 1-2 : Infrastructure",color:"var(--inf)",items:[]},
+    {name:"Phase 2 — Semaine 3-4 : Configuration client",color:"var(--s)",items:[]},
+    {name:"Phase 3 — Mois 2-3 : Lancement et ajustement",color:"var(--ok)",items:[]}
+  ];
+
+  // Phase 1 : infra
+  phases[0].items.push("Créer les comptes sur chaque outil sélectionné");
+  phases[0].items.push("Activer l'authentification MFA sur tous les outils");
+  if(STATE.selected['zoom'])phases[0].items.push("Zoom : activer l'option EU Data Residency dans les paramètres");
+  if(STATE.selected['whatsapp'])phases[0].items.push("WhatsApp Business : configurer le numéro professionnel dédié + réponses automatiques hors horaires");
+  phases[0].items.push("Vérifier et signer les DPA avec chaque sous-traitant (RGPD art. 28)");
+  if(STATE.selected['pennylane']||STATE.selected['dext'])phases[0].items.push("Configurer les droits d'accès et la journalisation sur le portail client");
+  if(STATE.selected['yousign'])phases[0].items.push("Yousign : paramétrer le modèle de lettre de mission (signature eIDAS avancée)");
+  phases[0].items.push("Rédiger et diffuser la procédure interne d'interdiction des canaux non sécurisés");
+
+  // Phase 2 : config client
+  if(STATE.selected['calendly']||STATE.selected['calcom']){
+    var cn=STATE.selected['calendly']?'Calendly':'Cal.com';
+    phases[1].items.push(cn+" : créer les 6 types de RDV (découverte, onboarding, trimestriel, callback, clôture, urgence)");
+    phases[1].items.push(cn+" : intégrer le lien dans la signature email et le portail client");
+    phases[1].items.push(cn+" : configurer les rappels automatisés (J-1, H-1 par email et SMS)");
+  }
+  phases[1].items.push("Annexer la charte de communication à la lettre de mission (art. 151 CD)");
+  phases[1].items.push("Documenter le consentement client par canal (RGPD art. 6-7)");
+  if(STATE.selected['freshdesk']||STATE.selected['crisp'])phases[1].items.push("Ticketing : configurer les catégories et les SLA par priorité");
+  if(STATE.selected['brevo'])phases[1].items.push("Brevo : préparer le premier envoi newsletter (cf. Annexe 17)");
+  phases[1].items.push("Former l'équipe à la confidentialité numérique (art. 147 CD + ord. 1945 art. 21)");
+
+  // Phase 3 : lancement
+  phases[2].items.push("Envoyer la charte signée aux premiers clients");
+  phases[2].items.push("Organiser le premier RDV visio accompagné pour les clients à faible maturité digitale");
+  if(STATE.selected['whatsapp'])phases[2].items.push("WhatsApp Business : envoyer les premiers rappels test (formulation neutre vérifiée)");
+  phases[2].items.push("Vérifier les 10 points de conformité (onglet 3) et corriger les écarts");
+  phases[2].items.push("Compléter la checklist de conformité et archiver le PDF de validation");
+  phases[2].items.push("Ajuster les SLA si nécessaire (retour d'expérience à M+1)");
+
+  var h='',totalItems=0,itemIdx=0;
+  phases.forEach(function(ph,pi){
+    h+='<div class="phase" style="border-color:'+ph.color+'"><div class="phase-h"><span class="phase-badge" style="background:'+ph.color+'">Phase '+(pi+1)+'</span>'+ph.name+'</div>';
+    ph.items.forEach(function(it){
+      var did='dp_'+itemIdx;
+      h+='<div class="deploy-item'+(STATE.deploy[did]?' done':'')+'" id="'+did+'" onclick="toggleDeploy(\''+did+'\')"><div class="d-box" id="db_'+did+'">'+(STATE.deploy[did]?'✓':'')+'</div><span>'+it+'</span></div>';
+      totalItems++;itemIdx++;
+    });
+    h+='</div>';
+  });
+  document.getElementById('deployPhases').innerHTML=h;
+  document.getElementById('deployCount').textContent=totalItems;
+  updateDeployProgress(totalItems);
+}
+function toggleDeploy(id){
+  STATE.deploy[id]=!STATE.deploy[id];
+  var el=document.getElementById(id),b=document.getElementById('db_'+id);
+  if(STATE.deploy[id]){el.classList.add('done');b.innerHTML='✓';b.style.background='var(--ok)';b.style.borderColor='var(--ok)';b.style.color='#fff';}
+  else{el.classList.remove('done');b.innerHTML='';b.style.background='';b.style.borderColor='var(--g300)';b.style.color='';}
+  var total=document.querySelectorAll('.deploy-item').length;
+  updateDeployProgress(total);updateDots();
+}
+function updateDeployProgress(total){
+  var done=document.querySelectorAll('.deploy-item.done').length;
+  var pct=total>0?Math.round(done/total*100):0;
+  document.getElementById('deployProgress').textContent=pct+' %';
+  var g=document.getElementById('deployGauge');g.style.width=pct+'%';g.style.background=pct===100?'var(--ok)':pct>=50?'var(--inf)':'var(--wr)';
+}
+
+/* ══════════════════════════════════════ DOTS ══════════════════════════════════════ */
+function updateDots(){
+  setDot('dot1',STATE.diag.taille&&STATE.diag.client&&STATE.diag.maturite?'green':'red');
+  var sc=TOOLS.filter(function(t){return STATE.selected[t.id]}).length;setDot('dot2',sc>0?'green':'red');
+  var ck=0;CHECKS.forEach(function(c){if(STATE.checks[c.id])ck++});setDot('dot3',ck===10?'green':ck>0?'orange':'red');
+  setDot('dot4',STATE.charteGenerated?'green':'red');
+  var dp=document.querySelectorAll('.deploy-item.done').length,dt=document.querySelectorAll('.deploy-item').length;
+  setDot('dot5',dp>0&&dp===dt?'green':dp>0?'orange':'red');
+}
+function setDot(id,c){var e=document.getElementById(id);if(e)e.className='dot dot-'+c;}
+
+/* ══════════════════════════════════════ CABINET X ══════════════════════════════════════ */
+function loadCabinetX(){
+  sv('dTaille','solo');sv('dClient','mixte');sv('dMaturite','moyenne');sv('dBudget','modere');sv('dObjectif','reactivite');sv('dConf','standard');
+  STATE.diag={taille:'solo',client:'mixte',maturite:'moyenne',budget:'modere',objectif:'reactivite',conf:'standard'};
+  clearSel();
+  ["pennylane","dext","calendly","teams","yousign","freshdesk","brevo","whatsapp"].forEach(function(id){STATE.selected[id]=true;var r=document.getElementById('row_'+id),c=document.getElementById('cb_'+id);if(r){r.style.background='#e8f8f5';c.style.background='var(--ok)';c.style.borderColor='var(--ok)';c.innerHTML='✓';c.style.color='#fff';}});
+  CHECKS.forEach(function(c){STATE.checks[c.id]=true;document.getElementById('ck_'+c.id).classList.add('done');document.getElementById('ckb_'+c.id).innerHTML='✓';});
+  updateConfScore();genRecos();calcStack();
+  /* Force build + auto-check ALL deploy items */
+  buildDeploy();
+  document.querySelectorAll('.deploy-item').forEach(function(el){
+    var did=el.id;
+    STATE.deploy[did]=true;
+    el.classList.add('done');
+    var b=document.getElementById('db_'+did);
+    if(b){b.innerHTML='✓';b.style.background='var(--ok)';b.style.borderColor='var(--ok)';b.style.color='#fff';}
+  });
+  var total=document.querySelectorAll('.deploy-item').length;
+  updateDeployProgress(total);
+  generateCharte();
+  updateDots();
+  toast("Cas Cabinet X chargé — tous les onglets complétés");
+}
+
+/* ══════════════════════════════════════ EXPORT ══════════════════════════════════════ */
+function exportJSON(){var b=new Blob([JSON.stringify(STATE,null,2)],{type:'application/json'});var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='Annexe16_Communication_'+fmtDate()+'.json';a.click();toast("JSON exporté");}
+function importJSON(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(ev){try{STATE=JSON.parse(ev.target.result);restoreUI();toast("Importé");}catch(err){toast("Erreur : "+err.message,"warn");}};r.readAsText(f);e.target.value='';}
+function restoreUI(){
+  if(STATE.diag){sv('dTaille',STATE.diag.taille);sv('dClient',STATE.diag.client);sv('dMaturite',STATE.diag.maturite);sv('dBudget',STATE.diag.budget);sv('dObjectif',STATE.diag.objectif);sv('dConf',STATE.diag.conf);}
+  TOOLS.forEach(function(t){if(STATE.selected[t.id]){var r=document.getElementById('row_'+t.id),c=document.getElementById('cb_'+t.id);if(r){r.style.background='#e8f8f5';c.style.background='var(--ok)';c.style.borderColor='var(--ok)';c.innerHTML='✓';c.style.color='#fff';}}});
+  CHECKS.forEach(function(c){if(STATE.checks[c.id]){document.getElementById('ck_'+c.id).classList.add('done');document.getElementById('ckb_'+c.id).innerHTML='✓';}});
+  updateConfScore();updateDots();
+}
+function resetAll(){if(!confirm("Réinitialiser ?"))return;STATE={diag:{taille:"",client:"",maturite:"",budget:"minimal",objectif:"reactivite",conf:"standard"},selected:{},checks:{},deploy:{},charteGenerated:false};['dTaille','dClient','dMaturite'].forEach(function(id){document.getElementById(id).value='';});sv('dBudget','minimal');sv('dObjectif','reactivite');sv('dConf','standard');clearSel();CHECKS.forEach(function(c){document.getElementById('ck_'+c.id).classList.remove('done');document.getElementById('ckb_'+c.id).innerHTML='';STATE.checks[c.id]=false;});updateConfScore();document.getElementById('recoBox').classList.add('hidden');document.getElementById('charteEmpty').style.display='block';document.getElementById('charteContent').style.display='none';updateDots();toast("Réinitialisé");}
+
+/* ══════════════════════════════════════ PDF ══════════════════════════════════════ */
+function exportPDF(){
+  document.getElementById('overlay').classList.add('show');
+  setTimeout(function(){try{
+    var jsPDF=window.jspdf.jsPDF,doc=new jsPDF({unit:'mm',format:'a4'}),pw=210,ph=297,mg=12,cw=pw-2*mg,y=0,LH=5,PC=[26,46,68];
+    function np(){doc.addPage();y=mg;}
+    function chk(h){if(y+h>ph-16)np();}
+    function safe(s){return(s||'').replace(/[^\x20-\x7E\u00C0-\u024F]/g,' ');}
+
+    /* Section header */
+    function hdr(t){
+      chk(14);y+=4;
+      doc.setFillColor(PC[0],PC[1],PC[2]);
+      doc.rect(mg,y,cw,9,'F');
+      doc.setTextColor(255);doc.setFontSize(10);doc.setFont('helvetica','bold');
+      doc.text(safe(t),mg+4,y+6.5);
+      y+=13;doc.setTextColor(50);doc.setFont('helvetica','normal');
+    }
+
+    /* Simple text line */
+    function txt(t,sz){
+      sz=sz||8.5;chk(6);doc.setFontSize(sz);
+      var ls=doc.splitTextToSize(safe(t),cw-2);
+      doc.text(ls,mg+1,y);y+=ls.length*LH+1;
+    }
+
+    /* Table with proper row separators */
+    function tbl(hds,rows,ws){
+      chk(12);
+      /* Header row */
+      doc.setFontSize(8);doc.setFont('helvetica','bold');
+      doc.setFillColor(PC[0],PC[1],PC[2]);doc.setTextColor(255);
+      doc.rect(mg,y,cw,8,'F');
+      var x=mg;
+      hds.forEach(function(h,i){doc.text(safe(h),x+2,y+5.5);x+=ws[i];});
+      y+=10;
+      /* Data rows */
+      doc.setFont('helvetica','normal');doc.setTextColor(50);doc.setFontSize(7.5);
+      rows.forEach(function(r,ri){
+        /* Calculate row height */
+        var mH=0;
+        r.forEach(function(c,i){
+          var ls=doc.splitTextToSize(safe(String(c)),ws[i]-4);
+          var h=ls.length*LH;if(h>mH)mH=h;
+        });
+        mH=Math.max(mH,LH)+2;
+        chk(mH+1);
+        /* Alternate row background */
+        if(ri%2===0){doc.setFillColor(245,247,250);doc.rect(mg,y-1,cw,mH,'F');}
+        /* Row separator line */
+        doc.setDrawColor(200,210,220);doc.line(mg,y+mH-1,mg+cw,y+mH-1);
+        /* Cell text */
+        x=mg;
+        r.forEach(function(c,i){
+          doc.text(safe(String(c)),x+2,y+2,{maxWidth:ws[i]-4});
+          x+=ws[i];
+        });
+        y+=mH;
+      });
+      y+=3;
+    }
+
+    /* Footer on all pages */
+    function footer(){
+      var pn=doc.getNumberOfPages();
+      for(var i=1;i<=pn;i++){
+        doc.setPage(i);doc.setFontSize(7);doc.setTextColor(150);
+        doc.text('Annexe 16 - Technologies de communication | '+safe(fmtDate())+' | Page '+i+'/'+pn,mg,ph-8);
+        doc.setDrawColor(200);doc.line(mg,ph-11,pw-mg,ph-11);
+      }
+    }
+
+    /* ═══ PAGE 1 : TITRE ═══ */
+    doc.setFillColor(PC[0],PC[1],PC[2]);doc.rect(0,0,pw,28,'F');
+    doc.setTextColor(255);doc.setFontSize(16);doc.setFont('helvetica','bold');
+    doc.text('ANNEXE 16',mg+2,14);
+    doc.setFontSize(10);doc.setFont('helvetica','normal');
+    doc.text('Technologies de communication client - Matrice de selection',mg+2,22);
+    doc.setFontSize(7.5);
+    doc.text('Ord. 1945 art. 21 | Art. 147, 151, 152 CD | RGPD | '+safe(fmtDate()),pw-mg-90,22);
+    y=34;
+
+    /* ═══ SECTION 1 : STACK ═══ */
+    hdr('1. STACK TECHNOLOGIQUE');
+    var sel=TOOLS.filter(function(t){return STATE.selected[t.id]});
+    if(sel.length>0){
+      var sr=[];sel.forEach(function(t){
+        sr.push([t.n,CAT_LABELS[t.cat],t.u,t.sec+'/5',t.co===0?'Gratuit':t.co+' EUR',t.sc+'/10']);
+      });
+      tbl(['Outil','Famille','Usage principal','Secret','Cout','Score'],sr,[34,28,60,16,20,cw-158]);
+      var cost=sel.reduce(function(s,t){return s+t.co},0);
+      doc.setFont('helvetica','bold');doc.setFontSize(8.5);
+      txt('Budget : '+cost.toFixed(0)+' EUR/mois | '+(cost*12).toFixed(0)+' EUR/an | '+sel.length+' outils');
+      doc.setFont('helvetica','normal');
+      y+=2;
+    } else {
+      txt('Aucune technologie selectionnee.');y+=3;
+    }
+
+    /* ═══ SECTION 2 : CONFORMITE ═══ */
+    hdr('2. CONFORMITE ('+Object.keys(STATE.checks).filter(function(k){return STATE.checks[k]}).length+'/10)');
+    var cr=[];CHECKS.forEach(function(c){
+      cr.push([STATE.checks[c.id]?'[X]':'[ ]',c.t,c.r]);
+    });
+    tbl(['','Verification','Reference'],cr,[8,cw-54,46]);
+
+    /* ═══ PAGE 2 : CHARTE ═══ */
+    np();
+    hdr('3. CHARTE DE COMMUNICATION DIGITALE');
+    doc.setFont('helvetica','italic');
+    txt('Annexe a la lettre de mission - Art. 151 Code de deontologie (decret n 2012-432, ed. janv. 2026)');
+    doc.setFont('helvetica','normal');
+    y+=2;
+
+    tbl(['Principe','Regles'],[
+      ['Objet','Double obligation : secret professionnel (ord. 1945, art. 21) et discretion (art. 147 CD). Classification des canaux fondee sur le cumul des deux.'],
+      ['Gradation','Urgence = telephone | Question rapide = portail (<4h) | Echange fond = visio Calendly (OJ 48h, CR 24h) | Callback sous 2h ouvrees'],
+      ['SLA','Synchrone 9h-12h / 14h-17h (L-V) | Asynchrone 4h max | Hors horaires : aucune reponse (engagement contractuel)'],
+      ['Securite','INTERDIT : WhatsApp perso, Messenger, SMS documents | AUTORISE : portail securise, Teams/Slack, email chiffre'],
+      ['WhatsApp Business','RESTREINT : rappels neutres uniquement ("Rappel : RDV demain a 14h") sans mention du cabinet ni de la mission. N prof. dedie. Exclu secteurs reglementes. En cas de doute : portail + email pro.'],
+      ['Signature','Yousign - signature eIDAS avancee min. pour la lettre de mission (UE n 910/2014, art. 26)'],
+      ['Deconnexion','Engagement contractuel : aucune sollicitation hors plages horaires. Reponse differee a la plage suivante.']
+    ],[32,cw-32]);
+
+    /* Chaine operationnelle */
+    y+=2;doc.setFontSize(8);doc.setFont('helvetica','bold');doc.setTextColor(PC[0],PC[1],PC[2]);
+    chk(6);doc.text('Chaine operationnelle : Annexe 15 (Onboarding)  ->  Annexe 16 (Communication)  ->  Annexe 17 (Newsletter)',mg+1,y);
+    y+=6;
+
+    /* References */
+    doc.setFontSize(7);doc.setFont('helvetica','normal');doc.setTextColor(100);
+    chk(10);
+    var refs=[
+      'Ref. : Ord. 45-2138 art. 21 | Code de deontologie (decret 2012-432, ed. janv. 2026) art. 147, 151, 152, 155',
+      'RGPD (UE 2016/679) | Art. 226-13 CP | ANSSI 2024 | NPMQ (arrete 30/05/2024, JO 17/07/2024) par.45',
+      'eIDAS (UE 910/2014) art. 26 | eIDAS 2.0 (UE 2024/1183)'
+    ];
+    refs.forEach(function(r){doc.text(safe(r),mg+1,y);y+=4;});
+
+    footer();doc.save('Annexe16_Technologies_Communication.pdf');
+    document.getElementById('overlay').classList.remove('show');toast('PDF genere');
+  }catch(e){console.error(e);document.getElementById('overlay').classList.remove('show');toast('Erreur : '+e.message,'warn');}},300);
+}
+
+/* UTILS */
+function gv(id){return document.getElementById(id).value;}
+function sv(id,v){document.getElementById(id).value=v;}
+function fmtDate(){var d=new Date();return String(d.getDate()).padStart(2,'0')+'.'+String(d.getMonth()+1).padStart(2,'0')+'.'+d.getFullYear();}
+function toast(m,t){var e=document.getElementById('toastEl');e.textContent=m;e.style.background=t==='warn'?'var(--wr)':'var(--ok)';e.classList.add('show');setTimeout(function(){e.classList.remove('show')},2500);}
+init();
+</script>
+</body>
+</html>

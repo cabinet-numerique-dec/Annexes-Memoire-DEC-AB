@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Annexe 18 — Plan de sourcing du collaborateur</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root{--p:#1e3a5f;--pl:#2d5a8a;--s:#0d9488;--sl:#14b8a6;--a:#f59e0b;--d:#dc2626;--ok:#059669;--w:#d97706;--inf:#2563eb;--pu:#7c3aed;--g50:#f9fafb;--g100:#f3f4f6;--g200:#e5e7eb;--g300:#d1d5db;--g500:#6b7280;--g700:#374151;--g800:#1f2937;--r:14px;--sh:0 4px 6px -1px rgb(0 0 0/.08),0 2px 4px -2px rgb(0 0 0/.05)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:linear-gradient(135deg,var(--g100),#e0e7ef);color:var(--g700);line-height:1.65;min-height:100vh;font-size:15px}
+.mx{max-width:1200px;margin:0 auto;padding:24px}
+
+/* HEADER */
+.hd{background:linear-gradient(135deg,var(--p),var(--pl));color:#fff;border-radius:var(--r);padding:28px 32px;margin-bottom:22px;position:relative;overflow:hidden}
+.hd::before{content:"";position:absolute;top:-50%;right:-10%;width:300px;height:300px;background:rgba(255,255,255,.04);border-radius:50%}
+.hd h1{font-size:22px;font-weight:700;margin-bottom:6px;position:relative}
+.hd p{opacity:.85;font-size:14px;position:relative;line-height:1.5}
+.badges{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.badge{background:rgba(255,255,255,.15);padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:.3px}
+.retour{display:inline-block;margin-top:12px;color:rgba(255,255,255,.7);font-size:13px;text-decoration:none;transition:color .15s}
+.retour:hover{color:#fff}
+
+/* PROGRESS BAR */
+.pbar-wrap{background:#fff;border-radius:var(--r);padding:14px 20px;margin-bottom:16px;box-shadow:var(--sh);display:flex;align-items:center;gap:16px}
+.pbar-wrap .plab{font-size:13px;font-weight:700;color:var(--p);white-space:nowrap}
+.pbar{flex:1;height:10px;background:var(--g200);border-radius:10px;overflow:hidden}
+.pbar-fill{height:100%;background:linear-gradient(90deg,var(--s),var(--sl));border-radius:10px;transition:width .4s ease}
+.ppct{font-size:15px;font-weight:700;color:var(--s);min-width:42px;text-align:right}
+
+/* FLUX */
+.flux{background:#fff;border-radius:var(--r);padding:16px 20px;margin-bottom:16px;box-shadow:var(--sh);display:flex;align-items:center;justify-content:center;gap:0;flex-wrap:wrap}
+.flux-item{text-align:center;padding:8px 18px}
+.flux-item .fx-n{font-size:12px;font-weight:700;color:var(--p);text-transform:uppercase;letter-spacing:.5px}
+.flux-item .fx-v{font-size:11px;color:var(--ok);font-weight:700;text-transform:uppercase;margin-top:2px}
+.flux-item .fx-t{font-size:13px;color:var(--g500)}
+.flux-item.cur{background:#eff6ff;border-radius:10px;border:2px solid var(--p)}
+.flux-item.cur .fx-t{color:var(--p);font-weight:600}
+.flux-arr{font-size:18px;color:var(--g300);padding:0 6px}
+
+/* STEP NAV */
+.steps{display:flex;background:#fff;border-radius:var(--r);box-shadow:var(--sh);margin-bottom:16px;overflow:hidden}
+.step{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:16px 10px;font-size:14px;font-weight:600;color:var(--g500);cursor:pointer;transition:all .2s;border-bottom:3px solid transparent;text-align:center}
+.step:hover{background:var(--g50)}
+.step.on{color:var(--p);border-bottom-color:var(--p);background:#eff6ff}
+.step.ok2{color:var(--ok);border-bottom-color:var(--ok)}
+.step .sn{width:28px;height:28px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;background:var(--g200);color:var(--g500);flex-shrink:0}
+.step.on .sn{background:var(--p);color:#fff}
+.step.ok2 .sn{background:var(--ok);color:#fff}
+
+/* TOOLBAR */
+.tb{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.bt{display:inline-flex;align-items:center;gap:6px;padding:10px 18px;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;transition:all .15s}
+.bp{background:var(--p);color:#fff}.bp:hover{background:var(--pl)}
+.bs{background:var(--g200);color:var(--g700)}.bs:hover{background:var(--g300)}
+.bw{background:var(--a);color:#fff;font-size:14px;padding:12px 22px}.bw:hover{background:#d97706}
+.bok{background:var(--ok);color:#fff}.bok:hover{opacity:.9}
+
+/* PANELS */
+.pn{display:none;animation:fi .25s ease}.pn.on{display:block}
+@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* CARDS */
+.cd{background:#fff;border-radius:var(--r);padding:22px;box-shadow:var(--sh);margin-bottom:18px}
+.cd h3{font-size:17px;font-weight:700;color:var(--g800);margin-bottom:6px}
+.cd .sub{font-size:13px;color:var(--g500);margin-bottom:14px;line-height:1.5}
+.gr{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:18px}
+
+/* HINT BOXES */
+.hnt{padding:14px 18px;border-radius:10px;font-size:14px;margin-bottom:16px;display:flex;gap:12px;align-items:flex-start;line-height:1.55}
+.hnt .ico{font-size:20px;flex-shrink:0;line-height:1}
+.hnt.blue{background:#eff6ff;border:1px solid #bfdbfe}
+.hnt.green{background:#ecfdf5;border:1px solid #a7f3d0}
+.hnt.amber{background:#fef3c7;border:1px solid #fde68a}
+.hnt.red{background:#fef2f2;border:1px solid #fecaca}
+.hnt.purple{background:#f5f3ff;border:1px solid #ddd6fe}
+
+/* FORMS */
+.fg{margin-bottom:14px}
+.fg label{display:block;font-size:12px;font-weight:600;color:var(--g500);margin-bottom:5px;text-transform:uppercase;letter-spacing:.4px}
+.fg input,.fg select,.fg textarea{width:100%;padding:11px 14px;border:2px solid var(--g200);border-radius:10px;font-size:15px;font-family:inherit;transition:border .15s}
+.fg textarea{resize:vertical;min-height:55px}
+.fg input:focus,.fg select:focus,.fg textarea:focus{outline:none;border-color:var(--p)}
+.fr{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+.fr3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media(max-width:768px){.fr3{grid-template-columns:1fr}}
+#besoinCard{border:2px solid var(--g200);transition:border-color .3s}
+#besoinCard.filled{border-color:var(--ok)}
+
+/* READ-ONLY SUMMARY */
+.ro-box{background:linear-gradient(135deg,#f0f4f8,#e8edf3);border:2px solid var(--g200);border-radius:12px;padding:18px;margin-bottom:16px}
+.ro-box h4{font-size:15px;font-weight:700;color:var(--p);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.ro-row{display:flex;justify-content:space-between;padding:7px 0;font-size:14px;border-bottom:1px solid var(--g200)}
+.ro-row:last-child{border:none}
+.ro-row .rl{color:var(--g500)}.ro-row .rv{font-weight:600;color:var(--g800)}
+.ro-badge{display:inline-block;font-size:10px;font-weight:700;padding:3px 10px;border-radius:12px;background:var(--p);color:#fff;text-transform:uppercase;letter-spacing:.5px}
+
+/* TABLES */
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{background:var(--p);color:#fff;padding:11px 12px;text-align:left;font-weight:600;font-size:13px}
+th:first-child{border-radius:10px 0 0 0}th:last-child{border-radius:0 10px 0 0}
+td{padding:11px 12px;border-bottom:1px solid var(--g200)}
+tr:hover td{background:var(--g50)}
+
+/* SOURCING CARDS */
+.src{display:flex;align-items:flex-start;gap:14px;padding:16px;border-radius:12px;border:2px solid var(--g200);margin-bottom:10px;cursor:pointer;transition:all .2s;position:relative}
+.src:hover{border-color:var(--pl);background:var(--g50)}
+.src.on{border-color:var(--s);background:#ecfdf5;border-width:2px}
+.src.on::after{content:"\2713";position:absolute;top:10px;right:12px;width:24px;height:24px;background:var(--ok);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700}
+.src-ico{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.src-txt{flex:1}
+.src-txt h4{font-size:15px;font-weight:600;color:var(--g800);margin-bottom:3px}
+.src-txt p{font-size:13px;color:var(--g500);margin-bottom:6px;line-height:1.45}
+.src-meta{display:flex;gap:8px;flex-wrap:wrap}
+.src-tag{font-size:11px;font-weight:600;padding:3px 9px;border-radius:8px;letter-spacing:.2px}
+.src-tag.cost{background:#fef3c7;color:#92400e}
+.src-tag.delay{background:#eff6ff;color:#1e40af}
+.src-tag.target{background:#f5f3ff;color:#5b21b6}
+
+/* RECO BOX */
+.reco{background:linear-gradient(135deg,#eff6ff,#e0eaff);border:2px solid #93c5fd;border-radius:12px;padding:18px;margin-bottom:16px}
+.reco h4{font-size:15px;font-weight:700;color:var(--p);margin-bottom:6px}
+.reco p{font-size:14px;color:var(--g700);line-height:1.55}
+.reco strong{color:var(--p)}
+
+/* BUDGET */
+.budg{background:var(--g50);border:2px solid var(--g200);border-radius:12px;padding:18px;margin-top:14px}
+.budg h4{font-size:15px;font-weight:700;color:var(--p);margin-bottom:12px}
+.budg-row{display:flex;justify-content:space-between;padding:7px 0;font-size:14px;border-bottom:1px solid var(--g200)}
+.budg-row:last-child{border:none}
+.budg-row.total{font-weight:700;font-size:15px;color:var(--p);padding-top:10px;margin-top:4px;border-top:2px solid var(--g300);border-bottom:none}
+.budg-row .bl{color:var(--g500)}.budg-row .bv{font-weight:600}
+.budg-bar{margin-top:14px}
+.budg-bar-label{font-size:12px;font-weight:600;color:var(--g500);margin-bottom:6px}
+.budg-bar-track{height:28px;background:var(--g200);border-radius:8px;overflow:hidden;display:flex}
+.budg-bar-seg{height:100%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;transition:width .3s;min-width:0;overflow:hidden;white-space:nowrap;padding:0 4px}
+
+/* MSG TABS */
+.mtabs{display:flex;gap:6px;margin-bottom:12px}
+.mtab{padding:9px 16px;border:2px solid var(--g200);border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;background:#fff;color:var(--g500)}
+.mtab.on{border-color:var(--p);background:#eff6ff;color:var(--p)}
+.mtab:hover{border-color:var(--pl)}
+
+/* TIMELINE */
+.tl{position:relative;padding-left:32px}
+.tl::before{content:"";position:absolute;left:12px;top:6px;bottom:6px;width:2px;background:var(--g200)}
+.tl-i{position:relative;padding:12px 0}
+.tl-d{position:absolute;left:-24px;top:16px;width:14px;height:14px;border-radius:50%;border:2px solid var(--p);background:#fff}
+.tl-i.done .tl-d{background:var(--ok);border-color:var(--ok)}
+.tl-w{font-size:12px;font-weight:700;color:var(--p);text-transform:uppercase;letter-spacing:.5px}
+.tl-t{font-size:15px;font-weight:500;color:var(--g800)}
+.tl-s{font-size:13px;color:var(--g500);line-height:1.5}
+.tl-lnk{font-size:12px;color:var(--inf);font-weight:600;margin-top:3px}
+
+/* CHECKLIST */
+.ck{display:flex;align-items:flex-start;gap:12px;padding:10px 12px;border-radius:10px;cursor:pointer;transition:all .15s;margin-bottom:4px}
+.ck:hover{background:var(--g50)}
+.ck.dn{background:#ecfdf5}
+.ckb{width:22px;height:22px;border:2px solid var(--g300);border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;font-size:13px;font-weight:700;color:#fff;transition:all .15s}
+.ck.dn .ckb{background:var(--ok);border-color:var(--ok)}
+.ck-t{font-size:14px;font-weight:600;color:var(--g800)}
+.ck-r{font-size:12px;color:var(--g500);font-style:italic}
+
+/* SUMMARY */
+.sum{background:linear-gradient(135deg,var(--p),var(--pl));color:#fff;border-radius:var(--r);padding:24px;margin-bottom:18px}
+.sum h3{color:#fff;margin-bottom:12px;font-size:17px}
+.sum-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.15);font-size:15px}
+.sum-row:last-child{border:none}
+.sum-l{opacity:.75}.sum-v{font-weight:600}
+
+/* VERDICT */
+.verdict{border-radius:14px;padding:20px 24px;margin-bottom:18px;text-align:center}
+.verdict.go{background:linear-gradient(135deg,#ecfdf5,#d1fae5);border:2px solid #6ee7b7}
+.verdict.warn{background:linear-gradient(135deg,#fef3c7,#fde68a);border:2px solid #fbbf24}
+.verdict.nogo{background:linear-gradient(135deg,#fef2f2,#fecaca);border:2px solid #f87171}
+.verdict h3{font-size:20px;font-weight:700;margin-bottom:4px}
+.verdict p{font-size:14px;line-height:1.55}
+.verdict.go h3{color:#065f46}.verdict.go p{color:#047857}
+.verdict.warn h3{color:#92400e}.verdict.warn p{color:#a16207}
+.verdict.nogo h3{color:#991b1b}.verdict.nogo p{color:#dc2626}
+
+/* NAV */
+.nav{display:flex;justify-content:space-between;margin-top:18px;gap:10px}
+
+/* TOAST */
+.to{position:fixed;bottom:24px;right:24px;background:var(--g800);color:#fff;padding:12px 20px;border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,.2);transform:translateY(80px);opacity:0;transition:all .25s;z-index:9999;font-size:14px;font-weight:500}
+.to.sh{transform:translateY(0);opacity:1}
+
+/* OVERLAY */
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:99999;display:none;align-items:center;justify-content:center}
+.ov.sh{display:flex}
+.ovc{background:#fff;padding:32px;border-radius:16px;text-align:center}
+.sp{width:40px;height:40px;margin:0 auto 14px;border:3px solid var(--g200);border-top-color:var(--p);border-radius:50%;animation:spn .8s linear infinite}
+@keyframes spn{to{transform:rotate(360deg)}}
+
+@media(max-width:768px){.mx{padding:14px}.gr,.fr{grid-template-columns:1fr}.steps{flex-wrap:wrap}.flux{flex-direction:column;gap:4px}.flux-arr{transform:rotate(90deg)}.mtabs{flex-wrap:wrap}}
+</style>
+</head>
+<body>
+<div class="mx">
+
+<!-- HEADER -->
+<div class="hd">
+  <h1>Annexe 18 — Plan de sourcing du collaborateur</h1>
+  <p>Construire la stratégie de recherche de candidats : canaux, budget campagne, messages d'approche et conformité juridique.</p>
+  <div class="badges">
+    <span class="badge">Partie III, Chap. 1, §1.1</span>
+    <span class="badge">NPMQ §22, A22-1 à A22-4</span>
+    <span class="badge">Art. 148 Déontologie OEC</span>
+    <span class="badge">RGPD art. 5, 13, 17</span>
+  </div>
+  <a href="#" class="retour" title="Retour au mémoire">&#8592; Retour au mémoire — Partie III, Chapitre 1, Section 1, §1.1</a>
+</div>
+
+<!-- PROGRESS BAR -->
+<div class="pbar-wrap">
+  <div class="plab">Avancement</div>
+  <div class="pbar"><div class="pbar-fill" id="pbarFill" style="width:0%"></div></div>
+  <div class="ppct" id="ppct">0 %</div>
+</div>
+
+<!-- FLUX ANNEXES -->
+<div class="flux">
+  <div class="flux-item"><div class="fx-n">Annexe 19</div><div class="fx-v">Définir</div><div class="fx-t">Fiche de poste</div></div>
+  <div class="flux-arr">&#10132;</div>
+  <div class="flux-item cur"><div class="fx-n">Annexe 18</div><div class="fx-v">Chercher</div><div class="fx-t">Plan de sourcing</div></div>
+  <div class="flux-arr">&#10132;</div>
+  <div class="flux-item"><div class="fx-n">Annexe 20</div><div class="fx-v">Évaluer</div><div class="fx-t">Tests et décision</div></div>
+  <div class="flux-arr">&#10132;</div>
+  <div class="flux-item"><div class="fx-n">Annexe 21</div><div class="fx-v">Intégrer</div><div class="fx-t">Onboarding</div></div>
+</div>
+
+<!-- STEP NAV -->
+<div class="steps" id="stepBar">
+  <div class="step on" onclick="go(1)"><span class="sn">1</span>Stratégie de sourcing</div>
+  <div class="step" onclick="go(2)"><span class="sn">2</span>Conformité et export</div>
+</div>
+
+<!-- TOOLBAR -->
+<div class="tb">
+  <button class="bt bp" onclick="xPDF()">&#128196; Export PDF</button>
+  <button class="bt bs" onclick="xJSON()">&#128190; JSON</button>
+  <input type="file" id="impF" accept=".json" style="display:none" onchange="iJSON(event)">
+  <button class="bt bs" onclick="document.getElementById('impF').click()">&#128194; Importer</button>
+  <button class="bt bs" onclick="resetAll()">&#8635; RAZ</button>
+</div>
+
+<!-- ═══════════ ÉTAPE 1 : STRATÉGIE DE SOURCING ═══════════ -->
+<div id="p1" class="pn on">
+
+  <div class="hnt blue"><div class="ico">&#128269;</div><div><strong>Objectif :</strong> À partir du besoin formalisé dans l'Annexe 19, construire le plan de sourcing opérationnel : quels canaux activer, quel budget y consacrer, quels messages diffuser et dans quel calendrier. Un processus structuré réduit de 30 % les délais de recrutement (APEC, <em>Baromètre sourcing cadres</em>, éd. 2022, p. 18).</div></div>
+
+  <div class="hnt amber"><div class="ico">&#9888;&#65039;</div><div><strong>Prérequis financier :</strong> Le recrutement ne doit être lancé que lorsque la trésorerie couvre six mois de charges incluant le salaire prévu (Annexe 4, Période 4 : M+6 à M+12 ; condition vérifiable dans l'Annexe 7). Un recrutement manqué coûte entre 15 000 et 25 000 € (Annexe 25, entretien n° 5 ; ManpowerGroup, <em>Le coût d'un mauvais recrutement</em>, 2023).</div></div>
+
+  <!-- DÉFINITION DU BESOIN -->
+  <div class="cd" id="besoinCard">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px">
+      <div>
+        <h3 style="margin-bottom:2px">&#128203; Définir le besoin de recrutement</h3>
+        <div class="sub" style="margin-bottom:0">Renseignez le profil recherché ou chargez le cas pratique pour tester l'outil.</div>
+      </div>
+      <button class="bt bw" onclick="loadCX()" style="white-space:nowrap;font-size:15px;padding:12px 24px">&#9889; Cas pratique Cabinet X</button>
+    </div>
+    <div class="fr">
+      <div class="fg"><label>Intitulé du poste *</label><input type="text" id="fPoste" placeholder="Ex : Collaborateur comptable confirmé" oninput="syncRO();updReco();autoSave()"></div>
+      <div class="fg"><label>Niveau *</label><select id="fNiv" onchange="syncRO();updReco();autoSave()"><option value="">— Choisir le niveau —</option><option value="Junior (0-2 ans)">Junior (0-2 ans)</option><option value="Confirmé (2-5 ans)">Confirmé (2-5 ans)</option><option value="Senior (5+ ans)">Senior (5+ ans)</option><option value="Manager">Manager</option></select></div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label>Mode de travail</label><select id="fMode" onchange="syncRO();autoSave()"><option value="100 % télétravail">100 % télétravail</option><option value="Hybride">Hybride</option><option value="Coworking + remote">Coworking + remote</option></select></div>
+      <div class="fg"><label>Salaire brut annuel (€) *</label><input type="number" id="fBrut" placeholder="38000" oninput="syncRO();updBudget();autoSave()"></div>
+      <div class="fg"><label>Date cible d'embauche</label><input type="text" id="fDate" placeholder="Ex : Septembre 2026" oninput="syncRO();autoSave()"></div>
+    </div>
+    <!-- RÉSULTAT CALCULÉ (apparaît quand brut est renseigné) -->
+    <div id="coutCalc" style="display:none;background:var(--g50);border-radius:10px;padding:14px 18px;margin-top:8px">
+      <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px">
+        <div><span style="font-size:13px;color:var(--g500)">Coût employeur estimé</span><br><strong style="font-size:18px;color:var(--p)" id="roCout">—</strong></div>
+        <div><span style="font-size:13px;color:var(--g500)">Dont charges patronales (~42 %)</span><br><strong style="font-size:15px;color:var(--g700)" id="roCharges">—</strong></div>
+        <div><span style="font-size:13px;color:var(--g500)">Mutuelle + matériel remote</span><br><strong style="font-size:15px;color:var(--g700)">3 200 €/an</strong></div>
+      </div>
+      <div style="font-size:11px;color:var(--g500);margin-top:8px">Charges patronales ~42 % (URSSAF 2025) + mutuelle ~1 200 €/an + matériel remote ~2 000 €/an. Ajustable dans l'Annexe 19.</div>
+    </div>
+  </div>
+
+  <!-- BENCHMARK SALARIAL -->
+  <div class="cd">
+    <h3>Repères salariaux 2025-2026 <span class="ro-badge" style="font-size:10px">consultation</span></h3>
+    <div class="sub">Sources : Robert Half, <em>Guide des salaires 2026</em> (publié oct. 2025) ; Hays, <em>Étude de rémunération 2025</em> — Île-de-France. Minima conventionnels : accord n° 48 du 21 mai 2024, revalorisé +2,9 % pour 2026. Ajuster –10 à –15 % en province.</div>
+    <table><thead><tr><th>Profil</th><th>Brut annuel (marché IDF)</th><th>Avantages courants cabinet numérique</th></tr></thead><tbody>
+      <tr><td><strong>Junior</strong> (0-2 ans)</td><td>28 000 — 33 000 €</td><td>Télétravail, formation outils, flexibilité horaire</td></tr>
+      <tr><td><strong>Confirmé</strong> (2-5 ans)</td><td>35 000 — 42 000 €</td><td>Primes sur objectifs, autonomie portefeuille</td></tr>
+      <tr><td><strong>Senior</strong> (5+ ans)</td><td>42 000 — 55 000 €</td><td>Intéressement, management, perspective d'association</td></tr>
+      <tr><td><strong>Manager</strong></td><td>50 000 — 65 000 €</td><td>Pilotage équipe, participation aux résultats</td></tr>
+    </tbody></table>
+  </div>
+
+  <!-- RECOMMANDATION INTELLIGENTE -->
+  <div class="reco" id="recoBox" style="display:none">
+    <h4>&#128161; Recommandation de sourcing</h4>
+    <p id="recoText"></p>
+  </div>
+
+  <!-- CANAUX DE SOURCING -->
+  <div class="cd">
+    <h3>Canaux de sourcing</h3>
+    <div class="sub">Sélectionnez les canaux à activer. Le budget et la répartition se calculent automatiquement.</div>
+    <div id="srcList">
+      <div class="src" onclick="tSrc(this)" data-ch="LinkedIn (approche directe)" data-cost="200" data-costlbl="Gratuit (free) à 250 €/mois (Recruiter Lite)" data-delay="2-4 sem." data-target="Confirmés, seniors" data-profils="Confirmé,Senior,Manager">
+        <div class="src-ico" style="background:#eff6ff">&#128101;</div>
+        <div class="src-txt">
+          <h4>LinkedIn (approche directe)</h4>
+          <p>Cibler des profils précis, actifs ou passifs. Canal n° 1 pour les profils expérimentés en cabinet.</p>
+          <div class="src-meta">
+            <span class="src-tag cost">Gratuit à 250 €/mois</span>
+            <span class="src-tag delay">2-4 semaines</span>
+            <span class="src-tag target">Confirmés, seniors</span>
+          </div>
+        </div>
+      </div>
+      <div class="src" onclick="tSrc(this)" data-ch="Annonce emploi (Indeed, APEC, HelloWork)" data-cost="500" data-costlbl="300 – 800 € / annonce boostée" data-delay="2-3 sem." data-target="Tous niveaux" data-profils="Junior,Confirmé,Senior,Manager">
+        <div class="src-ico" style="background:#ecfdf5">&#128240;</div>
+        <div class="src-txt">
+          <h4>Annonce emploi (Indeed, APEC, HelloWork)</h4>
+          <p>Volume de candidatures. Mettre en avant télétravail et outils modernes pour se différencier.</p>
+          <div class="src-meta">
+            <span class="src-tag cost">300 – 800 € / annonce</span>
+            <span class="src-tag delay">2-3 semaines</span>
+            <span class="src-tag target">Tous niveaux</span>
+          </div>
+        </div>
+      </div>
+      <div class="src" onclick="tSrc(this)" data-ch="Cooptation (réseau personnel et professionnel)" data-cost="500" data-costlbl="Gratuit (prime cooptation optionnelle : 500 – 1 500 €)" data-delay="Variable" data-target="Confirmés" data-profils="Confirmé,Senior">
+        <div class="src-ico" style="background:#fef3c7">&#129309;</div>
+        <div class="src-txt">
+          <h4>Cooptation</h4>
+          <p>Qualité via le réseau. Attention : conserver l'objectivité dans l'évaluation (Annexe 20).</p>
+          <div class="src-meta">
+            <span class="src-tag cost">Gratuit à 1 500 €</span>
+            <span class="src-tag delay">Variable</span>
+            <span class="src-tag target">Confirmés</span>
+          </div>
+        </div>
+      </div>
+      <div class="src" onclick="tSrc(this)" data-ch="Écoles et universités (DCG, DSCG, CCA)" data-cost="200" data-costlbl="Gratuit (forums écoles) à 500 € (partenariat)" data-delay="3-6 sem." data-target="Juniors, alternants" data-profils="Junior">
+        <div class="src-ico" style="background:#ede9fe">&#127891;</div>
+        <div class="src-txt">
+          <h4>Écoles (DCG / DSCG / Master CCA)</h4>
+          <p>Alternance et vivier junior. Supervision obligatoire (NPMQ §23, art. 148 Code de déontologie).</p>
+          <div class="src-meta">
+            <span class="src-tag cost">Gratuit à 500 €</span>
+            <span class="src-tag delay">3-6 semaines</span>
+            <span class="src-tag target">Juniors, alternants</span>
+          </div>
+        </div>
+      </div>
+      <div class="src" onclick="tSrc(this)" data-ch="Réseaux professionnels (OEC, ANECS, CJEC)" data-cost="0" data-costlbl="Gratuit (réseau ordinal)" data-delay="2-4 sem." data-target="Tous niveaux EC" data-profils="Junior,Confirmé,Senior,Manager">
+        <div class="src-ico" style="background:#fee2e2">&#127970;</div>
+        <div class="src-txt">
+          <h4>Réseaux professionnels (OEC, ANECS, CJEC)</h4>
+          <p>Profils expérimentés, motivés par l'innovation. Crédibilité institutionnelle.</p>
+          <div class="src-meta">
+            <span class="src-tag cost">Gratuit</span>
+            <span class="src-tag delay">2-4 semaines</span>
+            <span class="src-tag target">Tous niveaux EC</span>
+          </div>
+        </div>
+      </div>
+      <div class="src" onclick="tSrc(this)" data-ch="Cabinet de recrutement spécialisé" data-cost="0" data-costlbl="15 à 25 % du brut annuel" data-delay="4-8 sem." data-target="Confirmés à managers" data-profils="Senior,Manager">
+        <div class="src-ico" style="background:#f3f4f6">&#128188;</div>
+        <div class="src-txt">
+          <h4>Cabinet de recrutement spécialisé</h4>
+          <p>Déléguer la recherche. Honoraires : 15 à 25 % du brut annuel (Recsi Group 2025, Talent Program 2025).</p>
+          <div class="src-meta">
+            <span class="src-tag cost">15-25 % du brut</span>
+            <span class="src-tag delay">4-8 semaines</span>
+            <span class="src-tag target">Confirmés à managers</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BUDGET CAMPAGNE -->
+    <div class="budg" id="budgBox" style="display:none">
+      <h4>&#128176; Budget estimatif de la campagne de sourcing</h4>
+      <div id="budgRows"></div>
+      <div class="budg-row total">
+        <span class="bl">Estimation totale campagne</span>
+        <span class="bv" id="budgTotal">0 €</span>
+      </div>
+      <div id="budgRatio" style="font-size:13px;font-weight:600;color:var(--p);margin-top:8px"></div>
+      <!-- BARRE DE REPARTITION -->
+      <div class="budg-bar" id="budgBarWrap" style="display:none">
+        <div class="budg-bar-label">Répartition du budget par canal</div>
+        <div class="budg-bar-track" id="budgBarTrack"></div>
+      </div>
+      <div style="font-size:11px;color:var(--g500);margin-top:10px;line-height:1.5">Estimations indicatives basées sur les pratiques marché 2025-2026. Le coût réel varie selon la durée de diffusion, les options de boost et les honoraires négociés.</div>
+    </div>
+  </div>
+
+  <!-- MESSAGES D'APPROCHE MULTI-CANAL -->
+  <div class="cd">
+    <h3>Messages d'approche</h3>
+    <div class="sub">Templates adaptés par canal. Personnalisez avant envoi.</div>
+    <div class="mtabs" id="msgTabs">
+      <div class="mtab on" onclick="switchMsg('linkedin')" data-type="linkedin">&#128101; LinkedIn</div>
+      <div class="mtab" onclick="switchMsg('email')" data-type="email">&#128231; E-mail candidat</div>
+      <div class="mtab" onclick="switchMsg('annonce')" data-type="annonce">&#128240; Accroche annonce</div>
+    </div>
+    <textarea id="msgArea" rows="9" style="width:100%;padding:14px;border:2px solid var(--g200);border-radius:10px;font-size:14px;line-height:1.65;font-family:inherit"></textarea>
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <button class="bt bp" onclick="genCurrentMsg()">&#8635; Régénérer</button>
+      <button class="bt bs" onclick="cpMsg()">&#128203; Copier</button>
+    </div>
+  </div>
+
+  <!-- PLANNING -->
+  <div class="cd">
+    <h3>Planning de la campagne (5 semaines)</h3>
+    <div class="sub">Du lancement du sourcing au transfert vers l'Annexe 20 (évaluation)</div>
+    <div class="tl">
+      <div class="tl-i"><div class="tl-d"></div><div class="tl-w">Semaine 1</div><div class="tl-t">Diffusion annonce + approches directes</div><div class="tl-s">Publier sur les canaux sélectionnés, cibler les profils actifs et passifs</div></div>
+      <div class="tl-i"><div class="tl-d"></div><div class="tl-w">Semaine 2</div><div class="tl-t">Présélection CV + appels de qualification (15 min)</div><div class="tl-s">Filtrer les candidatures, vérifier la compatibilité numérique, shortlister 3 à 5 candidats</div></div>
+      <div class="tl-i"><div class="tl-d"></div><div class="tl-w">Semaines 3-5</div><div class="tl-t">Transfert vers Annexe 20 — Évaluation et décision</div><div class="tl-s">Entretiens, tests de connaissances et savoir-être, scoring, décision GO / GO conditionnel / NO-GO</div><div class="tl-lnk">&#8594; Annexe 20 (Évaluer) &#8594; Annexe 21 (Intégrer)</div></div>
+    </div>
+    <div class="hnt green" style="margin-top:14px;margin-bottom:0"><div class="ico">&#128205;</div><div><strong>Réactivité :</strong> 50 % des cadres attendent un retour sous 15 jours après candidature (APEC, <em>Pratiques et processus de recrutement</em>, mai 2024, p. 26). Le cabinet numérique dispose d'un avantage concurrentiel : sa capacité à réagir vite grâce à des outils collaboratifs dématérialisés.</div></div>
+  </div>
+
+  <div class="nav"><div></div><button class="bt bp" onclick="go(2)">Conformité et export &#8594;</button></div>
+</div>
+
+<!-- ═══════════ ÉTAPE 2 : CONFORMITÉ ET EXPORT ═══════════ -->
+<div id="p2" class="pn">
+
+  <div class="hnt blue"><div class="ico">&#9989;</div><div><strong>Objectif :</strong> Vérifier la conformité juridique du plan de sourcing, consulter le verdict de synthèse, puis exporter le livrable PDF à archiver au dossier permanent du cabinet.</div></div>
+
+  <!-- VERDICT -->
+  <div id="verdictBox" class="verdict warn">
+    <h3 id="verdictTitle">&#9888; Plan de sourcing incomplet</h3>
+    <p id="verdictText">Complétez les informations de l'étape 1 et validez la checklist de conformité pour obtenir un plan opérationnel.</p>
+  </div>
+
+  <!-- TABLEAU NORMATIF -->
+  <div class="cd">
+    <h3>Cadre normatif du recrutement en cabinet</h3>
+    <div class="sub">Obligations applicables dès la phase de recherche de candidats</div>
+    <table><thead><tr><th>Texte</th><th>Obligation au stade du sourcing</th></tr></thead><tbody>
+      <tr><td><strong>Art. L.1132-1 Code du travail</strong></td><td>L'annonce ne doit comporter aucun critère discriminatoire (25 critères protégés)</td></tr>
+      <tr><td><strong>Art. L.1221-6 Code du travail</strong></td><td>Les informations demandées aux candidats doivent avoir un lien direct et nécessaire avec le poste</td></tr>
+      <tr><td><strong>Art. L.1221-8 Code du travail</strong></td><td>Le candidat doit être informé préalablement des méthodes et techniques d'évaluation utilisées</td></tr>
+      <tr><td><strong>RGPD art. 5(1)(c)</strong></td><td>Minimisation des données : ne collecter que les données strictement nécessaires</td></tr>
+      <tr><td><strong>RGPD art. 13</strong></td><td>Information du candidat : identité du responsable, finalités, durée de conservation, droits</td></tr>
+      <tr><td><strong>CNIL, <em>Guide pratique — Recrutement</em>, janv. 2023</strong></td><td>Conservation des CV : 2 ans maximum pour les candidats non retenus, suppression sur demande (RGPD art. 17)</td></tr>
+      <tr><td><strong>NPMQ §22, A22-1 à A22-4</strong><br><span style="font-size:12px;color:var(--g500)">(Référentiel normatif OEC, éd. 2025)</span></td><td>La structure définit des procédures couvrant le recrutement, l'évaluation des compétences, la rémunération et l'estimation des besoins</td></tr>
+      <tr><td><strong>Art. 148, Code de déontologie OEC</strong><br><span style="font-size:12px;color:var(--g500)">(Décret n° 2012-432, mod. par décret n° 2022-1732)</span></td><td>L'expert-comptable s'assure que les collaborateurs auxquels il confie des travaux ont une compétence appropriée à la nature et à la complexité de ceux-ci</td></tr>
+    </tbody></table>
+  </div>
+
+  <!-- CHECKLIST -->
+  <div class="cd">
+    <h3>Checklist conformité sourcing <span style="font-size:14px;font-weight:400;color:var(--g500)" id="ckLbl">0/8</span></h3>
+    <div class="sub">Validez ces 8 points avant de diffuser l'annonce</div>
+    <div id="cCk"></div>
+  </div>
+
+  <!-- SYNTHÈSE -->
+  <div class="sum" id="sumBox">
+    <h3>Synthèse du plan de sourcing</h3>
+    <div class="sum-row"><span class="sum-l">Poste</span><span class="sum-v" id="sPoste">—</span></div>
+    <div class="sum-row"><span class="sum-l">Niveau</span><span class="sum-v" id="sNiv">—</span></div>
+    <div class="sum-row"><span class="sum-l">Mode de travail</span><span class="sum-v" id="sMode">—</span></div>
+    <div class="sum-row"><span class="sum-l">Coût employeur estimé</span><span class="sum-v" id="sCout">—</span></div>
+    <div class="sum-row"><span class="sum-l">Date cible</span><span class="sum-v" id="sDate">—</span></div>
+    <div class="sum-row"><span class="sum-l">Canaux activés</span><span class="sum-v" id="sCanaux">—</span></div>
+    <div class="sum-row"><span class="sum-l">Budget campagne estimé</span><span class="sum-v" id="sBudget">—</span></div>
+    <div class="sum-row"><span class="sum-l">Conformité sourcing</span><span class="sum-v" id="sConf">—</span></div>
+  </div>
+
+  <div class="hnt purple"><div class="ico">&#128279;</div><div><strong>Étape suivante :</strong> Les candidatures reçues sont évaluées dans l'<strong>Annexe 20</strong> — tests de connaissances, savoir-faire, savoir-être, scoring et décision GO / GO conditionnel / NO-GO. L'intégration du collaborateur retenu est structurée dans l'<strong>Annexe 21</strong>.</div></div>
+
+  <div class="gr">
+    <div class="cd" style="text-align:center;padding:28px">
+      <h3 style="margin-bottom:10px">&#128196; Exporter le plan de sourcing</h3>
+      <p style="font-size:14px;color:var(--g500);margin-bottom:14px">Rapport PDF complet à archiver au dossier permanent</p>
+      <button class="bt bp" onclick="xPDF()">Télécharger le PDF</button>
+    </div>
+    <div class="cd" style="text-align:center;padding:28px">
+      <h3 style="margin-bottom:10px">&#128190; Sauvegarder les données</h3>
+      <p style="font-size:14px;color:var(--g500);margin-bottom:14px">Export JSON pour réutilisation</p>
+      <button class="bt bs" onclick="xJSON()">Télécharger le JSON</button>
+    </div>
+  </div>
+
+  <div class="nav"><button class="bt bs" onclick="go(1)">&#8592; Sourcing</button><div></div></div>
+</div>
+
+</div><!-- /mx -->
+
+<div id="ov" class="ov"><div class="ovc"><div class="sp"></div><div style="font-size:16px;font-weight:600;color:var(--g700)">Génération PDF...</div></div></div>
+<div id="toE" class="to"></div>
+
+<script>
+/* ═══ CONFORMITÉ ═══ */
+var CK=[
+  {id:"k1",t:"Annonce sans critère discriminatoire",r:"Art. L.1132-1 Code du travail"},
+  {id:"k2",t:"Informations demandées liées au poste uniquement",r:"Art. L.1221-6 Code du travail"},
+  {id:"k3",t:"Méthodes d'évaluation communiquées aux candidats",r:"Art. L.1221-8 Code du travail"},
+  {id:"k4",t:"Données collectées limitées au strict nécessaire",r:"RGPD art. 5(1)(c) — minimisation"},
+  {id:"k5",t:"Information RGPD transmise à chaque candidat",r:"RGPD art. 13"},
+  {id:"k6",t:"Durée de conservation des CV définie (2 ans max)",r:"CNIL, Guide recrutement, janv. 2023 + RGPD art. 17"},
+  {id:"k7",t:"Compétences requises identifiées et documentées",r:"NPMQ §22, A22-1 (Réf. normatif OEC 2025)"},
+  {id:"k8",t:"Critères d'évaluation préparés pour l'Annexe 20",r:"Art. 148 Code de déontologie (Décret n° 2012-432, mod. 2022-1732)"}
+];
+var CP={};
+function rCk(){var c=document.getElementById("cCk");if(!c)return;c.innerHTML="";CK.forEach(function(ch){var dn=CP[ch.id]?" dn":"";c.innerHTML+='<div class="ck'+dn+'" onclick="tC(\''+ch.id+'\')"><div class="ckb">'+(CP[ch.id]?"\u2713":"")+'</div><div><div class="ck-t">'+ch.t+'</div><div class="ck-r">'+ch.r+'</div></div></div>'});uCk()}
+function tC(id){CP[id]=!CP[id];rCk();updProgress();updVerdict();autoSave()}
+function uCk(){var n=0;CK.forEach(function(c){if(CP[c.id])n++});document.getElementById("ckLbl").textContent=n+"/8"+(n===8?" ✓":"")}
+function getCkScore(){var n=0;CK.forEach(function(c){if(CP[c.id])n++});return n}
+
+/* ═══ SYNC CALCULS ═══ */
+function syncRO(){
+  var brut=parseFloat(gV("fBrut"))||0;
+  var calcBox=document.getElementById("coutCalc");
+  if(brut>0){
+    calcBox.style.display="block";
+    var charges=Math.round(brut*0.42);
+    document.getElementById("roCout").textContent=fmt(Math.round(brut*1.42+3200))+" €/an";
+    document.getElementById("roCharges").textContent=fmt(charges)+" €/an";
+  }else{calcBox.style.display="none"}
+  // Feedback visuel
+  var card=document.getElementById("besoinCard");
+  if(gV("fPoste")&&gV("fNiv")&&brut>0){card.classList.add("filled")}else{card.classList.remove("filled")}
+  updBudget()
+}
+
+/* ═══ RECOMMANDATION INTELLIGENTE ═══ */
+var RECO={
+  "Junior (0-2 ans)":{
+    text:"Pour un profil <strong>junior</strong>, les canaux les plus efficaces sont les <strong>écoles (DCG/DSCG)</strong> pour les stages et alternances, les <strong>annonces emploi</strong> (Indeed, APEC) pour le volume, et les <strong>réseaux professionnels</strong> (ANECS/CJEC) pour cibler les jeunes diplômés motivés par l'innovation. Budget moyen constaté : 200 à 800 €. Attention : la NPMQ (§23, A22-2) impose un niveau de supervision renforcé pour les juniors — à prévoir dès le cadrage.",
+    canaux:["Annonce emploi (Indeed, APEC, HelloWork)","Écoles et universités (DCG, DSCG, CCA)","Réseaux professionnels (OEC, ANECS, CJEC)"]
+  },
+  "Confirmé (2-5 ans)":{
+    text:"Pour un profil <strong>confirmé</strong>, la combinaison la plus efficace associe <strong>LinkedIn</strong> (approche directe des profils passifs), les <strong>annonces emploi</strong> (mettre en avant le télétravail et l'autonomie) et la <strong>cooptation</strong> via le réseau professionnel. Budget moyen constaté : 500 à 1 500 €. C'est le profil type du premier recrutement en cabinet numérique (Annexe 4, Période 4).",
+    canaux:["LinkedIn (approche directe)","Annonce emploi (Indeed, APEC, HelloWork)","Cooptation (réseau personnel et professionnel)"]
+  },
+  "Senior (5+ ans)":{
+    text:"Pour un profil <strong>senior</strong>, privilégier <strong>LinkedIn Recruiter</strong> (les seniors sont rarement en recherche active), la <strong>cooptation</strong> et éventuellement un <strong>cabinet de recrutement spécialisé</strong> si le budget le permet. Budget moyen constaté : 1 000 à 10 000 €. L'article 148 du Code de déontologie impose de vérifier que le senior pourra assurer la supervision des profils moins expérimentés.",
+    canaux:["LinkedIn (approche directe)","Cooptation (réseau personnel et professionnel)","Cabinet de recrutement spécialisé"]
+  },
+  "Manager":{
+    text:"Pour un profil <strong>manager</strong>, le recours à un <strong>cabinet de recrutement spécialisé</strong> est souvent nécessaire (profils rares et sollicités). Compléter par <strong>LinkedIn Recruiter</strong> et les <strong>réseaux ordinaux</strong> (OEC, CJEC). Budget moyen constaté : 7 000 à 15 000 €. Le manager devra être capable de piloter la qualité numérique (NPMQ §22, A22-3) — critère à vérifier dans l'Annexe 20.",
+    canaux:["Cabinet de recrutement spécialisé","LinkedIn (approche directe)","Réseaux professionnels (OEC, ANECS, CJEC)"]
+  }
+};
+function updReco(){
+  var niv=gV("fNiv");var box=document.getElementById("recoBox");
+  if(!niv||!RECO[niv]){box.style.display="none";return}
+  box.style.display="block";
+  document.getElementById("recoText").innerHTML=RECO[niv].text;
+}
+
+/* ═══ SOURCING ═══ */
+function tSrc(el){el.classList.toggle("on");updBudget();updProgress();autoSave()}
+function getCanaux(){var c=[];document.querySelectorAll(".src.on").forEach(function(s){c.push(s.getAttribute("data-ch"))});return c}
+function getCanauxData(){var d=[];document.querySelectorAll(".src.on").forEach(function(s){d.push({name:s.getAttribute("data-ch"),cost:parseInt(s.getAttribute("data-cost"))||0,costlbl:s.getAttribute("data-costlbl"),delay:s.getAttribute("data-delay"),target:s.getAttribute("data-target")})});return d}
+
+/* ═══ BUDGET ═══ */
+var COLORS=["#2563eb","#059669","#d97706","#7c3aed","#dc2626","#0d9488"];
+function updBudget(){
+  var canaux=getCanauxData();var box=document.getElementById("budgBox");var rows=document.getElementById("budgRows");
+  if(canaux.length===0){box.style.display="none";return}
+  box.style.display="block";rows.innerHTML="";var total=0;var costs=[];
+  canaux.forEach(function(c){
+    var cost=c.cost;
+    if(c.name.indexOf("Cabinet de recrutement")>=0){var brut=parseFloat(gV("fBrut"))||38000;cost=Math.round(brut*0.20)}
+    total+=cost;costs.push({name:c.name,cost:cost,lbl:c.costlbl});
+    rows.innerHTML+='<div class="budg-row"><span class="bl">'+c.name+'</span><span class="bv">'+c.costlbl+'</span></div>'
+  });
+  document.getElementById("budgTotal").textContent=total>0?fmt(total)+" € (estimation moyenne)":"Gratuit";
+  // Ratio vs coût employeur
+  var brut=parseFloat(gV("fBrut"))||0;var coutEmp=brut>0?Math.round(brut*1.42+3200):0;
+  var ratio=document.getElementById("budgRatio");
+  if(coutEmp>0&&total>0){var pct=((total/coutEmp)*100).toFixed(1);ratio.textContent="Soit "+pct+" % du coût employeur annuel ("+fmt(coutEmp)+" €). Ratio de marché : 5 à 20 % pour un premier recrutement.";ratio.style.display="block"}else{ratio.style.display="none"}
+  // Barre de répartition
+  var barWrap=document.getElementById("budgBarWrap");var barTrack=document.getElementById("budgBarTrack");
+  if(total>0&&costs.length>1){barWrap.style.display="block";barTrack.innerHTML="";costs.forEach(function(c,i){if(c.cost>0){var pct=(c.cost/total*100);var seg=document.createElement("div");seg.className="budg-bar-seg";seg.style.width=pct+"%";seg.style.background=COLORS[i%COLORS.length];seg.textContent=pct>=15?Math.round(pct)+"%":"";seg.title=c.name+" : "+fmt(c.cost)+" €";barTrack.appendChild(seg)}})}else{barWrap.style.display="none"}
+}
+
+/* ═══ MESSAGES ═══ */
+var currentMsgType="linkedin";var MSG={};
+function genLinkedin(){var poste=gV("fPoste")||"[intitulé du poste]";var mode=gV("fMode")||"[mode de travail]";var niv=gV("fNiv")||"";var spec=niv.indexOf("Junior")>=0?"votre formation en comptabilité":"votre parcours en expertise comptable";return"Bonjour [Prénom],\n\nJ'ai remarqué "+spec+" et votre intérêt pour les outils numériques.\n\nJe dirige un cabinet d'expertise comptable 100 % numérique, structuré autour de Pennylane, Dext et Teams. Nous recherchons un(e) "+poste+" capable d'évoluer en autonomie dans cet environnement.\n\nLe poste est en "+mode+", avec une réelle flexibilité dans l'organisation du travail.\n\nSeriez-vous disponible pour un échange de 15 minutes cette semaine ?\n\nMonsieur X — Cabinet X"}
+function genEmail(){var poste=gV("fPoste")||"[intitulé du poste]";var mode=gV("fMode")||"[mode de travail]";return"Objet : Opportunité — "+poste+" ("+mode+")\n\nBonjour [Prénom],\n\nVotre candidature a retenu notre attention. Nous sommes un cabinet d'expertise comptable 100 % numérique et recherchons un(e) "+poste+".\n\nQuelques éléments clés :\n- Environnement full cloud (Pennylane, Dext, Teams)\n- "+mode+"\n- Flexibilité horaire et formation continue\n\nSeriez-vous disponible pour un entretien téléphonique de 15 minutes ?\n\nCordialement,\nMonsieur X — Cabinet X"}
+function genAnnonce(){var mode=gV("fMode")||"100 % télétravail";return"ACCROCHE :\nRejoignez un cabinet sans murs, 100 % cloud, où chaque collaborateur pilote son portefeuille en autonomie avec les meilleurs outils du marché.\n\nAVANTAGES À METTRE EN AVANT :\n- "+mode+"\n- Outils : Pennylane + Dext + Teams\n- Flexibilité horaire\n- Prime sur objectifs\n- Formation continue financée\n- Perspective d'évolution rapide\n\nMENTION OBLIGATOIRE :\nCe poste est ouvert aux personnes en situation de handicap. Les données collectées seront traitées conformément au RGPD (art. 13). Conservation : 2 ans maximum (candidats non retenus)."}
+function genAllMsgs(){MSG.linkedin=genLinkedin();MSG.email=genEmail();MSG.annonce=genAnnonce()}
+function switchMsg(type){currentMsgType=type;document.querySelectorAll(".mtab").forEach(function(t){t.classList.toggle("on",t.getAttribute("data-type")===type)});if(!MSG[type])genAllMsgs();document.getElementById("msgArea").value=MSG[type]||""}
+function genCurrentMsg(){genAllMsgs();document.getElementById("msgArea").value=MSG[currentMsgType]||"";toast("Message régénéré")}
+function cpMsg(){var el=document.getElementById("msgArea");el.select();document.execCommand("copy");toast("Copié !")}
+
+/* ═══ VERDICT ═══ */
+function updVerdict(){
+  var box=document.getElementById("verdictBox");var title=document.getElementById("verdictTitle");var text=document.getElementById("verdictText");
+  var poste=gV("fPoste");var canaux=getCanaux();var ck=getCkScore();
+  var cd=getCanauxData();var bt=0;cd.forEach(function(c){var cost=c.cost;if(c.name.indexOf("Cabinet de recrutement")>=0){cost=Math.round((parseFloat(gV("fBrut"))||38000)*0.20)}bt+=cost});
+  var brut=parseFloat(gV("fBrut"))||0;var coutEmp=brut>0?Math.round(brut*1.42+3200):0;
+
+  if(poste&&canaux.length>=2&&ck===8){
+    box.className="verdict go";
+    title.textContent="✓ Plan de sourcing opérationnel";
+    var t="Le plan mobilise <strong>"+canaux.length+" canaux</strong> pour recruter « "+poste+" »";
+    if(bt>0)t+=", pour un budget campagne estimé de <strong>"+fmt(bt)+" €</strong>";
+    if(coutEmp>0&&bt>0)t+=" ("+((bt/coutEmp)*100).toFixed(1)+" % du coût employeur annuel)";
+    t+=". Conformité : <strong>8/8</strong>. Prochaine étape : transférer les candidatures vers l'Annexe 20 pour évaluation.";
+    text.innerHTML=t
+  }else if(poste&&canaux.length>=1){
+    box.className="verdict warn";
+    title.textContent="⚠ Plan de sourcing à compléter";
+    var missing=[];
+    if(canaux.length<2)missing.push("sélectionner au moins 2 canaux (stratégie multi-canal)");
+    if(ck<8)missing.push("valider la checklist conformité ("+ck+"/8)");
+    text.innerHTML="Il reste à "+missing.join(" et ")+" avant diffusion."
+  }else{
+    box.className="verdict nogo";
+    title.textContent="✗ Plan de sourcing non démarré";
+    text.innerHTML="Renseignez le besoin (étape 1) et sélectionnez au moins 2 canaux de sourcing pour construire le plan."
+  }
+}
+
+/* ═══ PROGRESS ═══ */
+function updProgress(){
+  var total=0,done=0;
+  total++;if(gV("fPoste"))done++;
+  total++;if(getCanaux().length>=1)done++;
+  total++;if(getCanaux().length>=2)done++;
+  total++;if(document.getElementById("msgArea").value.length>20)done++;
+  CK.forEach(function(c){total++;if(CP[c.id])done++});
+  var pct=total>0?Math.round(done/total*100):0;
+  document.getElementById("pbarFill").style.width=pct+"%";
+  document.getElementById("ppct").textContent=pct+" %"
+}
+
+/* ═══ NAVIGATION ═══ */
+function go(n){
+  for(var i=1;i<=2;i++){var p=document.getElementById("p"+i);if(p)p.classList.toggle("on",i===n)}
+  document.querySelectorAll(".step").forEach(function(s,i){s.classList.remove("on","ok2");if(i<n-1)s.classList.add("ok2");if(i===n-1)s.classList.add("on")});
+  if(n===1){genAllMsgs();switchMsg(currentMsgType);updReco()}
+  if(n===2){updSum();updVerdict()}
+  updProgress();window.scrollTo({top:0,behavior:"smooth"})
+}
+
+/* ═══ SUMMARY ═══ */
+function updSum(){
+  document.getElementById("sPoste").textContent=gV("fPoste")||"—";
+  document.getElementById("sNiv").textContent=gV("fNiv")||"—";
+  document.getElementById("sMode").textContent=gV("fMode")||"—";
+  document.getElementById("sDate").textContent=gV("fDate")||"—";
+  var brut=parseFloat(gV("fBrut"))||0;
+  document.getElementById("sCout").textContent=brut>0?fmt(Math.round(brut*1.42+3200))+" €/an":"—";
+  var canaux=getCanaux();
+  document.getElementById("sCanaux").textContent=canaux.length>0?canaux.length+" canal(aux)":"Aucun";
+  var cd=getCanauxData();var bt=0;cd.forEach(function(c){var cost=c.cost;if(c.name.indexOf("Cabinet de recrutement")>=0){cost=Math.round((parseFloat(gV("fBrut"))||38000)*0.20)}bt+=cost});
+  document.getElementById("sBudget").textContent=bt>0?fmt(bt)+" € (estimation)":"Gratuit";
+  var cn=getCkScore();
+  document.getElementById("sConf").textContent=cn+"/8"+(cn===8?" — Conforme":" — À compléter")
+}
+
+/* ═══ CABINET X ═══ */
+function loadCX(){
+  sV("fPoste","Collaborateur comptable confirmé — 100 % numérique");
+  document.getElementById("fNiv").value="Confirmé (2-5 ans)";
+  document.getElementById("fMode").value="100 % télétravail";
+  sV("fDate","Septembre 2026");document.getElementById("fBrut").value="38000";syncRO();
+  document.querySelectorAll(".src").forEach(function(s){s.classList.remove("on")});
+  ["LinkedIn (approche directe)","Annonce emploi (Indeed, APEC, HelloWork)","Cooptation (réseau personnel et professionnel)"].forEach(function(ch){document.querySelectorAll(".src").forEach(function(s){if(s.getAttribute("data-ch")===ch)s.classList.add("on")})});
+  CK.forEach(function(ch){CP[ch.id]=true});rCk();
+  genAllMsgs();switchMsg("linkedin");updReco();updBudget();updProgress();
+  go(1);toast("Cas pratique Cabinet X chargé");autoSave()
+}
+
+/* ═══ RESET ═══ */
+function resetAll(){
+  if(!confirm("Réinitialiser toutes les données ?"))return;
+  document.querySelectorAll("input[type=text],input[type=number],textarea").forEach(function(el){el.value=""});
+  document.querySelectorAll("select").forEach(function(el){el.selectedIndex=0});
+  document.querySelectorAll(".src").forEach(function(s){s.classList.remove("on")});
+  CP={};rCk();MSG={};document.getElementById("msgArea").value="";
+  document.getElementById("budgBox").style.display="none";
+  document.getElementById("recoBox").style.display="none";
+  syncRO();try{localStorage.removeItem("annexe18_data")}catch(e){}
+  updProgress();toast("Réinitialisé")
+}
+
+/* ═══ UTILS ═══ */
+function gV(id){var el=document.getElementById(id);return el?el.value.trim():""}
+function sV(id,v){var el=document.getElementById(id);if(el)el.value=v||""}
+function fmt(n){return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g," ")}
+function fN(){var d=new Date();return String(d.getDate()).padStart(2,"0")+"."+String(d.getMonth()+1).padStart(2,"0")+"."+d.getFullYear()}
+function toast(m){var el=document.getElementById("toE");el.textContent=m;el.classList.add("sh");setTimeout(function(){el.classList.remove("sh")},2200)}
+
+/* ═══ SAVE/LOAD ═══ */
+function autoSave(){try{var d={v:"10.0",fiche:{poste:gV("fPoste"),niveau:gV("fNiv"),mode:gV("fMode"),date:gV("fDate"),brut:gV("fBrut")},canaux:getCanaux(),messages:MSG,compliance:CP};localStorage.setItem("annexe18_data",JSON.stringify(d))}catch(e){}updProgress()}
+function loadFromStorage(){try{var raw=localStorage.getItem("annexe18_data");if(!raw)return;var d=JSON.parse(raw);if(d.fiche){sV("fPoste",d.fiche.poste);sV("fDate",d.fiche.date);if(d.fiche.brut)document.getElementById("fBrut").value=d.fiche.brut;if(d.fiche.niveau)document.getElementById("fNiv").value=d.fiche.niveau;if(d.fiche.mode)document.getElementById("fMode").value=d.fiche.mode;syncRO()}if(d.canaux){document.querySelectorAll(".src").forEach(function(s){s.classList.toggle("on",d.canaux.indexOf(s.getAttribute("data-ch"))>=0)})}if(d.messages)MSG=d.messages;if(d.compliance){CP=d.compliance;rCk()}updReco();updBudget();updProgress();toast("Données restaurées")}catch(e){}}
+
+/* ═══ JSON ═══ */
+function xJSON(){var d={v:"10.0",annexe:"18",titre:"Plan de sourcing du collaborateur",date:new Date().toISOString(),fiche:{poste:gV("fPoste"),niveau:gV("fNiv"),mode:gV("fMode"),date:gV("fDate"),brut:gV("fBrut")},canaux:getCanaux(),canauxData:getCanauxData(),messages:MSG,compliance:CP};var bl=new Blob([JSON.stringify(d,null,2)],{type:"application/json"});var a=document.createElement("a");a.href=URL.createObjectURL(bl);a.download="annexe18_sourcing_"+new Date().toISOString().split("T")[0]+".json";a.click();toast("JSON exporté")}
+function iJSON(ev){var f=ev.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(e){try{var d=JSON.parse(e.target.result);if(d.fiche){sV("fPoste",d.fiche.poste);sV("fDate",d.fiche.date);if(d.fiche.brut)document.getElementById("fBrut").value=d.fiche.brut;if(d.fiche.niveau)document.getElementById("fNiv").value=d.fiche.niveau;if(d.fiche.mode)document.getElementById("fMode").value=d.fiche.mode;syncRO()}if(d.canaux){document.querySelectorAll(".src").forEach(function(s){s.classList.toggle("on",d.canaux.indexOf(s.getAttribute("data-ch"))>=0)})}if(d.messages)MSG=d.messages;if(d.compliance){CP=d.compliance;rCk()}updReco();updBudget();updProgress();toast("Importé avec succès")}catch(err){toast("Fichier invalide")}};r.readAsText(f)}
+
+/* ═══ INIT ═══ */
+document.addEventListener("DOMContentLoaded",function(){rCk();loadFromStorage();genAllMsgs();switchMsg("linkedin");updReco();updProgress()});
+document.addEventListener("input",function(e){if(e.target.id==="msgArea"){MSG[currentMsgType]=e.target.value}autoSave()});
+document.addEventListener("change",function(e){if(e.target.tagName==="SELECT"){syncRO();updReco();autoSave();updProgress()}});
+
+/* ═══ PDF ═══ */
+function xPDF(){
+  document.getElementById("ov").classList.add("sh");
+  setTimeout(function(){
+  try{
+    var J=window.jspdf.jsPDF,doc=new J("p","mm","a4");
+    var pw=210,ph=297,mg=14,cw=pw-2*mg,y=0,pg=1,PC=[30,58,95],LH=3.3;
+    function safe(t){if(!t)return"";return String(t).replace(/[\u{1F300}-\u{1FAFF}]/gu,"").replace(/[\u{2600}-\u{27BF}]/gu,"").replace(/[\u00A0\u202F]/g," ").replace(/\u2026/g,"...").replace(/[\u2013\u2014]/g,"-").replace(/\u2192/g,"->").replace(/\u20ac/g,"EUR").replace(/[^\x20-\x7E\u00C0-\u00FF]/g,"").trim()}
+    function ft(){doc.setDrawColor(180);doc.setLineWidth(.2);doc.line(mg,ph-12,pw-mg,ph-12);doc.setFontSize(7);doc.setTextColor(130);doc.setFont("helvetica","normal");doc.text("Annexe 18 - Plan de sourcing du collaborateur | Confidentiel",mg,ph-8);doc.text("Page "+pg,pw-mg-10,ph-8)}
+    function np(){ft();doc.addPage();pg++;y=14}
+    function chk(n){if(y+n>ph-18)np()}
+    function hdr(t){chk(13);doc.setFillColor(PC[0],PC[1],PC[2]);doc.rect(mg,y,cw,8,"F");doc.setTextColor(255);doc.setFontSize(10);doc.setFont("helvetica","bold");doc.text(safe(t),mg+3,y+5.8);y+=12;doc.setTextColor(0)}
+    function row(l,v){doc.setFontSize(8.5);doc.setFont("helvetica","bold");doc.setTextColor(100);chk(5);doc.text(safe(l),mg,y);doc.setFont("helvetica","normal");doc.setTextColor(40);var ls=doc.splitTextToSize(safe(v),cw-42);doc.text(ls,mg+42,y);y+=Math.max(5,ls.length*3.8)}
+    function txt(t,sz){doc.setFontSize(sz||8);doc.setFont("helvetica","normal");doc.setTextColor(50);var ls=doc.splitTextToSize(safe(t),cw);for(var i=0;i<ls.length;i++){chk(LH+1);doc.text(ls[i],mg,y);y+=LH}}
+    function tbl(hdrs,rows,ws){var tw=0;ws.forEach(function(w){tw+=w});var pad=1.5;chk(10);doc.setFillColor(PC[0],PC[1],PC[2]);doc.rect(mg,y,tw,7,"F");doc.setFontSize(7.5);doc.setFont("helvetica","bold");doc.setTextColor(255);var x=mg;hdrs.forEach(function(h,i){doc.text(safe(h),x+pad,y+5);x+=ws[i]});y+=7;doc.setFontSize(7.5);doc.setFont("helvetica","normal");doc.setTextColor(40);rows.forEach(function(r,ri){var mxL=1,cls=[];r.forEach(function(c,ci){var ls=doc.splitTextToSize(safe(String(c)),ws[ci]-2*pad);cls.push(ls);if(ls.length>mxL)mxL=ls.length});var rh=Math.max(5,mxL*LH+2);chk(rh+1);doc.setFillColor(ri%2===0?247:255,ri%2===0?249:255,ri%2===0?252:255);doc.rect(mg,y,tw,rh,"F");x=mg;cls.forEach(function(ls,ci){ls.forEach(function(l,li){doc.text(l,x+pad,y+3.5+li*LH)});x+=ws[ci]});y+=rh});y+=4}
+
+    // HEADER
+    doc.setFillColor(PC[0],PC[1],PC[2]);doc.rect(0,0,pw,24,"F");doc.setTextColor(255);doc.setFontSize(14);doc.setFont("helvetica","bold");doc.text("PLAN DE SOURCING - CABINET NUMERIQUE",mg,12);doc.setFontSize(8.5);doc.setFont("helvetica","normal");doc.text("Annexe 18 | "+safe(fN())+" | Confidentiel",mg,19);y=28;
+    doc.setFontSize(7.5);doc.setTextColor(PC[0],PC[1],PC[2]);doc.setFont("helvetica","bold");doc.text("Flux : Annexe 19 (Definir) -> Annexe 18 (Chercher) -> Annexe 20 (Evaluer) -> Annexe 21 (Integrer)",mg,y);y+=6;
+
+    // 1. RESUME
+    hdr("1. RESUME DU BESOIN (issu de l'Annexe 19)");
+    row("Poste :",gV("fPoste")||"--");row("Niveau :",gV("fNiv")||"--");row("Mode :",gV("fMode")||"--");
+    var brut=parseFloat(gV("fBrut"))||0;
+    row("Brut annuel :",brut>0?fmt(brut)+" EUR":"--");row("Cout employeur :",brut>0?fmt(Math.round(brut*1.42+3200))+" EUR/an":"--");row("Date cible :",gV("fDate")||"--");y+=3;
+
+    // 2. CANAUX
+    hdr("2. CANAUX DE SOURCING RETENUS");
+    var canaux=getCanauxData();
+    if(canaux.length){var cr=canaux.map(function(c,i){return[i+1,c.name,c.costlbl,c.delay,c.target]});tbl(["#","Canal","Cout","Delai","Cible"],cr,[6,cw*0.35,cw*0.25,cw*0.15,cw*0.25-6])}else{txt("Aucun canal selectionne")}
+
+    // 3. BUDGET
+    hdr("3. BUDGET ESTIMATIF DE LA CAMPAGNE");
+    if(canaux.length){var bt=0;var br2=canaux.map(function(c){var cost=c.cost;if(c.name.indexOf("Cabinet de recrutement")>=0){cost=Math.round((parseFloat(gV("fBrut"))||38000)*0.20)}bt+=cost;return[c.name,cost>0?fmt(cost)+" EUR":c.costlbl]});br2.push(["TOTAL ESTIME",fmt(bt)+" EUR"]);tbl(["Poste de depense","Montant"],br2,[cw*0.6,cw*0.4]);
+    var coutEmp=brut>0?Math.round(brut*1.42+3200):0;if(coutEmp>0&&bt>0){doc.setFontSize(8);doc.setFont("helvetica","bold");doc.setTextColor(PC[0],PC[1],PC[2]);chk(5);doc.text("Ratio : "+((bt/coutEmp)*100).toFixed(1)+" % du cout employeur annuel",mg,y);y+=5}}else{txt("Aucun canal selectionne")}
+
+    // 4. PLANNING
+    chk(30);hdr("4. PLANNING (5 SEMAINES)");
+    tbl(["Sem.","Action","Detail","Lien"],[["S1","Diffusion + approches","Publier, cibler les profils","Annexe 18"],["S2","Preselection","Filtrer CV, appels 15 min","Annexe 18"],["S3-5","Evaluation + Decision","Entretiens, tests, scoring","-> Annexe 20"]],[10,cw*0.25,cw*0.35,cw*0.4-10]);
+
+    // 5. CONFORMITE
+    hdr("5. CONFORMITE SOURCING");
+    var ckr=[];CK.forEach(function(c){ckr.push([CP[c.id]?"[X]":"[ ]",c.t,c.r])});tbl(["","Verification","Reference"],ckr,[7,cw-45,38]);
+    var dn=getCkScore();doc.setFontSize(8.5);doc.setFont("helvetica","bold");doc.setTextColor(dn===8?0:180,dn===8?128:0,0);chk(5);doc.text("Score : "+dn+"/8"+(dn===8?" - CONFORME":" - A COMPLETER"),mg,y);y+=6;
+
+    // 6. VERDICT
+    hdr("6. VERDICT");
+    var poste=gV("fPoste");var cxLen=getCanaux().length;
+    if(poste&&cxLen>=2&&dn===8){txt("PLAN OPERATIONNEL — "+cxLen+" canaux actives, conformite 8/8. Pret pour diffusion.",8.5)}
+    else{txt("PLAN A COMPLETER — Verifier canaux et conformite avant diffusion.",8.5)}y+=4;
+
+    // REFS
+    chk(20);y+=3;doc.setFontSize(7);doc.setTextColor(120);
+    doc.text("References normatives :",mg,y);y+=3;
+    doc.text("NPMQ §22-23, A22-1 a A22-4 (Referentiel normatif OEC, ed. 2025)",mg,y);y+=3;
+    doc.text("Art. 148 Code de deontologie OEC (Decret n 2012-432, mod. decret n 2022-1732 du 30 dec. 2022)",mg,y);y+=3;
+    doc.text("Code du travail : L.1132-1, L.1221-6, L.1221-8 | RGPD art. 5, 13, 17 | CNIL Guide recrutement janv. 2023",mg,y);y+=3;
+    doc.text("Sources salariales : Robert Half 2026 | Hays 2025 | Conv. coll. EC accord n 48 (+2,9% 2026) | URSSAF 2025",mg,y);y+=3;
+    doc.text("ETAPE SUIVANTE : Annexe 20 (Evaluer) -> Annexe 21 (Integrer)",mg,y);
+    ft();doc.save("Annexe18_Plan_sourcing_"+new Date().toISOString().split("T")[0]+".pdf");
+    document.getElementById("ov").classList.remove("sh");toast("PDF téléchargé")
+  }catch(e){console.error(e);document.getElementById("ov").classList.remove("sh");toast("Erreur : "+e.message)}
+  },300)
+}
+</script>
+</body>
+</html>

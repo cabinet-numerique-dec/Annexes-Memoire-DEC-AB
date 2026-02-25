@@ -1,0 +1,1727 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Annexe 21 – Parcours d'intégration numérique du collaborateur</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        :root {
+            --primary: #1e3a5f;
+            --primary-light: #2d5a8a;
+            --secondary: #0d9488;
+            --secondary-light: #14b8a6;
+            --accent: #f59e0b;
+            --danger: #dc2626;
+            --success: #059669;
+            --warning: #d97706;
+            --info: #2563eb;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --radius: 12px;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, var(--gray-100) 0%, #e0e7ef 100%);
+            color: var(--gray-700);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        .container { max-width: 1100px; margin: 0 auto; padding: 24px; }
+
+        /* ═══ HEADER ═══ */
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white; border-radius: var(--radius);
+            padding: 32px; margin-bottom: 24px;
+            position: relative; overflow: hidden;
+        }
+        .header::before {
+            content: ""; position: absolute; top: -50%; right: -10%;
+            width: 300px; height: 300px;
+            background: rgba(255,255,255,0.05); border-radius: 50%;
+        }
+        .header h1 { font-size: 22px; font-weight: 700; margin-bottom: 8px; position: relative; }
+        .header p { opacity: 0.9; font-size: 14px; max-width: 900px; position: relative; }
+        .header-meta { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; position: relative; }
+        .badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: rgba(255,255,255,0.15);
+            padding: 6px 14px; border-radius: 20px;
+            font-size: 12px; font-weight: 600;
+        }
+        .badge-accent { background: var(--secondary); color: white; }
+        .context-box {
+            background: rgba(255,255,255,0.1);
+            border-left: 4px solid var(--accent);
+            padding: 14px 18px; border-radius: 0 8px 8px 0; margin-top: 16px;
+        }
+        .context-box p { font-size: 13px; margin-bottom: 4px; opacity: 0.95; }
+
+        /* ═══ TABS ═══ */
+        .tabs {
+            display: flex; gap: 4px; background: white; padding: 8px;
+            border-radius: var(--radius); box-shadow: var(--shadow);
+            margin-bottom: 24px;
+        }
+        .tab {
+            flex: 1; padding: 12px 16px; border: none; background: transparent;
+            font-size: 14px; font-weight: 600; color: var(--gray-600);
+            border-radius: 8px; cursor: pointer; transition: all 0.2s;
+            text-align: center;
+        }
+        .tab:hover:not(:disabled) { background: var(--gray-100); }
+        .tab.active { background: var(--primary); color: white; }
+        .tab:disabled { opacity: 0.4; cursor: not-allowed; }
+        .panel { display: none; animation: fadeIn 0.3s ease; }
+        .panel.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* ═══ CARDS ═══ */
+        .card {
+            background: white; border-radius: var(--radius);
+            padding: 24px; box-shadow: var(--shadow); margin-bottom: 20px;
+        }
+        .card-header {
+            display: flex; align-items: center; gap: 12px;
+            margin-bottom: 16px; padding-bottom: 16px;
+            border-bottom: 1px solid var(--gray-200);
+        }
+        .card-icon {
+            width: 44px; height: 44px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            border-radius: 10px; display: flex; align-items: center; justify-content: center;
+            font-size: 20px; color: white; flex-shrink: 0;
+        }
+        .card-icon.teal { background: linear-gradient(135deg, var(--secondary), var(--secondary-light)); }
+        .card-icon.green { background: linear-gradient(135deg, var(--success), #34d399); }
+        .card-icon.amber { background: linear-gradient(135deg, var(--warning), var(--accent)); }
+        .card h2 { font-size: 17px; font-weight: 700; color: var(--gray-800); }
+        .card .subtitle { color: var(--gray-500); font-size: 12px; margin-top: 2px; }
+
+        /* ═══ BUTTONS ═══ */
+        .btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 11px 22px; border: none; border-radius: 8px;
+            font-size: 14px; font-weight: 600; cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-light); transform: translateY(-2px); box-shadow: var(--shadow); }
+        .btn-secondary { background: var(--gray-200); color: var(--gray-700); }
+        .btn-secondary:hover { background: var(--gray-300); }
+        .btn-warning { background: var(--accent); color: white; }
+        .btn-warning:hover { background: var(--warning); }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-danger:hover { background: #b91c1c; }
+        .btn-success { background: var(--success); color: white; }
+        .btn-success:hover { background: #047857; }
+        .btn-sm { padding: 7px 14px; font-size: 12px; }
+        .btn-group { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
+
+        /* ═══ GUIDE BOX ═══ */
+        .guide-box {
+            background: linear-gradient(135deg, #eff6ff, #dbeafe);
+            border-left: 4px solid var(--info);
+            border-radius: 0 8px 8px 0;
+            padding: 14px 18px; margin-bottom: 16px;
+        }
+        .guide-box strong { color: var(--primary); font-size: 13px; display: block; margin-bottom: 4px; }
+        .guide-box p { font-size: 12px; color: var(--gray-700); margin-bottom: 2px; }
+        .guide-box.warn { background: linear-gradient(135deg, #fffbeb, #fef3c7); border-color: var(--accent); }
+        .guide-box.warn strong { color: #92400e; }
+        .guide-box.green { background: linear-gradient(135deg, #f0fdf4, #dcfce7); border-color: var(--success); }
+        .guide-box.green strong { color: #065f46; }
+
+        /* ═══ FORMS ═══ */
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin-bottom: 14px; }
+        .form-group label {
+            display: block; margin-bottom: 5px;
+            font-weight: 600; font-size: 12px; color: var(--gray-600);
+        }
+        .required { color: var(--danger); }
+        input, select, textarea {
+            width: 100%; padding: 10px 14px; border: 2px solid var(--gray-200);
+            border-radius: 8px; font-size: 14px; transition: border-color 0.2s;
+            font-family: inherit; background: white;
+        }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); }
+        textarea { min-height: 70px; resize: vertical; }
+
+        /* ═══ PROFILE SELECT ═══ */
+        .profile-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin: 14px 0; }
+        .profile-card {
+            background: var(--gray-50); border: 2px solid var(--gray-200);
+            border-radius: 10px; padding: 16px; text-align: center;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .profile-card:hover { border-color: var(--primary); }
+        .profile-card.selected { border-color: var(--primary); background: #eff6ff; box-shadow: 0 4px 12px rgba(30,58,95,0.15); }
+        .profile-card h4 { font-size: 14px; color: var(--gray-800); margin: 6px 0 4px; }
+        .profile-card p { font-size: 11px; color: var(--gray-500); }
+        .profile-icon { font-size: 28px; }
+
+        /* ═══ STAT CARDS ═══ */
+        .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 20px; }
+        .stat-card {
+            background: white; border-radius: var(--radius); padding: 16px;
+            box-shadow: var(--shadow); text-align: center;
+        }
+        .stat-value {
+            font-size: 26px; font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .stat-label { font-size: 11px; color: var(--gray-500); margin-top: 2px; font-weight: 500; }
+        .stat-card.danger .stat-value { background: linear-gradient(135deg, var(--danger), #ef4444); -webkit-background-clip: text; background-clip: text; }
+        .stat-card.success .stat-value { background: linear-gradient(135deg, var(--success), #34d399); -webkit-background-clip: text; background-clip: text; }
+
+        /* ═══ ACCORDION (phases) ═══ */
+        .accordion { margin-bottom: 12px; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
+        .accordion-header {
+            display: flex; align-items: center; gap: 12px;
+            padding: 14px 20px; cursor: pointer;
+            background: white; transition: background 0.2s;
+            border-bottom: 1px solid transparent;
+        }
+        .accordion-header:hover { background: var(--gray-50); }
+        .accordion.open .accordion-header { border-bottom-color: var(--gray-200); }
+        .accordion-marker {
+            width: 34px; height: 34px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 14px; color: white; flex-shrink: 0;
+        }
+        .accordion.p1 .accordion-marker { background: var(--primary-light); }
+        .accordion.p2 .accordion-marker { background: var(--secondary); }
+        .accordion.p3 .accordion-marker { background: var(--warning); }
+        .accordion.p4 .accordion-marker { background: #7c3aed; }
+        .accordion.p5 .accordion-marker { background: var(--danger); }
+        .accordion-title { flex: 1; }
+        .accordion-title strong { font-size: 14px; color: var(--gray-800); display: block; }
+        .accordion-title span { font-size: 11px; color: var(--gray-500); }
+        .accordion-badge {
+            padding: 4px 12px; border-radius: 20px;
+            font-size: 12px; font-weight: 700; background: var(--gray-100); color: var(--gray-600);
+        }
+        .accordion-badge.done { background: #d1fae5; color: var(--success); }
+        .accordion-badge.partial { background: #fef3c7; color: var(--warning); }
+        .accordion-arrow { font-size: 14px; color: var(--gray-400); transition: transform 0.2s; }
+        .accordion.open .accordion-arrow { transform: rotate(180deg); }
+        .accordion-body { display: none; padding: 16px 20px; background: white; }
+        .accordion.open .accordion-body { display: block; }
+
+        /* ═══ CHECKLIST ═══ */
+        .ck {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 14px; background: var(--gray-50); border: 1.5px solid var(--gray-200);
+            border-radius: 8px; margin-bottom: 6px; cursor: pointer; transition: all 0.15s;
+        }
+        .ck:hover { border-color: var(--primary); }
+        .ck.done { background: #f0fdf4; border-color: var(--success); }
+        .ck.critical { border-left: 3px solid var(--danger); }
+        .ck.critical.done { border-left-color: var(--success); }
+        .ck-box {
+            width: 22px; height: 22px; border: 2px solid var(--gray-300);
+            border-radius: 5px; display: flex; align-items: center; justify-content: center;
+            font-size: 12px; color: transparent; flex-shrink: 0; transition: all 0.15s;
+        }
+        .ck.done .ck-box { background: var(--success); border-color: var(--success); color: white; }
+        .ck-text { flex: 1; font-size: 13px; color: var(--gray-700); }
+        .ck-text strong { font-weight: 600; }
+        .ck-ref { font-size: 10px; color: var(--info); display: block; margin-top: 2px; }
+
+        /* ═══ EVAL GRID ═══ */
+        .eval-row {
+            display: grid; grid-template-columns: 1fr 80px 1fr;
+            align-items: center; gap: 10px; padding: 10px 14px;
+            background: var(--gray-50); border-radius: 8px; margin-bottom: 6px;
+        }
+        .eval-row label { font-size: 13px; color: var(--gray-700); }
+        .eval-row input { text-align: center; padding: 8px; font-weight: 700; }
+        .eval-row .interp { font-size: 11px; color: var(--gray-500); text-align: right; }
+        @media (max-width: 600px) { .eval-row { grid-template-columns: 1fr 60px; } .eval-row .interp { display: none; } }
+
+        /* ═══ VERDICT ═══ */
+        .verdict-box {
+            border: 2px solid; border-radius: var(--radius); padding: 20px; text-align: center; margin: 20px 0;
+        }
+        .verdict-box.success { border-color: var(--success); background: #d1fae5; }
+        .verdict-box.warning { border-color: var(--warning); background: #fef3c7; }
+        .verdict-box.danger { border-color: var(--danger); background: #fee2e2; }
+        .verdict-box h3 { font-size: 20px; font-weight: 800; }
+        .verdict-box.success h3 { color: var(--success); }
+        .verdict-box.warning h3 { color: var(--warning); }
+        .verdict-box.danger h3 { color: var(--danger); }
+        .verdict-box p { font-size: 14px; color: var(--gray-600); margin-top: 6px; }
+
+        /* ═══ PE BOX ═══ */
+        .pe-box {
+            background: #eff6ff; border: 1px solid #bfdbfe;
+            border-radius: var(--radius); padding: 14px 18px; margin: 16px 0;
+        }
+        .pe-box h4 { font-size: 14px; color: var(--primary); margin-bottom: 8px; }
+        .pe-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 8px; }
+        .pe-item { background: white; padding: 10px; border-radius: 8px; text-align: center; }
+        .pe-item small { font-size: 10px; color: var(--gray-500); display: block; }
+        .pe-item strong { font-size: 13px; color: var(--primary); }
+
+        /* ═══ NORMATIF ═══ */
+        .normatif-bar {
+            display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0;
+        }
+        .norme-tag {
+            padding: 4px 10px; border-radius: 6px;
+            font-size: 10px; font-weight: 600;
+        }
+        .norme-tag.droit { background: #dbeafe; color: #1e40af; }
+        .norme-tag.deonto { background: #e9d5ff; color: #6b21a8; }
+        .norme-tag.npmq { background: #d1fae5; color: #065f46; }
+        .norme-tag.secu { background: #fee2e2; color: #991b1b; }
+        .norme-tag.lcb { background: #fed7aa; color: #9a3412; }
+
+        /* ═══ PROGRESS ═══ */
+        .progress { background: var(--gray-200); border-radius: 10px; height: 10px; overflow: hidden; margin: 8px 0; }
+        .progress-fill { height: 100%; border-radius: 10px; background: linear-gradient(90deg, var(--primary), var(--secondary)); transition: width 0.5s; }
+
+        /* ═══ TOAST ═══ */
+        .toast {
+            position: fixed; bottom: 24px; right: 24px;
+            background: var(--gray-800); color: white;
+            padding: 12px 20px; border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            transform: translateY(100px); opacity: 0;
+            transition: all 0.3s ease; z-index: 9999;
+            font-size: 13px; font-weight: 500;
+        }
+        .toast.show { transform: translateY(0); opacity: 1; }
+
+        /* ═══ BILAN DASHBOARD ═══ */
+        .bilan-banner {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white; padding: 20px 24px; border-radius: var(--radius);
+            margin-bottom: 20px; display: flex; justify-content: space-between;
+            align-items: center; flex-wrap: wrap; gap: 10px;
+        }
+        .bilan-banner .bilan-title { font-size: 18px; font-weight: 700; }
+        .bilan-banner .bilan-sub { font-size: 12px; opacity: 0.85; margin-top: 2px; }
+        .bilan-banner .bilan-date { font-size: 11px; opacity: 0.7; background: rgba(255,255,255,0.12); padding: 4px 12px; border-radius: 20px; }
+
+        .bilan-dual-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        @media (max-width: 900px) { .bilan-dual-grid { grid-template-columns: 1fr; } }
+
+        .timeline-container { padding: 8px 0; }
+        .timeline-phase {
+            display: flex; align-items: stretch; gap: 14px; margin-bottom: 2px;
+            position: relative;
+        }
+        .timeline-left {
+            width: 56px; display: flex; flex-direction: column; align-items: center;
+            flex-shrink: 0; position: relative;
+        }
+        .timeline-dot {
+            width: 36px; height: 36px; border-radius: 50%; display: flex;
+            align-items: center; justify-content: center; font-weight: 800;
+            font-size: 13px; color: white; z-index: 2; flex-shrink: 0;
+        }
+        .timeline-line {
+            width: 3px; flex: 1; background: var(--gray-200); margin: 2px 0;
+        }
+        .timeline-phase:last-child .timeline-line { display: none; }
+        .timeline-right {
+            flex: 1; background: white; border: 1px solid var(--gray-200);
+            border-radius: 10px; padding: 14px 18px; margin-bottom: 10px;
+            transition: all 0.2s;
+        }
+        .timeline-right.complete { border-color: var(--success); background: #f0fdf4; }
+        .timeline-right.in-progress { border-color: var(--warning); background: #fffbeb; }
+        .timeline-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+        .timeline-title { font-size: 13px; font-weight: 700; color: var(--gray-800); }
+        .timeline-pct { font-size: 12px; font-weight: 700; padding: 2px 10px; border-radius: 20px; }
+        .timeline-bar { height: 6px; background: var(--gray-200); border-radius: 6px; overflow: hidden; margin: 6px 0; }
+        .timeline-bar-fill { height: 100%; border-radius: 6px; transition: width 0.5s; }
+        .timeline-meta { font-size: 10px; color: var(--gray-500); }
+
+        .alert-item {
+            display: flex; gap: 12px; align-items: flex-start;
+            padding: 12px 16px; background: #fef2f2; border: 1px solid #fecaca;
+            border-radius: 8px; margin-bottom: 8px;
+        }
+        .alert-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+        .alert-text { flex: 1; }
+        .alert-text strong { font-size: 13px; color: var(--gray-800); display: block; }
+        .alert-text small { font-size: 11px; color: var(--danger); }
+        .alert-ref { font-size: 10px; color: var(--info); margin-top: 2px; display: block; }
+
+        .action-item {
+            display: flex; gap: 12px; align-items: flex-start;
+            padding: 12px 16px; border-radius: 8px; margin-bottom: 8px;
+        }
+        .action-item.urgent { background: #fef2f2; border-left: 4px solid var(--danger); }
+        .action-item.recommend { background: #eff6ff; border-left: 4px solid var(--info); }
+        .action-item.success { background: #f0fdf4; border-left: 4px solid var(--success); }
+        .action-icon { font-size: 18px; flex-shrink: 0; }
+        .action-text { flex: 1; }
+        .action-text strong { font-size: 13px; color: var(--gray-800); display: block; margin-bottom: 2px; }
+        .action-text p { font-size: 12px; color: var(--gray-600); margin: 0; }
+
+        .evo-row {
+            display: grid; grid-template-columns: 130px 1fr 60px 60px;
+            align-items: center; gap: 8px; padding: 10px 14px;
+            border-radius: 8px; margin-bottom: 4px;
+        }
+        .evo-row:nth-child(odd) { background: var(--gray-50); }
+        .evo-label { font-size: 12px; font-weight: 600; color: var(--gray-700); }
+        .evo-bar-track { height: 8px; background: var(--gray-200); border-radius: 8px; overflow: hidden; position: relative; }
+        .evo-bar-j30 { height: 100%; border-radius: 8px; background: var(--warning); position: absolute; top: 0; left: 0; opacity: 0.5; }
+        .evo-bar-j90 { height: 100%; border-radius: 8px; background: var(--success); position: absolute; top: 0; left: 0; }
+        .evo-val { font-size: 12px; font-weight: 700; text-align: center; }
+        .evo-trend { font-size: 14px; text-align: center; }
+
+        .pe-summary {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+        }
+        .pe-summary-item {
+            background: var(--gray-50); padding: 16px; border-radius: 10px; text-align: center;
+        }
+        .pe-summary-item small { font-size: 10px; color: var(--gray-500); display: block; margin-bottom: 4px; }
+        .pe-summary-item .pe-val { font-size: 16px; font-weight: 800; color: var(--primary); }
+        .pe-summary-item.decision { border: 2px solid var(--primary); }
+
+        /* ═══ FOOTER ═══ */
+        footer { text-align: center; padding: 24px; color: var(--gray-500); font-size: 12px; }
+
+        /* ═══ PRINT ═══ */
+        @media print {
+            body { background: white; }
+            .no-print { display: none !important; }
+            .card { box-shadow: none; border: 1px solid var(--gray-200); }
+        }
+        @media (max-width: 768px) {
+            .container { padding: 16px; }
+            .header h1 { font-size: 18px; }
+            .form-grid { grid-template-columns: 1fr; }
+            .profile-grid { grid-template-columns: repeat(2, 1fr); }
+            .stat-grid { grid-template-columns: repeat(2, 1fr); }
+            .tabs { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- HEADER -->
+    <div class="header no-print">
+        <h1>📋 Annexe 21 – Parcours d'intégration numérique du collaborateur</h1>
+        <p>Outil de suivi structuré de l'onboarding en cabinet d'expertise comptable 100% numérique.</p>
+        <div class="header-meta">
+            <span class="badge">🎯 5 phases · 42 tâches</span>
+            <span class="badge badge-accent">⚖️ Normes intégrées (NPMQ, RGPD, ANSSI)</span>
+            <span class="badge">📄 Export PDF</span>
+        </div>
+        <div class="context-box">
+            <p><strong>Mode d'emploi :</strong> 1) Configurez le profil du collaborateur — 2) Cochez les tâches au fil de l'intégration — 3) Remplissez les évaluations aux jalons J+30 et J+90 — 4) Exportez le bilan PDF.</p>
+            <p><strong>Référentiel :</strong> Code du travail · Décret n° 2012-432 · NPMQ §22-33 · ANSSI · RGPD · NPLAB (LCB-FT).</p>
+        </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs no-print">
+        <button class="tab active" onclick="showTab(1)" id="tab1">1. Configuration</button>
+        <button class="tab" onclick="showTab(2)" id="tab2" disabled>2. Parcours d'intégration</button>
+        <button class="tab" onclick="showTab(3)" id="tab3" disabled>3. Bilan & Export</button>
+    </div>
+
+    <!-- ═══════════════════════════════════ -->
+    <!-- TAB 1 : CONFIGURATION              -->
+    <!-- ═══════════════════════════════════ -->
+    <div class="panel active" id="panel1">
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon">⚙️</div>
+                <div><h2>Configuration du parcours</h2><div class="subtitle">Renseignez les informations puis lancez le parcours</div></div>
+            </div>
+
+            <div class="guide-box">
+                <strong>💡 Pourquoi cette étape ?</strong>
+                <p>Ces informations permettent d'adapter le parcours au profil du collaborateur : durée, tâches critiques, seuils d'évaluation et calcul automatique de la période d'essai.</p>
+            </div>
+
+            <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
+                <button class="btn btn-warning btn-sm" onclick="loadDemo()">Cas pratique Cabinet X</button>
+                <button class="btn btn-secondary btn-sm" onclick="document.getElementById('importFile').click()">📤 Importer JSON</button>
+                <button class="btn btn-secondary btn-sm" id="btnExportJson" onclick="exportJSON()" style="display:none">💾 Exporter JSON</button>
+                <input type="file" id="importFile" accept=".json" style="display:none" onchange="importJSON(event)">
+            </div>
+
+            <h3 style="font-size:14px;color:var(--gray-800);margin:18px 0 10px;">👤 Collaborateur</h3>
+            <div class="form-grid">
+                <div class="form-group"><label>Nom complet <span class="required">*</span></label><input type="text" id="collabName" placeholder="Ex: Marie LAURENT"></div>
+                <div class="form-group"><label>Email professionnel</label><input type="email" id="collabEmail" placeholder="m.laurent@cabinet.fr"></div>
+                <div class="form-group"><label>Date d'arrivée <span class="required">*</span></label><input type="date" id="startDate"></div>
+                <div class="form-group"><label>Poste</label><input type="text" id="collabPosition" placeholder="Ex: Collaboratrice comptable"></div>
+            </div>
+
+            <h3 style="font-size:14px;color:var(--gray-800);margin:18px 0 10px;">🎓 Profil <span class="required">*</span></h3>
+            <div class="guide-box">
+                <strong>Comment choisir ?</strong>
+                <p>Le profil détermine la durée du parcours et les seuils d'évaluation. Choisissez selon l'expérience en cabinet du collaborateur.</p>
+            </div>
+            <div class="profile-grid">
+                <div class="profile-card" onclick="selectProfile('apprenti')" id="card-apprenti">
+                    <div class="profile-icon">🎓</div><h4>Apprenti</h4><p>Formation · 120 jours</p>
+                </div>
+                <div class="profile-card" onclick="selectProfile('junior')" id="card-junior">
+                    <div class="profile-icon">👤</div><h4>Junior (0-2 ans)</h4><p>Montée en compétence · 90 jours</p>
+                </div>
+                <div class="profile-card" onclick="selectProfile('confirme')" id="card-confirme">
+                    <div class="profile-icon">💼</div><h4>Confirmé (2-5 ans)</h4><p>Autonomie rapide · 60 jours</p>
+                </div>
+                <div class="profile-card" onclick="selectProfile('senior')" id="card-senior">
+                    <div class="profile-icon">⭐</div><h4>Senior / Chef mission</h4><p>Adaptation ciblée · 45 jours</p>
+                </div>
+            </div>
+
+            <h3 style="font-size:14px;color:var(--gray-800);margin:18px 0 10px;">🏢 Encadrement & Cabinet</h3>
+            <div class="form-grid">
+                <div class="form-group"><label>Manager <span class="required">*</span></label><input type="text" id="managerName" placeholder="Nom du manager"></div>
+                <div class="form-group"><label>Buddy / Mentor</label><input type="text" id="buddyName" placeholder="Nom du buddy"></div>
+                <div class="form-group"><label>Cabinet <span class="required">*</span></label><input type="text" id="cabinetName" placeholder="Ex: Cabinet Expert & Associés"></div>
+                <div class="form-group"><label>Mode de travail</label>
+                    <select id="workMode"><option value="hybride">Hybride</option><option value="remote">100% Remote</option><option value="presentiel">Présentiel</option></select>
+                </div>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="launchParcours()">🚀 Lancer le parcours d'intégration →</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════ -->
+    <!-- TAB 2 : PARCOURS (tout sur 1 page) -->
+    <!-- ═══════════════════════════════════ -->
+    <div class="panel" id="panel2">
+        <!-- Bandeau collaborateur -->
+        <div id="collabBanner" style="background:linear-gradient(135deg,var(--primary),var(--primary-light));color:white;padding:14px 20px;border-radius:var(--radius);margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;box-shadow:var(--shadow);">
+        </div>
+
+        <!-- KPIs globaux -->
+        <div class="stat-grid" id="kpiGrid">
+            <div class="stat-card"><div style="font-size:20px">📅</div><div class="stat-value" id="kDay">J+0</div><div class="stat-label">Jour</div></div>
+            <div class="stat-card"><div style="font-size:20px">✅</div><div class="stat-value" id="kTasks">0/42</div><div class="stat-label">Tâches</div></div>
+            <div class="stat-card" id="kCritCard"><div style="font-size:20px">⚠️</div><div class="stat-value" id="kCrit">0</div><div class="stat-label">Critiques restantes</div></div>
+            <div class="stat-card"><div style="font-size:20px">📊</div><div class="stat-value" id="kPct">0%</div><div class="stat-label">Progression</div></div>
+        </div>
+
+        <div class="progress"><div class="progress-fill" id="globalBar" style="width:0%"></div></div>
+
+        <!-- PE Box -->
+        <div class="pe-box" id="peBox" style="display:none">
+            <h4>⚖️ Période d'essai — Cadre légal</h4>
+            <div class="pe-grid">
+                <div class="pe-item"><small>Catégorie</small><strong id="peCat">-</strong></div>
+                <div class="pe-item"><small>Durée initiale</small><strong id="peDur">-</strong></div>
+                <div class="pe-item"><small>Renouvellement</small><strong id="peRen">-</strong></div>
+                <div class="pe-item"><small>Fin PE estimée</small><strong id="peEnd">-</strong></div>
+            </div>
+            <p style="font-size:10px;color:var(--gray-500);margin-top:8px;">Réf. : Art. L.1221-19 à L.1221-26 C. trav. · IDCC 0787.</p>
+        </div>
+
+        <!-- ═══ PHASE 1 ═══ -->
+        <div class="accordion p1 open" id="acc1">
+            <div class="accordion-header" onclick="toggleAcc(1)">
+                <div class="accordion-marker">1</div>
+                <div class="accordion-title"><strong>Pré-arrivée (J-7 → J0)</strong><span>Administratif · IT · Communication</span></div>
+                <span class="accordion-badge" id="badge1">0/16</span>
+                <span class="accordion-arrow">▼</span>
+            </div>
+            <div class="accordion-body">
+                <div class="guide-box">
+                    <strong>📋 À faire AVANT l'arrivée du collaborateur</strong>
+                    <p>Préparez tout le cadre administratif, les accès IT et la communication interne. Les tâches marquées en rouge sont <strong>obligatoires</strong> (pré-requis légaux ou sécuritaires).</p>
+                </div>
+                <div id="list_p1"></div>
+            </div>
+        </div>
+
+        <!-- ═══ PHASE 2 ═══ -->
+        <div class="accordion p2" id="acc2">
+            <div class="accordion-header" onclick="toggleAcc(2)">
+                <div class="accordion-marker">2</div>
+                <div class="accordion-title"><strong>Accueil & Sécurisation (J0 → J+2)</strong><span>Setup technique · Accueil · Premiers échanges</span></div>
+                <span class="accordion-badge" id="badge2">0/13</span>
+                <span class="accordion-arrow">▼</span>
+            </div>
+            <div class="accordion-body">
+                <div class="guide-box">
+                    <strong>🤝 Les 48 premières heures</strong>
+                    <p>Activez tous les accès sécurisés, faites l'accueil formel et vérifiez que l'environnement de travail est opérationnel.</p>
+                </div>
+                <div id="list_p2"></div>
+            </div>
+        </div>
+
+        <!-- ═══ PHASE 3 ═══ -->
+        <div class="accordion p3" id="acc3">
+            <div class="accordion-header" onclick="toggleAcc(3)">
+                <div class="accordion-marker">3</div>
+                <div class="accordion-title"><strong>Mise en main (J+3 → J+10)</strong><span>Formation outils · Dossier-test · Revue technique</span></div>
+                <span class="accordion-badge" id="badge3">0/8</span>
+                <span class="accordion-arrow">▼</span>
+            </div>
+            <div class="accordion-body">
+                <div class="guide-box">
+                    <strong>🧠 Formation et premier test opérationnel</strong>
+                    <p>Le collaborateur se forme aux outils du cabinet et traite un dossier-test de bout en bout. La revue technique valide qu'il maîtrise le processus de production.</p>
+                </div>
+                <div id="list_p3"></div>
+
+                <!-- ÉVAL DOSSIER-TEST -->
+                <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--gray-200);">
+                    <h4 style="font-size:14px;color:var(--gray-800);margin-bottom:8px;">📝 Évaluation du dossier-test (revue technique)</h4>
+                    <div class="guide-box warn">
+                        <strong>Qu'est-ce que c'est ?</strong>
+                        <p>Le manager évalue le premier dossier traité de bout en bout par le collaborateur. Chaque critère est noté de 1 à 5. Un score ≥ 24/30 (80%) valide la compétence technique de base.</p>
+                        <p><strong>Quand remplir ?</strong> Après la tâche « Dossier-test complet réalisé » (Phase 3).</p>
+                        <p><strong>Grille :</strong> 1 = Insuffisant · 2 = Fragile · 3 = Acceptable · 4 = Bon · 5 = Excellent</p>
+                    </div>
+                    <div id="reviewGrid"></div>
+                    <div style="text-align:center;padding:10px;background:var(--gray-50);border-radius:8px;margin-top:8px;">
+                        <strong>Score :</strong> <span id="reviewScore">—</span>/30
+                        <span id="reviewBadge" style="margin-left:10px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;background:var(--gray-200);color:var(--gray-600);">En attente</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ PHASE 4 ═══ -->
+        <div class="accordion p4" id="acc4">
+            <div class="accordion-header" onclick="toggleAcc(4)">
+                <div class="accordion-marker">4</div>
+                <div class="accordion-title"><strong>Autonomie contrôlée (J+10 → J+45)</strong><span>Dossiers réels · Rituels de suivi · Évaluation J+30</span></div>
+                <span class="accordion-badge" id="badge4">0/6</span>
+                <span class="accordion-arrow">▼</span>
+            </div>
+            <div class="accordion-body">
+                <div class="guide-box">
+                    <strong>🚀 Montée en autonomie progressive</strong>
+                    <p>Le collaborateur prend en charge des dossiers réels sous supervision. Le jalon J+30 est un point d'étape majeur : c'est le moment de mesurer la satisfaction, l'intégration et d'anticiper d'éventuelles difficultés.</p>
+                </div>
+                <div id="list_p4"></div>
+
+                <!-- ÉVAL J+30 -->
+                <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--gray-200);">
+                    <h4 style="font-size:14px;color:var(--gray-800);margin-bottom:8px;">📊 Évaluation jalon J+30</h4>
+                    <div class="guide-box warn">
+                        <strong>Pourquoi ce jalon ?</strong>
+                        <p>À J+30, on évalue à la fois la <strong>compétence technique</strong> (maîtrise outils, autonomie) et la <strong>dimension humaine</strong> (satisfaction, charge, feedback). C'est le premier signal d'alerte si l'intégration dérape.</p>
+                        <p><strong>Comment remplir ?</strong> Remplissez chaque indicateur lors de l'entretien J+30. Les indicateurs « recommandation » et « charge » alimentent le tableau de bord fidélisation.</p>
+                    </div>
+                    <div id="j30Grid"></div>
+                    <div class="form-group" style="margin-top:10px;">
+                        <label>Commentaires J+30</label>
+                        <textarea id="j30Comments" placeholder="Points forts, axes d'amélioration, alertes éventuelles..." onchange="save()"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ PHASE 5 ═══ -->
+        <div class="accordion p5" id="acc5">
+            <div class="accordion-header" onclick="toggleAcc(5)">
+                <div class="accordion-marker">5</div>
+                <div class="accordion-title"><strong>Consolidation (J+45 → J+90)</strong><span>Validation autonomie · Bilan final · Décision PE</span></div>
+                <span class="accordion-badge" id="badge5">0/5</span>
+                <span class="accordion-arrow">▼</span>
+            </div>
+            <div class="accordion-body">
+                <div class="guide-box">
+                    <strong>✅ Décision finale</strong>
+                    <p>C'est ici que se formalise la décision de période d'essai. L'entretien J+90 évalue l'autonomie réelle et débouche sur la validation, la prolongation ou la non-reconduction du contrat.</p>
+                </div>
+                <div id="list_p5"></div>
+
+                <!-- ÉVAL J+90 -->
+                <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--gray-200);">
+                    <h4 style="font-size:14px;color:var(--gray-800);margin-bottom:8px;">📋 Évaluation finale J+90</h4>
+                    <div class="guide-box green">
+                        <strong>Comment prendre la décision ?</strong>
+                        <p><strong>Production ≥90%</strong> sans reprise + <strong>Autonomie ≥80%</strong> + <strong>Taux d'erreur ≤5%</strong> = Validation recommandée.</p>
+                        <p>Si un indicateur est en dessous, envisagez la prolongation. Si plusieurs sont insuffisants, la non-reconduction peut être justifiée.</p>
+                    </div>
+                    <div id="j90Grid"></div>
+                    <div class="form-group" style="margin-top:10px;">
+                        <label>Décision période d'essai</label>
+                        <select id="j90Decision" onchange="save()">
+                            <option value="">— Sélectionner —</option>
+                            <option value="validated">✅ Validée – Embauche confirmée</option>
+                            <option value="extended">⏳ Prolongée – Accompagnement renforcé</option>
+                            <option value="ended">❌ Non renouvelée</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Plan de développement / Commentaires finaux</label>
+                        <textarea id="j90Comments" placeholder="Bilan global, certifications visées, objectifs à 6 mois..." onchange="save()"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Normes bar -->
+        <div class="card" style="padding:14px 18px;">
+            <strong style="font-size:12px;color:var(--gray-600);">📖 Base normative :</strong>
+            <div class="normatif-bar">
+                <span class="norme-tag droit">Code du travail L.1221-19 à 26</span>
+                <span class="norme-tag deonto">Décret 2012-432 art. 145, 147, 148</span>
+                <span class="norme-tag npmq">NPMQ §22, §26-30, §32-33</span>
+                <span class="norme-tag secu">ANSSI · RGPD art. 32, 33, 39</span>
+                <span class="norme-tag lcb">CMF L.561-2 · NPLAB §15-22</span>
+                <span class="norme-tag droit">IDCC 0787</span>
+            </div>
+        </div>
+
+        <div class="btn-group no-print">
+            <button class="btn btn-secondary" onclick="showTab(1)">← Configuration</button>
+            <button class="btn btn-success" onclick="showTab(3)">📊 Voir le bilan d'intégration →</button>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════ -->
+    <!-- TAB 3 : BILAN & EXPORT PDF         -->
+    <!-- ═══════════════════════════════════ -->
+    <div class="panel" id="panel3">
+
+        <!-- Bandeau collaborateur bilan -->
+        <div id="bilanBanner" class="bilan-banner"></div>
+
+        <!-- VERDICT -->
+        <div id="bilanVerdict"></div>
+
+        <!-- KPIs enrichis -->
+        <div id="bilanKPIs"></div>
+
+        <!-- Timeline visuelle -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon teal">🗓️</div>
+                <div><h2>Chronologie du parcours</h2><div class="subtitle">Progression par phase avec jalons réglementaires</div></div>
+            </div>
+            <div id="bilanTimeline"></div>
+        </div>
+
+        <!-- Radar + Indicateurs côte à côte -->
+        <div class="bilan-dual-grid">
+            <!-- Radar J+30 -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon amber">📡</div>
+                    <div><h2>Radar des compétences J+30</h2><div class="subtitle">Évaluation multidimensionnelle</div></div>
+                </div>
+                <div id="bilanRadarContainer" style="display:flex;justify-content:center;align-items:center;min-height:280px;">
+                    <canvas id="radarCanvas" width="320" height="280"></canvas>
+                </div>
+                <div id="bilanRadarLegend"></div>
+            </div>
+
+            <!-- Comparaison J+30 vs J+90 -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon green">📈</div>
+                    <div><h2>Évolution J+30 → J+90</h2><div class="subtitle">Comparaison des indicateurs clés</div></div>
+                </div>
+                <div id="bilanEvolution"></div>
+            </div>
+        </div>
+
+        <!-- Alertes réglementaires -->
+        <div class="card" id="bilanAlertesCard" style="display:none;">
+            <div class="card-header">
+                <div class="card-icon" style="background:linear-gradient(135deg,var(--danger),#ef4444);">🚨</div>
+                <div><h2>Alertes réglementaires</h2><div class="subtitle">Tâches critiques non complétées et risques associés</div></div>
+            </div>
+            <div id="bilanAlertes"></div>
+        </div>
+
+        <!-- Plan d'action -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon" style="background:linear-gradient(135deg,#7c3aed,#a855f7);">🎯</div>
+                <div><h2>Plan d'action recommandé</h2><div class="subtitle">Recommandations automatisées basées sur les données collectées</div></div>
+            </div>
+            <div id="bilanActions"></div>
+        </div>
+
+        <!-- Synthèse PE -->
+        <div class="card" id="bilanPECard">
+            <div class="card-header">
+                <div class="card-icon">⚖️</div>
+                <div><h2>Synthèse période d'essai</h2><div class="subtitle">Décision et conformité légale</div></div>
+            </div>
+            <div id="bilanPE"></div>
+        </div>
+
+        <!-- Export -->
+        <div class="btn-group no-print" style="justify-content:center;padding:10px 0 20px;">
+            <button class="btn btn-secondary" onclick="showTab(2)">← Modifier le parcours</button>
+            <button class="btn btn-primary" onclick="exportPDF()" style="font-size:15px;padding:14px 32px;">📥 Exporter le bilan complet en PDF</button>
+            <button class="btn btn-secondary" onclick="exportJSON()">💾 Sauvegarder JSON</button>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast">💾 Sauvegarde automatique</div>
+
+<footer class="no-print">
+    <p><strong>Annexe 21</strong> – Parcours d'intégration numérique · Mémoire DEC – Cabinet 100% Numérique – Février 2026</p>
+</footer>
+<script>
+// ═══════════════════════════════════
+// DATA
+// ═══════════════════════════════════
+var CONFIG = {
+    apprenti: { name:'Apprenti / Alternant', dur:120, pe:{ cat:'Apprenti', duree:'Selon contrat (45j effectifs)', renouv:'Non applicable', prev:'Art. L.6222-18 C. trav.', jours:0 }},
+    junior: { name:'Junior (0-2 ans)', dur:90, pe:{ cat:'Employé', duree:'2 mois', renouv:'2 mois (si CC le prévoit)', prev:'24h (<8j), 48h (8j-1m), 2 sem. (1-3m), 1 mois (>3m)', jours:60 }},
+    confirme: { name:'Confirmé (2-5 ans)', dur:60, pe:{ cat:'Agent de maîtrise', duree:'3 mois', renouv:'3 mois', prev:'24h (<8j), 48h (8j-1m), 2 sem. (1-3m), 1 mois (>3m)', jours:90 }},
+    senior: { name:'Senior / Chef mission', dur:45, pe:{ cat:'Cadre', duree:'4 mois', renouv:'4 mois', prev:'24h (<8j), 48h (8j-1m), 2 sem. (1-3m), 1 mois (>3m)', jours:120 }}
+};
+
+var PHASES = [
+    { num:1, keys:['p1_admin','p1_it','p1_comm'], label:'Pré-arrivée' },
+    { num:2, keys:['p2_sec','p2_acc'], label:'Accueil & Sécurisation' },
+    { num:3, keys:['p3_train'], label:'Mise en main' },
+    { num:4, keys:['p4_rit'], label:'Autonomie contrôlée' },
+    { num:5, keys:['p5_final'], label:'Consolidation' }
+];
+
+var CK = {
+    p1_admin: [
+        { id:'a1', t:'Signature contrat de travail', d:'Contrat signé et archivé GED', c:true, ref:'Art. L.1221-1 C. trav. ; IDCC 0787' },
+        { id:'a2', t:'DPAE effectuée', d:'Déclaration transmise à l\'URSSAF', c:true, ref:'Art. L.1221-10 C. trav.' },
+        { id:'a3', t:'Dossier collaborateur constitué', d:'Fiche SIRH, pièces collectées', c:true, ref:'RGPD art. 5 ; NPMQ §22' },
+        { id:'a4', t:'Affiliation mutuelle / prévoyance', d:'Attestation obtenue', c:true, ref:'Art. L.911-7 CSS' },
+        { id:'a5', t:'Charte confidentialité signée', d:'Secret professionnel, discrétion', c:true, ref:'Art. 147 Décret 2012-432 ; art. 226-13 CP' },
+        { id:'a6', t:'Charte SI / cybersécurité signée', d:'Règles informatiques et télétravail', c:true, ref:'ANSSI Guide hygiène ; RGPD art. 32' }
+    ],
+    p1_it: [
+        { id:'i1', t:'Matériel commandé et livré', d:'Laptop, écran, casque', c:true, ref:'ANSSI mesure 1' },
+        { id:'i2', t:'Poste configuré', d:'BitLocker, MDM, apps installées', c:true, ref:'ANSSI mesures 8-10' },
+        { id:'i3', t:'Comptes créés', d:'Email, M365, logiciel production', c:true, ref:'ANSSI mesure 2' },
+        { id:'i4', t:'MFA configurée', d:'TOTP ou clé U2F prête', c:true, ref:'ANSSI mesure 12' },
+        { id:'i5', t:'Habilitations attribuées', d:'Moindre privilège appliqué', c:true, ref:'ANSSI mesure 5 ; RGPD art. 32' },
+        { id:'i6', t:'Coffre-fort MDP créé', d:'Compte gestionnaire actif', c:true, ref:'ANSSI mesure 11' }
+    ],
+    p1_comm: [
+        { id:'c1', t:'Email de bienvenue envoyé', d:'Infos pratiques transmises à J-7', c:false, ref:'' },
+        { id:'c2', t:'Kit d\'intégration digital', d:'Livret, trombinoscope, guides', c:false, ref:'' },
+        { id:'c3', t:'Planning J1 + semaine 1', d:'Planning détaillé confirmé', c:true, ref:'' },
+        { id:'c4', t:'Buddy contacté', d:'Premier échange avant J0', c:false, ref:'' }
+    ],
+    p2_sec: [
+        { id:'s1', t:'MFA activée sur tous les comptes', d:'Codes backup générés', c:true, ref:'ANSSI mesure 12' },
+        { id:'s2', t:'Coffre-fort MDP configuré', d:'Extension navigateur installée', c:true, ref:'ANSSI mesure 11' },
+        { id:'s3', t:'VPN testé', d:'Connexion sécurisée validée', c:true, ref:'ANSSI mesure 19' },
+        { id:'s4', t:'Chiffrement disque vérifié', d:'BitLocker/FileVault activé', c:true, ref:'ANSSI mesure 8 ; RGPD art. 32' },
+        { id:'s5', t:'Formation phishing réalisée', d:'Quiz ≥80% validé', c:true, ref:'ANSSI mesure 36 ; RGPD art. 39' },
+        { id:'s6', t:'Test connexion télétravail', d:'Débit et stabilité OK', c:false, ref:'' },
+        { id:'s7', t:'MDM / Endpoint vérifié', d:'Antivirus, pare-feu, MAJ auto', c:true, ref:'ANSSI mesures 8-10' },
+        { id:'s8', t:'Accès production testés', d:'Premier dossier ouvert', c:false, ref:'' }
+    ],
+    p2_acc: [
+        { id:'ac1', t:'Accueil formel par manager', d:'Visio ou présentiel', c:false, ref:'' },
+        { id:'ac2', t:'Présentation à l\'équipe', d:'Stand-up ou réunion', c:false, ref:'' },
+        { id:'ac3', t:'Rencontre buddy/mentor', d:'Rôle expliqué', c:false, ref:'' },
+        { id:'ac4', t:'Rituels présentés', d:'Canaux Slack/Teams, règles', c:false, ref:'' },
+        { id:'ac5', t:'Débrief fin J1', d:'Point ressenti avec manager', c:false, ref:'' }
+    ],
+    p3_train: [
+        { id:'t1', t:'Module logiciel production validé', d:'Quiz ≥80%, maîtrise interface', c:true, ref:'NPMQ §22' },
+        { id:'t2', t:'Collecte automatisée testée', d:'Premier dépôt OCR réussi', c:false, ref:'' },
+        { id:'t3', t:'Module GED/portail testé', d:'Partage client fonctionnel', c:false, ref:'' },
+        { id:'t4', t:'Processus production maîtrisé', d:'Workflow collecte→livraison compris', c:true, ref:'NPMQ §26-28' },
+        { id:'t5', t:'Formation RGPD validée', d:'Certification obtenue', c:true, ref:'RGPD art. 39' },
+        { id:'t6', t:'Formation LCB-FT validée', d:'Quiz validé, signaux d\'alerte compris', c:true, ref:'CMF L.561-2 ; NPLAB §15-22' },
+        { id:'t7', t:'Dossier-test traité', d:'Flux complet de bout en bout', c:true, ref:'NPMQ §26-30' },
+        { id:'t8', t:'Revue technique ≥24/30', d:'Score évaluation ci-dessous', c:true, ref:'NPMQ §26-30 ; Art. 148 Décret 2012-432' }
+    ],
+    p4_rit: [
+        { id:'r1', t:'Points quotidiens buddy', d:'10 min/jour semaines 2-3', c:false, ref:'' },
+        { id:'r2', t:'1:1 manager hebdomadaire', d:'30 min : charge, qualité, ressenti', c:true, ref:'NPMQ §22 ; Art. 148 Décret 2012-432' },
+        { id:'r3', t:'Stand-up équipe', d:'Rituels synchrones ou asynchrones', c:false, ref:'' },
+        { id:'r4', t:'Revue qualité 1er dossier réel', d:'Traçabilité, cohérence vérifiées', c:true, ref:'NPMQ §26-30 ; §32-33' },
+        { id:'r5', t:'Entretien jalon J+30 réalisé', d:'Bilan complet + indicateurs ci-dessous', c:true, ref:'Art. L.1221-23 C. trav.' },
+        { id:'r6', t:'Simulation phishing', d:'Test de vigilance et feedback', c:false, ref:'ANSSI mesure 36' }
+    ],
+    p5_final: [
+        { id:'f1', t:'Autonomie opérationnelle validée', d:'Cycle complet sans reprise majeure', c:true, ref:'NPMQ §22' },
+        { id:'f2', t:'Entretien J+90 réalisé', d:'Bilan final + indicateurs ci-dessous', c:true, ref:'Art. L.1221-25/26 C. trav.' },
+        { id:'f3', t:'Plan de développement établi', d:'Objectifs 6 mois, formations', c:true, ref:'Art. L.6315-1 C. trav.' },
+        { id:'f4', t:'Décision PE formalisée', d:'Notifiée par écrit, délai respecté', c:true, ref:'Art. L.1221-25/26 C. trav. ; IDCC 0787' },
+        { id:'f5', t:'Dossier archivé', d:'Export + archivage GED/RH', c:false, ref:'RGPD art. 5 ; NPMQ §32-33' }
+    ]
+};
+
+var REVIEW_LABELS = ['Complétude collecte','Qualité saisie','Exactitude lettrage','Respect procédures','Utilisation outils','Présentation livrable'];
+var J30_ITEMS = [
+    { id:'j30_tools', label:'Maîtrise outils', max:10, interp:'≥7 = Bon · <5 = Alerte' },
+    { id:'j30_auto', label:'Autonomie production', max:10, interp:'≥7 = Bon · <5 = Alerte' },
+    { id:'j30_integ', label:'Intégration équipe', max:10, interp:'≥7 = Bon · <5 = Alerte' },
+    { id:'j30_sat', label:'Satisfaction collaborateur', max:10, interp:'≥7 = Bon · <5 = Alerte' },
+    { id:'j30_reco', label:'Recommandation cabinet (0-10)', max:10, interp:'9-10 Promoteur · 7-8 Passif · 0-6 Détracteur' },
+    { id:'j30_charge', label:'Charge perçue', max:10, interp:'≤5 OK · 6-7 Attention · ≥8 Alerte RPS' },
+    { id:'j30_clarity', label:'Clarté objectifs', max:10, interp:'≥7 = Clair · <5 = Flou' },
+    { id:'j30_fb', label:'Qualité feedback manager', max:10, interp:'≥7 = Bon · <5 = Insuffisant' }
+];
+var J90_ITEMS = [
+    { id:'j90_prod', label:'Production sans reprise (%)', max:100, interp:'Cible ≥90%' },
+    { id:'j90_dead', label:'Respect échéances (%)', max:100, interp:'Cible 100%' },
+    { id:'j90_err', label:'Taux d\'erreur (%)', max:100, interp:'Cible ≤5%' },
+    { id:'j90_auto', label:'Autonomie (%)', max:100, interp:'Cible ≥80%' }
+];
+
+// ═══════════════════════════════════
+// STATE
+// ═══════════════════════════════════
+var S = { profile:null, tasks:{}, reviews:{}, j30:{}, j90:{} };
+var STORAGE = 'a21_state';
+
+function save() {
+    collectEvals();
+    S.j30.comments = el('j30Comments') ? el('j30Comments').value : '';
+    S.j90.decision = el('j90Decision') ? el('j90Decision').value : '';
+    S.j90.comments = el('j90Comments') ? el('j90Comments').value : '';
+    try { localStorage.setItem(STORAGE, JSON.stringify(S)); } catch(e){}
+    showToast();
+    updateUI();
+}
+
+function collectEvals() {
+    for (var i=0;i<6;i++) { var v=el('rev'+i); if(v) S.reviews['r'+i]=v.value; }
+    J30_ITEMS.forEach(function(it){ var v=el(it.id); if(v) S.j30[it.id]=v.value; });
+    J90_ITEMS.forEach(function(it){ var v=el(it.id); if(v) S.j90[it.id]=v.value; });
+}
+
+function el(id) { return document.getElementById(id); }
+function showToast() { var t=el('toast'); t.classList.add('show'); setTimeout(function(){ t.classList.remove('show'); },1500); }
+
+// ═══════════════════════════════════
+// TABS
+// ═══════════════════════════════════
+function showTab(n) {
+    for(var i=1;i<=3;i++){
+        el('panel'+i).classList.remove('active');
+        el('tab'+i).classList.remove('active');
+    }
+    el('panel'+n).classList.add('active');
+    el('tab'+n).classList.add('active');
+    if(n>=2) updateUI();
+    if(n===3) generateBilan();
+    window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function toggleAcc(n) {
+    el('acc'+n).classList.toggle('open');
+}
+
+// ═══════════════════════════════════
+// PROFILE SELECT
+// ═══════════════════════════════════
+function selectProfile(p) {
+    S.profile = p;
+    document.querySelectorAll('.profile-card').forEach(function(c){ c.classList.remove('selected'); });
+    el('card-'+p).classList.add('selected');
+}
+
+// ═══════════════════════════════════
+// LAUNCH
+// ═══════════════════════════════════
+function launchParcours() {
+    var name = el('collabName').value.trim();
+    var date = el('startDate').value;
+    var mgr = el('managerName').value.trim();
+    var cab = el('cabinetName').value.trim();
+    if(!name){ alert('Saisissez le nom du collaborateur.'); return; }
+    if(!date){ alert('Saisissez la date d\'arrivée.'); return; }
+    if(!S.profile){ alert('Sélectionnez un profil.'); return; }
+    if(!mgr){ alert('Saisissez le nom du manager.'); return; }
+    if(!cab){ alert('Saisissez le nom du cabinet.'); return; }
+
+    S.config = { name:name, email:el('collabEmail').value, date:date, poste:el('collabPosition').value, manager:mgr, buddy:el('buddyName').value, cabinet:cab, mode:el('workMode').value };
+
+    el('btnExportJson').style.display = 'inline-flex';
+    buildChecklists();
+    buildEvalGrids();
+    updatePE();
+    el('tab2').disabled = false;
+    el('tab3').disabled = false;
+    save();
+    showTab(2);
+}
+
+// ═══════════════════════════════════
+// BUILD CHECKLISTS
+// ═══════════════════════════════════
+function buildChecklists() {
+    PHASES.forEach(function(ph){
+        var container = el('list_p'+ph.num);
+        var html = '';
+        ph.keys.forEach(function(key){
+            CK[key].forEach(function(item){
+                var done = S.tasks[item.id] ? ' done' : '';
+                var crit = item.c ? ' critical' : '';
+                var refHtml = item.ref ? '<span class="ck-ref">📖 '+item.ref+'</span>' : '';
+                html += '<div class="ck'+crit+done+'" id="ck-'+item.id+'" onclick="toggleTask(\''+item.id+'\')">' +
+                    '<div class="ck-box">✓</div>' +
+                    '<div class="ck-text"><strong>'+item.t+'</strong> — '+item.d+refHtml+'</div>' +
+                '</div>';
+            });
+        });
+        container.innerHTML = html;
+    });
+}
+
+function toggleTask(id) {
+    S.tasks[id] = !S.tasks[id];
+    var ckEl = el('ck-'+id);
+    if(ckEl) ckEl.classList.toggle('done');
+    save();
+}
+
+// ═══════════════════════════════════
+// BUILD EVAL GRIDS
+// ═══════════════════════════════════
+function buildEvalGrids() {
+    // Review grid
+    var rhtml = '';
+    REVIEW_LABELS.forEach(function(label, i){
+        rhtml += '<div class="eval-row"><label>'+label+'</label><input type="number" min="1" max="5" id="rev'+i+'" placeholder="1-5" onchange="calcReview();save()"><div class="interp">1=Insuffisant · 5=Excellent</div></div>';
+    });
+    el('reviewGrid').innerHTML = rhtml;
+
+    // J30 grid
+    var j30html = '';
+    J30_ITEMS.forEach(function(it){
+        j30html += '<div class="eval-row"><label>'+it.label+'</label><input type="number" min="0" max="'+it.max+'" id="'+it.id+'" placeholder="0-'+it.max+'" onchange="save()"><div class="interp">'+it.interp+'</div></div>';
+    });
+    el('j30Grid').innerHTML = j30html;
+
+    // J90 grid
+    var j90html = '';
+    J90_ITEMS.forEach(function(it){
+        j90html += '<div class="eval-row"><label>'+it.label+'</label><input type="number" min="0" max="'+it.max+'" id="'+it.id+'" placeholder="0-'+it.max+'" onchange="save()"><div class="interp">'+it.interp+'</div></div>';
+    });
+    el('j90Grid').innerHTML = j90html;
+
+    // Restore saved values
+    for(var k in S.reviews){ var e=el(k.replace('r','rev')); if(e) e.value=S.reviews[k]; }
+    J30_ITEMS.forEach(function(it){ var e=el(it.id); if(e && S.j30[it.id]) e.value=S.j30[it.id]; });
+    J90_ITEMS.forEach(function(it){ var e=el(it.id); if(e && S.j90[it.id]) e.value=S.j90[it.id]; });
+    if(S.j30.comments && el('j30Comments')) el('j30Comments').value = S.j30.comments;
+    if(S.j90.decision && el('j90Decision')) el('j90Decision').value = S.j90.decision;
+    if(S.j90.comments && el('j90Comments')) el('j90Comments').value = S.j90.comments;
+    calcReview();
+}
+
+function calcReview() {
+    var total=0, filled=0;
+    for(var i=0;i<6;i++){
+        var v=el('rev'+i); if(v && v.value){ total+=parseInt(v.value); filled++; }
+    }
+    el('reviewScore').textContent = filled===6 ? total : '—';
+    var badge = el('reviewBadge');
+    if(filled===6){
+        if(total>=24){ badge.textContent='✅ Validé (≥80%)'; badge.style.background='#d1fae5'; badge.style.color='#065f46'; }
+        else if(total>=18){ badge.textContent='⚠️ À renforcer'; badge.style.background='#fef3c7'; badge.style.color='#92400e'; }
+        else { badge.textContent='❌ Insuffisant'; badge.style.background='#fee2e2'; badge.style.color='#991b1b'; }
+    } else { badge.textContent='En attente'; badge.style.background='var(--gray-200)'; badge.style.color='var(--gray-600)'; }
+}
+
+// ═══════════════════════════════════
+// PE
+// ═══════════════════════════════════
+function updatePE() {
+    var pe = CONFIG[S.profile].pe;
+    el('peBox').style.display = 'block';
+    el('peCat').textContent = pe.cat;
+    el('peDur').textContent = pe.duree;
+    el('peRen').textContent = pe.renouv;
+    if(pe.jours && S.config.date){
+        var d = new Date(S.config.date);
+        d.setDate(d.getDate()+pe.jours);
+        el('peEnd').textContent = d.toLocaleDateString('fr-FR');
+    } else { el('peEnd').textContent = pe.duree; }
+}
+
+// ═══════════════════════════════════
+// UPDATE UI
+// ═══════════════════════════════════
+function updateUI() {
+    if(!S.config) return;
+    // Banner
+    el('collabBanner').innerHTML = '<div><strong style="font-size:15px">'+S.config.name+'</strong> <span style="opacity:0.8;font-size:12px">· '+CONFIG[S.profile].name+' · '+S.config.cabinet+'</span></div><div style="font-size:12px;opacity:0.8">Manager: '+S.config.manager+' · Arrivée: '+new Date(S.config.date).toLocaleDateString('fr-FR')+'</div>';
+
+    // Day
+    var days = Math.floor((Date.now() - new Date(S.config.date).getTime()) / 86400000);
+    el('kDay').textContent = 'J+'+(days<0?0:days);
+
+    // Tasks
+    var allItems = []; var done=0; var critLeft=0;
+    PHASES.forEach(function(ph){ ph.keys.forEach(function(key){ CK[key].forEach(function(item){ allItems.push(item); if(S.tasks[item.id]) done++; else if(item.c) critLeft++; }); }); });
+    var total = allItems.length;
+    var pct = total ? Math.round(done/total*100) : 0;
+    el('kTasks').textContent = done+'/'+total;
+    el('kCrit').textContent = critLeft;
+    el('kPct').textContent = pct+'%';
+    el('globalBar').style.width = pct+'%';
+    el('kCritCard').className = 'stat-card'+(critLeft>0?' danger':' success');
+
+    // Phase badges
+    PHASES.forEach(function(ph){
+        var pTotal=0, pDone=0;
+        ph.keys.forEach(function(key){ CK[key].forEach(function(item){ pTotal++; if(S.tasks[item.id]) pDone++; }); });
+        var b = el('badge'+ph.num);
+        b.textContent = pDone+'/'+pTotal;
+        b.className = 'accordion-badge'+(pDone===pTotal&&pTotal>0?' done':(pDone>0?' partial':''));
+    });
+}
+
+// ═══════════════════════════════════
+// BILAN DASHBOARD
+// ═══════════════════════════════════
+function generateBilan() {
+    if(!S.config) return;
+    collectEvals();
+
+    // ── Compute all data ──
+    var allItems=[],done=0,critLeft=0,critMissing=[];
+    PHASES.forEach(function(ph){ ph.keys.forEach(function(key){ CK[key].forEach(function(item){
+        allItems.push(item);
+        if(S.tasks[item.id]) done++;
+        else if(item.c){ critLeft++; critMissing.push(item); }
+    }); }); });
+    var total=allItems.length, pct=Math.round(done/total*100);
+    var days=Math.floor((Date.now()-new Date(S.config.date).getTime())/86400000);
+    if(days<0) days=0;
+    var profileCfg=CONFIG[S.profile];
+
+    // Review score
+    var reviewTotal=0,reviewFilled=0;
+    for(var i=0;i<6;i++){if(S.reviews['r'+i]){reviewTotal+=parseInt(S.reviews['r'+i]);reviewFilled++;}}
+
+    // J30/J90 data
+    var j30={},j90={};
+    J30_ITEMS.forEach(function(it){ j30[it.id]=parseInt(S.j30[it.id])||0; });
+    J90_ITEMS.forEach(function(it){ j90[it.id]=parseInt(S.j90[it.id])||0; });
+    var hasJ30=J30_ITEMS.some(function(it){return j30[it.id]>0;});
+    var hasJ90=J90_ITEMS.some(function(it){return j90[it.id]>0;});
+    var decision=S.j90.decision||'';
+
+    // Verdict logic
+    var verdict='success',vtxt='\u2705 INT\u00c9GRATION R\u00c9USSIE',vdesc='Toutes les t\u00e2ches critiques sont compl\u00e9t\u00e9es et les indicateurs sont conformes aux seuils attendus.';
+    if(critLeft>0){verdict='warning';vtxt='\u26a0\ufe0f INT\u00c9GRATION PARTIELLE';vdesc=critLeft+' t\u00e2che(s) critique(s) non compl\u00e9t\u00e9e(s). Un suivi compl\u00e9mentaire est recommand\u00e9 avant validation.';}
+    if(pct<50){verdict='danger';vtxt='\u274c INT\u00c9GRATION INSUFFISANTE';vdesc='Moins de 50% du parcours compl\u00e9t\u00e9. Des actions correctives urgentes sont n\u00e9cessaires.';}
+    if(j90.j90_prod>0&&j90.j90_prod<80){if(verdict==='success'){verdict='warning';vdesc='Production <80% \u2013 suivi \u00e0 renforcer.';}else{vdesc+=' Production <80%.';}}
+    if(j90.j90_auto>0&&j90.j90_auto<60){if(verdict==='success'){verdict='warning';vdesc='Autonomie <60% \u2013 accompagnement prolong\u00e9 recommand\u00e9.';}else{vdesc+=' Autonomie <60%.';}}
+
+    // ══════════════════════════════════
+    // 1. BANNER
+    // ══════════════════════════════════
+    el('bilanBanner').innerHTML='<div><div class="bilan-title">Bilan d\'int\u00e9gration \u2014 '+S.config.name+'</div><div class="bilan-sub">'+profileCfg.name+' \u00b7 '+S.config.cabinet+' \u00b7 Manager : '+S.config.manager+'</div></div><div class="bilan-date">G\u00e9n\u00e9r\u00e9 le '+new Date().toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'})+'</div>';
+
+    // ══════════════════════════════════
+    // 2. VERDICT
+    // ══════════════════════════════════
+    el('bilanVerdict').innerHTML='<div class="verdict-box '+verdict+'" style="margin-bottom:20px;"><h3 style="font-size:22px;">'+vtxt+'</h3><p style="max-width:600px;margin:8px auto 0;">'+vdesc+'</p></div>';
+
+    // ══════════════════════════════════
+    // 3. KPIs
+    // ══════════════════════════════════
+    var kpiHtml='<div class="stat-grid" style="margin-bottom:20px;">';
+    kpiHtml+='<div class="stat-card"><div style="font-size:20px">\ud83d\udcc5</div><div class="stat-value">J+'+days+'</div><div class="stat-label">Jour du parcours</div><div style="font-size:10px;color:var(--gray-500);margin-top:2px;">Dur\u00e9e cible : '+profileCfg.dur+' jours</div></div>';
+    kpiHtml+='<div class="stat-card"><div style="font-size:20px">\u2705</div><div class="stat-value">'+pct+'%</div><div class="stat-label">Progression globale</div><div style="font-size:10px;color:var(--gray-500);margin-top:2px;">'+done+'/'+total+' t\u00e2ches compl\u00e9t\u00e9es</div></div>';
+    kpiHtml+='<div class="stat-card '+(critLeft>0?'danger':'success')+'"><div style="font-size:20px">'+(critLeft>0?'\ud83d\udea8':'\ud83d\udee1\ufe0f')+'</div><div class="stat-value">'+critLeft+'</div><div class="stat-label">Critiques restantes</div><div style="font-size:10px;color:var(--gray-500);margin-top:2px;">'+(critLeft===0?'Conformit\u00e9 atteinte':'Action requise')+'</div></div>';
+    kpiHtml+='<div class="stat-card"><div style="font-size:20px">\ud83d\udcdd</div><div class="stat-value">'+(reviewFilled===6?reviewTotal+'/30':'\u2014')+'</div><div class="stat-label">Score dossier-test</div><div style="font-size:10px;color:var(--gray-500);margin-top:2px;">'+(reviewFilled===6?(reviewTotal>=24?'\u226580% Valid\u00e9':'<80% \u00c0 renforcer'):'Non \u00e9valu\u00e9')+'</div></div>';
+    kpiHtml+='</div>';
+    el('bilanKPIs').innerHTML=kpiHtml;
+
+    // ══════════════════════════════════
+    // 4. TIMELINE
+    // ══════════════════════════════════
+    var phaseColors=['var(--primary-light)','var(--secondary)','var(--warning)','#7c3aed','var(--danger)'];
+    var phaseLabels=['Pr\u00e9-arriv\u00e9e (J-7 \u2192 J0)','Accueil & S\u00e9curisation (J0 \u2192 J+2)','Mise en main (J+3 \u2192 J+10)','Autonomie contr\u00f4l\u00e9e (J+10 \u2192 J+45)','Consolidation (J+45 \u2192 J+90)'];
+    var phasePeriods=['Administratif \u00b7 IT \u00b7 Communication','S\u00e9curit\u00e9 \u00b7 Accueil formel','Formation outils \u00b7 Dossier-test','Dossiers r\u00e9els \u00b7 Jalon J+30','Validation \u00b7 Jalon J+90 \u00b7 D\u00e9cision PE'];
+    var tlHtml='<div class="timeline-container">';
+    PHASES.forEach(function(ph,idx){
+        var pt=0,pd=0;
+        ph.keys.forEach(function(k){CK[k].forEach(function(i){pt++;if(S.tasks[i.id])pd++;});});
+        var pp=pt>0?Math.round(pd/pt*100):0;
+        var status=pp===100?'complete':(pp>0?'in-progress':'');
+        var statusLabel=pp===100?'\u2705 Termin\u00e9':(pp>0?'\ud83d\udd04 En cours':'\u23f3 \u00c0 faire');
+        var pctColor=pp===100?'var(--success)':(pp>0?'var(--warning)':'var(--gray-400)');
+        tlHtml+='<div class="timeline-phase"><div class="timeline-left"><div class="timeline-dot" style="background:'+phaseColors[idx]+';">'+ph.num+'</div><div class="timeline-line" style="'+(pp===100?'background:var(--success);':'')+'"></div></div>';
+        tlHtml+='<div class="timeline-right '+status+'"><div class="timeline-header"><div class="timeline-title">'+phaseLabels[idx]+'</div><span class="timeline-pct" style="background:'+(pp===100?'#d1fae5':'var(--gray-100)')+';color:'+pctColor+';">'+pd+'/'+pt+' \u00b7 '+pp+'%</span></div>';
+        tlHtml+='<div class="timeline-bar"><div class="timeline-bar-fill" style="width:'+pp+'%;background:'+phaseColors[idx]+';"></div></div>';
+        tlHtml+='<div class="timeline-meta">'+phasePeriods[idx]+' \u2014 '+statusLabel+'</div></div></div>';
+    });
+    tlHtml+='</div>';
+    el('bilanTimeline').innerHTML=tlHtml;
+
+    // ══════════════════════════════════
+    // 5. RADAR J+30
+    // ══════════════════════════════════
+    if(hasJ30){
+        drawRadar(j30);
+        var lgHtml='<div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:10px;">';
+        var radarLabels=['Outils','Autonomie','Int\u00e9gration','Satisfaction','Recomm.','Charge*','Clart\u00e9','Feedback'];
+        radarLabels.forEach(function(l,i){
+            lgHtml+='<span style="font-size:10px;background:var(--gray-100);padding:2px 8px;border-radius:4px;color:var(--gray-600);">'+(i+1)+'. '+l+'</span>';
+        });
+        lgHtml+='</div><p style="font-size:10px;color:var(--gray-500);text-align:center;margin-top:6px;">* Charge per\u00e7ue : \u00e9chelle invers\u00e9e (\u22645 = OK, \u22658 = Alerte RPS)</p>';
+        el('bilanRadarLegend').innerHTML=lgHtml;
+    } else {
+        var canv=el('radarCanvas'); if(canv) canv.style.display='none';
+        el('bilanRadarContainer').innerHTML='<div style="text-align:center;padding:40px 20px;"><div style="font-size:40px;margin-bottom:10px;">\ud83d\udcca</div><p style="color:var(--gray-500);font-size:13px;">Le jalon J+30 n\'a pas encore \u00e9t\u00e9 renseign\u00e9.<br>Compl\u00e9tez l\'\u00e9valuation dans l\'onglet Parcours.</p></div>';
+        el('bilanRadarLegend').innerHTML='';
+    }
+
+    // ══════════════════════════════════
+    // 6. EVOLUTION J+30 -> J+90
+    // ══════════════════════════════════
+    var evoHtml='';
+    if(hasJ30||hasJ90){
+        var evoItems=[
+            {label:'Production',j30:j30.j30_auto*10,j90:j90.j90_prod,unit:'%',max:100},
+            {label:'Autonomie',j30:j30.j30_tools*10,j90:j90.j90_auto,unit:'%',max:100},
+            {label:'\u00c9ch\u00e9ances',j30:null,j90:j90.j90_dead,unit:'%',max:100},
+            {label:'Taux erreur',j30:null,j90:j90.j90_err,unit:'%',max:100,inverted:true}
+        ];
+        evoHtml+='<div style="margin-bottom:8px;"><div class="evo-row" style="background:none;font-weight:700;font-size:11px;color:var(--gray-500);"><div>Indicateur</div><div></div><div style="text-align:center;">J+30</div><div style="text-align:center;">J+90</div></div>';
+        evoItems.forEach(function(ev){
+            var v30=ev.j30||0,v90=ev.j90||0;
+            evoHtml+='<div class="evo-row"><div class="evo-label">'+ev.label+'</div><div class="evo-bar-track"><div class="evo-bar-j30" style="width:'+(ev.j30?v30:0)+'%;"></div><div class="evo-bar-j90" style="width:'+(ev.j90?v90:0)+'%;"></div></div><div class="evo-val" style="color:var(--warning);">'+(ev.j30?v30+ev.unit:'\u2014')+'</div><div class="evo-val" style="color:var(--success);">'+(ev.j90?v90+ev.unit:'\u2014')+'</div></div>';
+        });
+        evoHtml+='</div>';
+        evoHtml+='<div style="display:flex;gap:12px;justify-content:center;margin-top:8px;"><span style="font-size:10px;display:flex;align-items:center;gap:4px;"><span style="width:12px;height:8px;background:var(--warning);border-radius:2px;opacity:0.5;display:inline-block;"></span>J+30</span><span style="font-size:10px;display:flex;align-items:center;gap:4px;"><span style="width:12px;height:8px;background:var(--success);border-radius:2px;display:inline-block;"></span>J+90</span></div>';
+
+        if(decision){
+            var decMap={validated:{label:'\u2705 Valid\u00e9e \u2013 Embauche confirm\u00e9e',color:'var(--success)',bg:'#d1fae5'},extended:{label:'\u23f3 Prolong\u00e9e \u2013 Accompagnement renforc\u00e9',color:'var(--warning)',bg:'#fef3c7'},ended:{label:'\u274c Non renouvel\u00e9e',color:'var(--danger)',bg:'#fee2e2'}};
+            var dec=decMap[decision]||{label:decision,color:'var(--gray-600)',bg:'var(--gray-100)'};
+            evoHtml+='<div style="text-align:center;margin-top:14px;padding:12px;background:'+dec.bg+';border-radius:8px;"><small style="color:var(--gray-500);font-size:10px;display:block;">D\u00e9cision p\u00e9riode d\'essai</small><strong style="color:'+dec.color+';font-size:14px;">'+dec.label+'</strong></div>';
+        }
+    } else {
+        evoHtml='<div style="text-align:center;padding:40px 20px;"><div style="font-size:40px;margin-bottom:10px;">\ud83d\udcc8</div><p style="color:var(--gray-500);font-size:13px;">Aucune \u00e9valuation renseign\u00e9e pour le moment.<br>Compl\u00e9tez les jalons J+30 et J+90 dans l\'onglet Parcours.</p></div>';
+    }
+    el('bilanEvolution').innerHTML=evoHtml;
+
+    // ══════════════════════════════════
+    // 7. ALERTES REGLEMENTAIRES
+    // ══════════════════════════════════
+    if(critMissing.length>0){
+        el('bilanAlertesCard').style.display='block';
+        var alertHtml='';
+        critMissing.forEach(function(item){
+            alertHtml+='<div class="alert-item"><div class="alert-icon">\u26a0\ufe0f</div><div class="alert-text"><strong>'+item.t+'</strong><small>'+item.d+'</small>'+(item.ref?'<span class="alert-ref">\ud83d\udcd6 '+item.ref+'</span>':'')+'</div></div>';
+        });
+        el('bilanAlertes').innerHTML=alertHtml;
+    } else {
+        el('bilanAlertesCard').style.display='none';
+    }
+
+    // ══════════════════════════════════
+    // 8. PLAN D'ACTION
+    // ══════════════════════════════════
+    var actHtml='';
+    var actCount=0;
+
+    if(critLeft>0){
+        actHtml+='<div class="action-item urgent"><div class="action-icon">\ud83d\udd34</div><div class="action-text"><strong>Compl\u00e9ter les '+critLeft+' t\u00e2che(s) critique(s) restante(s)</strong><p>Ces t\u00e2ches sont li\u00e9es \u00e0 des obligations l\u00e9gales ou s\u00e9curitaires. Leur non-r\u00e9alisation expose le cabinet \u00e0 un risque de non-conformit\u00e9 r\u00e9glementaire.</p></div></div>';
+        actCount++;
+    }
+    if(reviewFilled===6&&reviewTotal<24){
+        actHtml+='<div class="action-item urgent"><div class="action-icon">\ud83d\udcdd</div><div class="action-text"><strong>Renforcer la formation technique (score dossier-test : '+reviewTotal+'/30)</strong><p>Le score est inf\u00e9rieur au seuil de validation de 80%. Planifier une session de formation cibl\u00e9e et un nouveau dossier-test dans les 10 jours.</p></div></div>';
+        actCount++;
+    }
+    if(hasJ30){
+        if(j30.j30_charge>=8){
+            actHtml+='<div class="action-item urgent"><div class="action-icon">\ud83e\udde0</div><div class="action-text"><strong>Alerte RPS : charge per\u00e7ue \u00e9lev\u00e9e ('+j30.j30_charge+'/10)</strong><p>Le collaborateur signale une surcharge. R\u00e9duire le portefeuille, ajuster les d\u00e9lais et planifier un entretien de suivi rapproch\u00e9. R\u00e9f. : Art. L.4121-1 C. trav.</p></div></div>';
+            actCount++;
+        }
+        if(j30.j30_reco<=6){
+            actHtml+='<div class="action-item recommend"><div class="action-icon">\ud83d\udcc9</div><div class="action-text"><strong>eNPS d\u00e9tracteur ('+j30.j30_reco+'/10) : risque de d\u00e9part pr\u00e9coce</strong><p>Organiser un entretien d\u00e9di\u00e9 pour identifier les irritants. Analyser l\'ad\u00e9quation poste/attentes et proposer des mesures correctives.</p></div></div>';
+            actCount++;
+        }
+        if(j30.j30_auto<5){
+            actHtml+='<div class="action-item recommend"><div class="action-icon">\ud83c\udfaf</div><div class="action-text"><strong>Autonomie insuffisante \u00e0 J+30 ('+j30.j30_auto+'/10)</strong><p>Renforcer le tutorat avec le buddy, augmenter la fr\u00e9quence des points quotidiens et d\u00e9finir des objectifs interm\u00e9diaires pr\u00e9cis.</p></div></div>';
+            actCount++;
+        }
+        if(j30.j30_fb<5){
+            actHtml+='<div class="action-item recommend"><div class="action-icon">\ud83d\udcac</div><div class="action-text"><strong>Qualit\u00e9 du feedback manager per\u00e7ue comme insuffisante ('+j30.j30_fb+'/10)</strong><p>Le manager doit structurer davantage les retours : points d\'am\u00e9lioration concrets, exemples, et fr\u00e9quence renforc\u00e9e des 1:1.</p></div></div>';
+            actCount++;
+        }
+    }
+    if(hasJ90){
+        if(j90.j90_prod>0&&j90.j90_prod<80){
+            actHtml+='<div class="action-item urgent"><div class="action-icon">\ud83d\udcca</div><div class="action-text"><strong>Production sans reprise insuffisante ('+j90.j90_prod+'% \u2013 cible \u226590%)</strong><p>Identifier les types de dossiers probl\u00e9matiques. Pr\u00e9voir un plan de mont\u00e9e en comp\u00e9tences cibl\u00e9 avant la fin de la p\u00e9riode d\'essai.</p></div></div>';
+            actCount++;
+        }
+        if(j90.j90_err>0&&j90.j90_err>10){
+            actHtml+='<div class="action-item urgent"><div class="action-icon">\u2757</div><div class="action-text"><strong>Taux d\'erreur \u00e9lev\u00e9 ('+j90.j90_err+'% \u2013 cible \u22645%)</strong><p>Mettre en place une revue syst\u00e9matique des dossiers et un double contr\u00f4le temporaire. R\u00e9f. : NPMQ \u00a726-30 contr\u00f4le qualit\u00e9.</p></div></div>';
+            actCount++;
+        }
+    }
+
+    // Positifs
+    if(pct===100&&critLeft===0){
+        actHtml+='<div class="action-item success"><div class="action-icon">\ud83c\udf89</div><div class="action-text"><strong>Parcours 100% compl\u00e9t\u00e9 \u2014 aucune t\u00e2che critique restante</strong><p>L\'int\u00e9gration est conforme aux exigences r\u00e9glementaires et aux standards du cabinet. Proc\u00e9der \u00e0 l\'archivage du dossier.</p></div></div>';
+        actCount++;
+    }
+    if(reviewFilled===6&&reviewTotal>=24){
+        actHtml+='<div class="action-item success"><div class="action-icon">\u2705</div><div class="action-text"><strong>Dossier-test valid\u00e9 avec '+reviewTotal+'/30 ('+Math.round(reviewTotal/30*100)+'%)</strong><p>Le collaborateur ma\u00eetrise le processus de production de bout en bout.</p></div></div>';
+        actCount++;
+    }
+    if(hasJ30&&j30.j30_reco>=9){
+        actHtml+='<div class="action-item success"><div class="action-icon">\u2b50</div><div class="action-text"><strong>eNPS promoteur ('+j30.j30_reco+'/10) \u2014 fort engagement</strong><p>Capitaliser sur cette satisfaction : proposer un r\u00f4le de buddy pour les prochaines int\u00e9grations, valoriser le parcours en interne.</p></div></div>';
+        actCount++;
+    }
+
+    if(actCount===0){
+        actHtml='<div class="action-item recommend"><div class="action-icon">\ud83d\udca1</div><div class="action-text"><strong>Donn\u00e9es insuffisantes pour g\u00e9n\u00e9rer des recommandations</strong><p>Compl\u00e9tez les \u00e9valuations J+30 et J+90 dans l\'onglet Parcours pour obtenir un plan d\'action personnalis\u00e9.</p></div></div>';
+    }
+    el('bilanActions').innerHTML=actHtml;
+
+    // ══════════════════════════════════
+    // 9. SYNTHESE PE
+    // ══════════════════════════════════
+    var pe=profileCfg.pe;
+    var peEndDate='\u2014';
+    if(pe.jours&&S.config.date){var d=new Date(S.config.date);d.setDate(d.getDate()+pe.jours);peEndDate=d.toLocaleDateString('fr-FR');}
+    var daysLeft=0;
+    if(pe.jours&&S.config.date){daysLeft=Math.max(0,pe.jours-days);}
+
+    var peHtml='<div class="pe-summary">';
+    peHtml+='<div class="pe-summary-item"><small>Cat\u00e9gorie</small><div class="pe-val">'+pe.cat+'</div></div>';
+    peHtml+='<div class="pe-summary-item"><small>Dur\u00e9e initiale</small><div class="pe-val">'+pe.duree+'</div></div>';
+    peHtml+='<div class="pe-summary-item"><small>Renouvellement</small><div class="pe-val">'+pe.renouv+'</div></div>';
+    peHtml+='<div class="pe-summary-item"><small>Fin PE estim\u00e9e</small><div class="pe-val">'+peEndDate+'</div></div>';
+    peHtml+='<div class="pe-summary-item"><small>Jours restants</small><div class="pe-val" style="color:'+(daysLeft<=15?'var(--danger)':'var(--primary)')+';">'+(pe.jours?daysLeft+' j':'N/A')+'</div></div>';
+
+    if(decision){
+        var decMap2={validated:{label:'Valid\u00e9e',color:'var(--success)'},extended:{label:'Prolong\u00e9e',color:'var(--warning)'},ended:{label:'Non renouvel\u00e9e',color:'var(--danger)'}};
+        var dc=decMap2[decision]||{label:'\u2014',color:'var(--gray-600)'};
+        peHtml+='<div class="pe-summary-item decision"><small>D\u00e9cision</small><div class="pe-val" style="color:'+dc.color+';">'+dc.label+'</div></div>';
+    } else {
+        peHtml+='<div class="pe-summary-item"><small>D\u00e9cision</small><div class="pe-val" style="color:var(--gray-400);">Non prise</div></div>';
+    }
+    peHtml+='</div>';
+
+    peHtml+='<div style="margin-top:14px;padding:12px 16px;background:var(--gray-50);border-radius:8px;border-left:3px solid var(--info);"><strong style="font-size:12px;color:var(--primary);">\ud83d\udcd6 Rappel l\u00e9gal \u2014 D\u00e9lais de pr\u00e9venance</strong><p style="font-size:11px;color:var(--gray-600);margin-top:4px;">'+pe.prev+'</p><p style="font-size:10px;color:var(--gray-500);margin-top:4px;">R\u00e9f. : Art. L.1221-25 et L.1221-26 C. trav. \u00b7 Convention collective IDCC 0787.</p></div>';
+
+    el('bilanPE').innerHTML=peHtml;
+}
+
+// ═══════════════════════════════════
+// RADAR CHART (Canvas)
+// ═══════════════════════════════════
+function drawRadar(j30data) {
+    var canvas=el('radarCanvas');
+    if(!canvas||!canvas.getContext) return;
+    canvas.style.display='block';
+    var ctx=canvas.getContext('2d');
+    var W=canvas.width,H=canvas.height;
+    var cx=W/2,cy=H/2+5,R=100;
+    var labels=['Outils','Autonomie','Int\u00e9gr.','Satisf.','Recomm.','Charge','Clart\u00e9','Feedback'];
+    var keys=['j30_tools','j30_auto','j30_integ','j30_sat','j30_reco','j30_charge','j30_clarity','j30_fb'];
+    var n=keys.length;
+    var vals=keys.map(function(k){return parseInt(j30data[k])||0;});
+
+    ctx.clearRect(0,0,W,H);
+
+    // Background polygons
+    for(var ring=2;ring<=10;ring+=2){
+        var rr=R*ring/10;
+        ctx.beginPath();
+        for(var i=0;i<=n;i++){
+            var angle=Math.PI*2*i/n-Math.PI/2;
+            var x=cx+Math.cos(angle)*rr;
+            var y=cy+Math.sin(angle)*rr;
+            if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+        }
+        ctx.closePath();
+        ctx.strokeStyle=ring===10?'#d1d5db':'#e5e7eb';
+        ctx.lineWidth=ring===10?1.5:0.8;
+        ctx.stroke();
+        if(ring%4===0){
+            ctx.fillStyle='#9ca3af';ctx.font='9px sans-serif';ctx.textAlign='center';
+            ctx.fillText(ring,cx,cy-rr-3);
+        }
+    }
+
+    // Axes
+    for(var i=0;i<n;i++){
+        var angle=Math.PI*2*i/n-Math.PI/2;
+        ctx.beginPath();ctx.moveTo(cx,cy);
+        ctx.lineTo(cx+Math.cos(angle)*R,cy+Math.sin(angle)*R);
+        ctx.strokeStyle='#e5e7eb';ctx.lineWidth=0.8;ctx.stroke();
+        var lx=cx+Math.cos(angle)*(R+18);
+        var ly=cy+Math.sin(angle)*(R+18);
+        ctx.fillStyle='#374151';ctx.font='bold 10px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+        ctx.fillText(labels[i],lx,ly);
+    }
+
+    // Threshold polygon (7 = "bon")
+    ctx.beginPath();ctx.setLineDash([4,3]);
+    for(var i=0;i<=n;i++){
+        var angle=Math.PI*2*(i%n)/n-Math.PI/2;
+        var rr=R*7/10;
+        var x=cx+Math.cos(angle)*rr;
+        var y=cy+Math.sin(angle)*rr;
+        if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.closePath();ctx.strokeStyle='rgba(5,150,105,0.4)';ctx.lineWidth=1;ctx.stroke();ctx.setLineDash([]);
+
+    // Data polygon
+    ctx.beginPath();
+    for(var i=0;i<=n;i++){
+        var idx=i%n;
+        var angle=Math.PI*2*idx/n-Math.PI/2;
+        var v=Math.min(vals[idx],10);
+        var rr=R*v/10;
+        var x=cx+Math.cos(angle)*rr;
+        var y=cy+Math.sin(angle)*rr;
+        if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.closePath();
+    ctx.fillStyle='rgba(30,58,95,0.15)';ctx.fill();
+    ctx.strokeStyle='#1e3a5f';ctx.lineWidth=2;ctx.stroke();
+
+    // Data points + values
+    for(var i=0;i<n;i++){
+        var angle=Math.PI*2*i/n-Math.PI/2;
+        var v=Math.min(vals[i],10);
+        var rr=R*v/10;
+        var x=cx+Math.cos(angle)*rr;
+        var y=cy+Math.sin(angle)*rr;
+        ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);
+        ctx.fillStyle=v>=7?'#059669':(v>=5?'#d97706':'#dc2626');
+        ctx.fill();
+        ctx.strokeStyle='white';ctx.lineWidth=2;ctx.stroke();
+        ctx.fillStyle=v>=7?'#059669':(v>=5?'#d97706':'#dc2626');
+        ctx.font='bold 10px sans-serif';ctx.textAlign='center';
+        ctx.fillText(v,x,y-10);
+    }
+}
+
+// ═══════════════════════════════════
+// PDF EXPORT (jsPDF)
+// ═══════════════════════════════════
+function exportPDF() {
+    collectEvals();
+    var jsPDF = window.jspdf.jsPDF;
+    var doc = new jsPDF('p','mm','a4');
+    var W=210, H=297, M=20, pw=W-2*M, y=M;
+    var c = S.config;
+    var navy=[30,58,95], gray=[55,65,81], lightgray=[229,231,235], white=[255,255,255], zebra=[249,250,251];
+
+    function addPage(){ doc.addPage(); y=M; }
+    function checkY(need){ if(y+need>H-25){ addPage(); } }
+    function sectionTitle(num, title){
+        checkY(14);
+        doc.setFillColor(navy[0],navy[1],navy[2]);
+        doc.rect(M, y-4, pw, 9, 'F');
+        doc.setTextColor(255,255,255); doc.setFontSize(10); doc.setFont(undefined,'bold');
+        doc.text(num+'. '+title, M+3, y+2);
+        y+=12;
+    }
+    function tableRow(label, value, isZebra){
+        if(isZebra){ doc.setFillColor(zebra[0],zebra[1],zebra[2]); doc.rect(M, y-3.5, pw, 6.5, 'F'); }
+        doc.setFontSize(9); doc.setTextColor(gray[0],gray[1],gray[2]); doc.setFont(undefined,'normal');
+        doc.text(label, M+3, y);
+        doc.setFont(undefined,'bold'); doc.text(String(value), M+75, y); doc.setFont(undefined,'normal');
+        y+=6.5;
+    }
+
+    // ── HEADER ──
+    doc.setFillColor(navy[0],navy[1],navy[2]);
+    doc.rect(0,0,W,40,'F');
+    doc.setTextColor(255); doc.setFontSize(17); doc.setFont(undefined,'bold');
+    doc.text('Annexe 21', M, 15);
+    doc.setFontSize(11); doc.setFont(undefined,'normal');
+    doc.text('Bilan d\'integration du collaborateur', M, 22);
+    doc.setFontSize(9);
+    doc.text(c.cabinet+'  |  '+c.name+'  |  '+CONFIG[S.profile].name, M, 30);
+    doc.text('Edite le '+new Date().toLocaleDateString('fr-FR'), M, 36);
+    y = 50;
+
+    // ── 1. INFORMATIONS ──
+    sectionTitle('1', 'Informations collaborateur');
+    var infos = [
+        ['Nom', c.name], ['Poste', c.poste||'Non renseigne'],
+        ['Date d\'arrivee', new Date(c.date).toLocaleDateString('fr-FR')], ['Profil', CONFIG[S.profile].name],
+        ['Manager', c.manager], ['Buddy / Mentor', c.buddy||'Non renseigne'],
+        ['Cabinet', c.cabinet], ['Mode de travail', c.mode]
+    ];
+    infos.forEach(function(r,i){ tableRow(r[0], r[1], i%2===0); });
+    y+=4;
+
+    // ── 2. PÉRIODE D'ESSAI ──
+    var pe = CONFIG[S.profile].pe;
+    sectionTitle('2', 'Periode d\'essai (cadre legal)');
+    tableRow('Categorie', pe.cat, true);
+    tableRow('Duree initiale', pe.duree, false);
+    tableRow('Renouvellement', pe.renouv, true);
+    tableRow('Delais de prevenance', pe.prev, false);
+    if(pe.jours && c.date){
+        var dEnd = new Date(c.date); dEnd.setDate(dEnd.getDate()+pe.jours);
+        tableRow('Fin PE estimee', dEnd.toLocaleDateString('fr-FR'), true);
+    }
+    doc.setFontSize(7); doc.setTextColor(160,160,160); doc.setFont(undefined,'italic');
+    doc.text('Ref. : Art. L.1221-19 a L.1221-26 C. trav. ; IDCC 0787 ; Delais art. L.1221-25/26', M+3, y+2);
+    doc.setFont(undefined,'normal');
+    y+=8;
+
+    // ── 3. PROGRESSION PAR PHASE ──
+    sectionTitle('3', 'Progression par phase');
+    PHASES.forEach(function(ph, idx){
+        var pt=0,pd=0; ph.keys.forEach(function(k){CK[k].forEach(function(it){pt++;if(S.tasks[it.id])pd++;});});
+        var pp=pt?Math.round(pd/pt*100):0;
+        var isZ = idx%2===0;
+        if(isZ){ doc.setFillColor(zebra[0],zebra[1],zebra[2]); doc.rect(M, y-3.5, pw, 8, 'F'); }
+        doc.setFontSize(9); doc.setTextColor(gray[0],gray[1],gray[2]); doc.setFont(undefined,'normal');
+        doc.text('Phase '+ph.num+' - '+ph.label, M+3, y);
+        // Progress bar
+        var barX=M+80, barW=55, barH=4;
+        doc.setFillColor(lightgray[0],lightgray[1],lightgray[2]); doc.roundedRect(barX, y-3, barW, barH, 2, 2, 'F');
+        if(pp>0){ doc.setFillColor(navy[0],navy[1],navy[2]); doc.roundedRect(barX, y-3, barW*pp/100, barH, 2, 2, 'F'); }
+        doc.setFont(undefined,'bold');
+        doc.text(pp+'%  ('+pd+'/'+pt+')', barX+barW+4, y);
+        doc.setFont(undefined,'normal');
+        y+=8;
+    });
+    y+=4;
+
+    // ── 4. VERDICT ──
+    var allItems=[]; var done=0; var critLeft=0;
+    PHASES.forEach(function(ph){ ph.keys.forEach(function(k){ CK[k].forEach(function(it){ allItems.push(it); if(S.tasks[it.id]) done++; else if(it.c) critLeft++; }); }); });
+    var total=allItems.length; var pct=Math.round(done/total*100);
+    var verdict='INTEGRATION REUSSIE', vc=[5,150,105], vBg=[209,250,229];
+    if(critLeft>0){ verdict='INTEGRATION PARTIELLE'; vc=[217,119,6]; vBg=[254,243,199]; }
+    if(pct<50){ verdict='INTEGRATION INSUFFISANTE'; vc=[220,38,38]; vBg=[254,226,226]; }
+
+    sectionTitle('4', 'Verdict');
+    doc.setFillColor(vBg[0],vBg[1],vBg[2]);
+    doc.setDrawColor(vc[0],vc[1],vc[2]); doc.setLineWidth(0.6);
+    doc.roundedRect(M, y-4, pw, 20, 3, 3, 'FD');
+    doc.setTextColor(vc[0],vc[1],vc[2]); doc.setFontSize(14); doc.setFont(undefined,'bold');
+    doc.text(verdict, W/2, y+4, {align:'center'});
+    doc.setFontSize(9); doc.setFont(undefined,'normal');
+    doc.text(pct+'% complete  |  '+done+'/'+total+' taches  |  '+critLeft+' critiques restantes', W/2, y+11, {align:'center'});
+    y+=26;
+
+    // ── 5a. DOSSIER-TEST ──
+    sectionTitle('5', 'Evaluations');
+    var reviewT=0,reviewF=0;
+    for(var i=0;i<6;i++){if(S.reviews['r'+i]){reviewT+=parseInt(S.reviews['r'+i]);reviewF++;}}
+    doc.setFontSize(10); doc.setTextColor(navy[0],navy[1],navy[2]); doc.setFont(undefined,'bold');
+    doc.text('5a. Dossier-test (revue technique)', M+3, y); y+=7;
+    if(reviewF===6){
+        REVIEW_LABELS.forEach(function(label, idx){
+            tableRow(label, S.reviews['r'+idx]+'/5', idx%2===0);
+        });
+        var reviewStatus = reviewT>=24 ? 'Valide (>=80%)' : (reviewT>=18 ? 'A renforcer' : 'Insuffisant');
+        doc.setFont(undefined,'bold'); doc.setTextColor(navy[0],navy[1],navy[2]);
+        doc.text('Score total : '+reviewT+'/30 - '+reviewStatus, M+3, y+2); y+=8;
+    } else {
+        doc.setFontSize(9); doc.setTextColor(gray[0],gray[1],gray[2]); doc.setFont(undefined,'italic');
+        doc.text('Non renseigne', M+3, y); y+=6;
+        doc.setFont(undefined,'normal');
+    }
+
+    // ── 5b. JALON J+30 ──
+    checkY(50);
+    doc.setFontSize(10); doc.setTextColor(navy[0],navy[1],navy[2]); doc.setFont(undefined,'bold');
+    doc.text('5b. Jalon J+30 (indicateurs)', M+3, y); y+=7;
+    var hasJ30 = false;
+    J30_ITEMS.forEach(function(it){ if(S.j30[it.id]) hasJ30=true; });
+    if(hasJ30){
+        var j30idx=0;
+        J30_ITEMS.forEach(function(it){
+            var v=S.j30[it.id];
+            if(v){ tableRow(it.label, v+'/'+it.max, j30idx%2===0); j30idx++; }
+        });
+        if(S.j30.comments){
+            y+=2; doc.setFontSize(8); doc.setTextColor(gray[0],gray[1],gray[2]); doc.setFont(undefined,'italic');
+            var comLines = doc.splitTextToSize('Commentaires : '+S.j30.comments, pw-6);
+            comLines.forEach(function(line){ checkY(5); doc.text(line, M+3, y); y+=4; });
+            doc.setFont(undefined,'normal'); y+=3;
+        }
+    } else {
+        doc.setFontSize(9); doc.setTextColor(gray[0],gray[1],gray[2]); doc.setFont(undefined,'italic');
+        doc.text('Non renseigne (entretien J+30 non encore realise)', M+3, y); y+=6;
+        doc.setFont(undefined,'normal');
+    }
+
+    // ── 5c. JALON J+90 ──
+    checkY(40);
+    doc.setFontSize(10); doc.setTextColor(navy[0],navy[1],navy[2]); doc.setFont(undefined,'bold');
+    doc.text('5c. Jalon J+90 (bilan final)', M+3, y); y+=7;
+    var hasJ90 = false;
+    J90_ITEMS.forEach(function(it){ if(S.j90[it.id]) hasJ90=true; });
+    if(hasJ90 || S.j90.decision){
+        if(hasJ90){
+            var j90idx=0;
+            J90_ITEMS.forEach(function(it){
+                var v=S.j90[it.id];
+                if(v){ tableRow(it.label, v+'%', j90idx%2===0); j90idx++; }
+            });
+        }
+        if(S.j90.decision){
+            var decisionLabel = {validated:'Validee - Embauche confirmee', extended:'Prolongee - Accompagnement renforce', ended:'Non renouvelee'}[S.j90.decision] || '';
+            y+=2;
+            doc.setFillColor(zebra[0],zebra[1],zebra[2]); doc.rect(M, y-3.5, pw, 7, 'F');
+            doc.setFontSize(10); doc.setTextColor(navy[0],navy[1],navy[2]); doc.setFont(undefined,'bold');
+            doc.text('Decision periode d\'essai : '+decisionLabel, M+3, y);
+            y+=8;
+        }
+        if(S.j90.comments){
+            doc.setFontSize(8); doc.setTextColor(gray[0],gray[1],gray[2]); doc.setFont(undefined,'italic');
+            var com90 = doc.splitTextToSize('Plan de developpement : '+S.j90.comments, pw-6);
+            com90.forEach(function(line){ checkY(5); doc.text(line, M+3, y); y+=4; });
+            doc.setFont(undefined,'normal'); y+=3;
+        }
+    } else {
+        doc.setFontSize(9); doc.setTextColor(gray[0],gray[1],gray[2]); doc.setFont(undefined,'italic');
+        doc.text('Non renseigne (entretien J+90 non encore realise)', M+3, y); y+=6;
+        doc.setFont(undefined,'normal');
+    }
+
+    // ── 6. SIGNATURES ──
+    checkY(45);
+    sectionTitle('6', 'Signatures');
+    doc.setDrawColor(180,180,180); doc.setLineWidth(0.3);
+    doc.setFontSize(9); doc.setTextColor(gray[0],gray[1],gray[2]); doc.setFont(undefined,'normal');
+
+    // Manager
+    doc.text('Le manager :', M+3, y);
+    doc.text(c.manager, M+3, y+5); doc.setFont(undefined,'bold'); doc.setFont(undefined,'normal');
+    doc.text('Date :', M+3, y+10);
+    doc.line(M+20, y+11, M+60, y+11);
+    doc.text('Signature :', M+3, y+20);
+    doc.line(M+25, y+21, M+75, y+21);
+
+    // Collaborateur
+    doc.text('Le collaborateur :', M+pw/2+3, y);
+    doc.text(c.name, M+pw/2+3, y+5);
+    doc.text('Date :', M+pw/2+3, y+10);
+    doc.line(M+pw/2+20, y+11, M+pw/2+60, y+11);
+    doc.text('Signature :', M+pw/2+3, y+20);
+    doc.line(M+pw/2+25, y+21, M+pw/2+75, y+21);
+
+    y+=30;
+
+    // RGPD notice
+    checkY(15);
+    doc.setFillColor(zebra[0],zebra[1],zebra[2]); doc.roundedRect(M, y, pw, 12, 2, 2, 'F');
+    doc.setFontSize(7); doc.setTextColor(160,160,160);
+    doc.text('RGPD - Ce document contient des donnees personnelles (art. 4 RGPD). Finalite : suivi d\'integration RH.', M+3, y+4);
+    doc.text('Conservation : durees legales applicables. Acces : manager, RH, associe referent. Cadre : Code du travail, Decret 2012-432, NPMQ, ANSSI.', M+3, y+9);
+
+    // Footer on all pages
+    var totalPages = doc.internal.getNumberOfPages();
+    for(var p=1; p<=totalPages; p++){
+        doc.setPage(p);
+        doc.setFontSize(7); doc.setTextColor(180,180,180);
+        doc.text('Annexe 21 - Parcours d\'integration numerique du collaborateur - Memoire DEC', M, H-8);
+        doc.text('Page '+p+'/'+totalPages, W-M, H-8, {align:'right'});
+    }
+
+    doc.save('Annexe21_Bilan_'+c.name.replace(/\s/g,'_')+'.pdf');
+}
+
+// ═══════════════════════════════════
+// JSON EXPORT/IMPORT
+// ═══════════════════════════════════
+function exportJSON() {
+    collectEvals();
+    var blob = new Blob([JSON.stringify(S, null, 2)], {type:'application/json'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'annexe21_'+S.config.name.replace(/\s/g,'_')+'.json';
+    a.click();
+}
+function importJSON(e) {
+    var file = e.target.files[0]; if(!file) return;
+    var reader = new FileReader();
+    reader.onload = function(ev){
+        try {
+            S = JSON.parse(ev.target.result);
+            restoreState();
+            showTab(2);
+        } catch(err){ alert('Fichier invalide.'); }
+    };
+    reader.readAsText(file);
+}
+function restoreState() {
+    if(!S.profile || !S.config) return;
+    el('collabName').value = S.config.name||'';
+    el('collabEmail').value = S.config.email||'';
+    el('startDate').value = S.config.date||'';
+    el('collabPosition').value = S.config.poste||'';
+    el('managerName').value = S.config.manager||'';
+    el('buddyName').value = S.config.buddy||'';
+    el('cabinetName').value = S.config.cabinet||'';
+    el('workMode').value = S.config.mode||'hybride';
+    selectProfile(S.profile);
+    buildChecklists();
+    buildEvalGrids();
+    updatePE();
+    el('btnExportJson').style.display='inline-flex';
+    el('tab2').disabled=false; el('tab3').disabled=false;
+}
+
+// ═══════════════════════════════════
+// DEMO
+// ═══════════════════════════════════
+function loadDemo() {
+    el('collabName').value='Marie LAURENT';
+    el('collabEmail').value='m.laurent@cabinetx.fr';
+    el('startDate').value=new Date(Date.now()-35*86400000).toISOString().split('T')[0];
+    el('collabPosition').value='Collaboratrice comptable';
+    el('managerName').value='Thomas MOREAU';
+    el('buddyName').value='Sophie BERNARD';
+    el('cabinetName').value='Cabinet X';
+    el('workMode').value='hybride';
+    selectProfile('junior');
+    // Pre-check tasks
+    var demoIds=['a1','a2','a3','a4','a5','a6','i1','i2','i3','i4','i5','i6','c1','c2','c3','c4','s1','s2','s3','s4','s5','s6','s7','s8','ac1','ac2','ac3','ac4','ac5','t1','t2','t3','t4','t5','t6','t7','t8','r1','r2','r3','r4','r5'];
+    demoIds.forEach(function(id){ S.tasks[id]=true; });
+    // Pre-fill reviews
+    S.reviews={r0:'4',r1:'5',r2:'4',r3:'5',r4:'4',r5:'4'};
+    S.j30={j30_tools:'7',j30_auto:'6',j30_integ:'8',j30_sat:'8',j30_reco:'9',j30_charge:'4',j30_clarity:'8',j30_fb:'7',comments:'Bonne progression. Renforcer l\'autonomie sur les dossiers de révision.'};
+    launchParcours();
+}
+
+// ═══════════════════════════════════
+// INIT
+// ═══════════════════════════════════
+document.addEventListener('DOMContentLoaded', function(){
+    el('startDate').value = new Date().toISOString().split('T')[0];
+    // Try restore
+    try {
+        var saved = localStorage.getItem(STORAGE);
+        if(saved){
+            S = JSON.parse(saved);
+            if(S.profile && S.config){ restoreState(); }
+        }
+    } catch(e){}
+});
+</script>
+</body>
+</html>

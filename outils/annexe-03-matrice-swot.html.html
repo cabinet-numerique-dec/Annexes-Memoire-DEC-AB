@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Annexe 3 – Diagnostic SWOT Cabinet 100% Numérique</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    :root{--primary:#1e3a5f;--primary-light:#2d5a8a;--secondary:#0d9488;--danger:#dc2626;--success:#059669;--warning:#d97706;--info:#2563eb;--purple:#7c3aed;--gray-50:#f9fafb;--gray-100:#f3f4f6;--gray-200:#e5e7eb;--gray-300:#d1d5db;--gray-500:#6b7280;--gray-600:#4b5563;--gray-700:#374151;--gray-800:#1f2937;--force:#059669;--faiblesse:#dc2626;--opportunite:#2563eb;--menace:#d97706;--radius:12px;--shadow:0 4px 6px -1px rgb(0 0 0/0.1)}
+    *{margin:0;padding:0;box-sizing:border-box}body{font-family:'Segoe UI',system-ui,sans-serif;background:linear-gradient(135deg,var(--gray-100),#e0e7ef);color:var(--gray-700);line-height:1.6;min-height:100vh}.container{max-width:1500px;margin:0 auto;padding:20px}
+    .header{background:linear-gradient(135deg,var(--primary),var(--primary-light));color:white;border-radius:var(--radius);padding:24px;margin-bottom:20px}.header h1{font-size:22px;font-weight:700;margin-bottom:6px}.header p{opacity:0.9;font-size:13px}.header-meta{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}.badge{background:rgba(255,255,255,0.15);padding:4px 10px;border-radius:16px;font-size:10px;font-weight:600}
+    .action-bar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px}.btn{display:inline-flex;align-items:center;gap:6px;padding:10px 18px;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s}.btn-primary{background:var(--primary);color:white}.btn-primary:hover{background:var(--primary-light)}.btn-secondary{background:var(--gray-200);color:var(--gray-700)}.btn-success{background:var(--success);color:white}.btn-danger{background:var(--danger);color:white}.btn-sm{padding:6px 12px;font-size:11px}
+    .tabs{display:flex;gap:4px;background:white;padding:6px;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:20px}.tab{padding:10px 18px;border:none;background:transparent;font-size:13px;font-weight:600;color:var(--gray-600);border-radius:8px;cursor:pointer;transition:all 0.2s}.tab:hover{background:var(--gray-100)}.tab.active{background:var(--primary);color:white}
+    .panel{display:none;animation:fadeIn 0.3s ease}.panel.active{display:block}@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+    .card{background:white;border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);margin-bottom:16px}.card-header{display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:14px;border-bottom:2px solid var(--gray-100)}.card-icon{width:44px;height:44px;background:linear-gradient(135deg,var(--primary),var(--primary-light));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;color:white}.card-icon.success{background:linear-gradient(135deg,var(--success),#34d399)}.card-icon.purple{background:linear-gradient(135deg,var(--purple),#a78bfa)}.card-icon.warning{background:linear-gradient(135deg,var(--warning),#fbbf24)}.card-icon.info{background:linear-gradient(135deg,var(--info),#60a5fa)}.card h3{font-size:16px;font-weight:700;color:var(--gray-800)}.card .subtitle{color:var(--gray-500);font-size:12px;margin-top:2px}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}@media(max-width:1000px){.grid-2{grid-template-columns:1fr}.grid-4{grid-template-columns:repeat(2,1fr)}}
+    .stat-card{background:white;border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);text-align:center;border-left:5px solid var(--primary);transition:transform 0.2s}.stat-card:hover{transform:translateY(-2px)}.stat-card.force{border-left-color:var(--force)}.stat-card.faiblesse{border-left-color:var(--faiblesse)}.stat-card.opportunite{border-left-color:var(--opportunite)}.stat-card.menace{border-left-color:var(--menace)}.stat-value{font-size:32px;font-weight:800;color:var(--gray-800)}.stat-label{font-size:12px;color:var(--gray-600);margin-top:4px;font-weight:600}
+    .swot-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}@media(max-width:900px){.swot-grid{grid-template-columns:1fr}}
+    .swot-quadrant{border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);background:white}.swot-header{padding:14px 18px;font-weight:700;font-size:14px;display:flex;justify-content:space-between;align-items:center;color:white}.swot-header.force{background:linear-gradient(135deg,var(--force),#34d399)}.swot-header.faiblesse{background:linear-gradient(135deg,var(--faiblesse),#f87171)}.swot-header.opportunite{background:linear-gradient(135deg,var(--opportunite),#60a5fa)}.swot-header.menace{background:linear-gradient(135deg,var(--menace),#fbbf24)}.swot-header .count{background:rgba(255,255,255,0.25);padding:4px 10px;border-radius:12px;font-size:12px}.swot-body{padding:14px;min-height:200px}
+    .swot-item{padding:12px 14px;margin-bottom:10px;background:var(--gray-50);border-radius:8px;border-left:4px solid;cursor:pointer;transition:all 0.2s}.swot-item:hover{background:var(--gray-100);transform:translateX(4px)}.swot-item.force{border-color:var(--force)}.swot-item.faiblesse{border-color:var(--faiblesse)}.swot-item.opportunite{border-color:var(--opportunite)}.swot-item.menace{border-color:var(--menace)}.swot-item-header{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}.swot-item-text{font-size:13px;font-weight:500;color:var(--gray-800);flex:1}.swot-item-score{font-weight:700;font-size:12px;padding:3px 8px;border-radius:6px}.swot-item-score.high{background:#fee2e2;color:#991b1b}.swot-item-score.med{background:#ffedd5;color:#9a3412}.swot-item-score.low{background:#d1fae5;color:#065f46}.swot-item-meta{font-size:11px;color:var(--gray-500);margin-top:6px;display:flex;gap:12px}
+    .add-btn{width:100%;padding:10px;margin-top:8px;border:2px dashed var(--gray-300);border-radius:8px;background:transparent;color:var(--gray-500);font-size:12px;font-weight:600;cursor:pointer;transition:all 0.2s}.add-btn:hover{border-color:var(--primary);color:var(--primary);background:var(--gray-50)}
+    .strategy-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}@media(max-width:900px){.strategy-grid{grid-template-columns:1fr}}
+    .strategy-card{background:white;border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}.strategy-header{padding:14px 18px;color:white;display:flex;justify-content:space-between;align-items:center}.strategy-header.so{background:linear-gradient(135deg,var(--success),#34d399)}.strategy-header.wo{background:linear-gradient(135deg,var(--purple),#a78bfa)}.strategy-header.st{background:linear-gradient(135deg,var(--info),#60a5fa)}.strategy-header.wt{background:linear-gradient(135deg,var(--warning),#fbbf24)}.strategy-type{font-weight:700;font-size:15px}.strategy-label{font-size:11px;opacity:0.9}.strategy-decision{padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700;background:rgba(255,255,255,0.25)}.strategy-body{padding:16px}.strategy-content{font-size:13px;color:var(--gray-700);margin-bottom:14px;line-height:1.5}.strategy-details{background:var(--gray-50);border-radius:8px;padding:12px}.strategy-detail{display:flex;gap:8px;margin-bottom:8px;font-size:12px}.strategy-detail:last-child{margin-bottom:0}.strategy-detail-label{font-weight:600;color:var(--gray-600);min-width:100px}.strategy-detail-value{color:var(--gray-700)}
+    .insight-box{background:linear-gradient(135deg,#eff6ff,#dbeafe);border-left:4px solid var(--info);padding:14px 18px;border-radius:0 10px 10px 0;margin:12px 0;font-size:13px}.insight-box.success{background:linear-gradient(135deg,#f0fdf4,#dcfce7);border-color:var(--success)}.insight-box.warning{background:linear-gradient(135deg,#fffbeb,#fef3c7);border-color:var(--warning)}
+    .source-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px}.source-card{background:var(--gray-50);border-radius:10px;padding:14px;border-left:4px solid var(--info)}.source-id{font-weight:700;color:var(--primary);font-size:12px;margin-bottom:4px}.source-org{font-weight:600;font-size:13px;color:var(--gray-800)}.source-title{font-size:12px;color:var(--gray-600);margin-top:3px}.source-meta{font-size:11px;color:var(--gray-500);margin-top:6px}.source-url{font-size:10px;color:var(--info);word-break:break-all;margin-top:4px}
+    .table-container{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:12px}th,td{border:1px solid var(--gray-200);padding:10px 12px;text-align:left}th{background:var(--gray-100);font-weight:600;font-size:11px;text-transform:uppercase;color:var(--gray-600)}tbody tr:hover{background:var(--gray-50)}
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:none;align-items:center;justify-content:center;z-index:9998;padding:20px}.modal-overlay.show{display:flex}.modal{background:white;border-radius:var(--radius);max-width:600px;width:100%;max-height:90vh;overflow:hidden}.modal-header{background:var(--primary);color:white;padding:16px 20px;display:flex;justify-content:space-between;align-items:center}.modal-header h3{font-size:16px;font-weight:700}.modal-close{background:rgba(255,255,255,0.2);border:none;color:white;width:30px;height:30px;border-radius:6px;cursor:pointer;font-size:16px}.modal-body{padding:20px;overflow-y:auto;max-height:calc(90vh - 130px)}.modal-footer{padding:14px 20px;border-top:1px solid var(--gray-200);display:flex;justify-content:flex-end;gap:10px}
+    .form-group{margin-bottom:14px}.form-group label{display:block;font-size:12px;font-weight:600;color:var(--gray-700);margin-bottom:5px}.form-group .required{color:var(--danger)}.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.form-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}textarea,input,select{width:100%;border:2px solid var(--gray-200);border-radius:8px;padding:10px 12px;font-size:13px;font-family:inherit;transition:border-color 0.2s}textarea:focus,input:focus,select:focus{outline:none;border-color:var(--primary)}textarea{min-height:80px;resize:vertical}.form-hint{font-size:11px;color:var(--gray-500);margin-top:4px}
+    .toast{position:fixed;bottom:20px;right:20px;background:var(--gray-800);color:white;padding:12px 20px;border-radius:10px;transform:translateY(100px);opacity:0;transition:all 0.3s ease;z-index:9999;font-size:13px;font-weight:500}.toast.show{transform:translateY(0);opacity:1}
+    .loading-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:none;align-items:center;justify-content:center;z-index:9999}.loading-overlay.show{display:flex}.loading-spinner{background:white;padding:30px 40px;border-radius:var(--radius);text-align:center}.spinner{width:40px;height:40px;border:4px solid var(--gray-200);border-top-color:var(--primary);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 12px}@keyframes spin{to{transform:rotate(360deg)}}
+    .btn-icon{width:28px;height:28px;padding:0;display:flex;align-items:center;justify-content:center;border-radius:6px;border:none;cursor:pointer;background:var(--gray-100);color:var(--gray-600);transition:all 0.2s}.btn-icon:hover{background:var(--gray-200)}.btn-icon.danger:hover{background:#fee2e2;color:var(--danger)}
+    .legend{display:flex;gap:20px;padding:12px 16px;background:var(--gray-50);border-radius:8px;font-size:12px;margin-top:14px;flex-wrap:wrap}
+    .diagnosis-box{background:linear-gradient(135deg,var(--primary),var(--primary-light));color:white;border-radius:var(--radius);padding:20px;margin-bottom:20px}.diagnosis-title{font-size:14px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:8px}.diagnosis-text{font-size:13px;line-height:1.6;opacity:0.95}
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>📊 Diagnostic SWOT — Cabinet 100% Numérique</h1>
+    <p>Outil d'aide à la décision stratégique pour l'expert-comptable • Basé sur données enquête et études sectorielles</p>
+    <div class="header-meta">
+      <span class="badge">📋 Analyse SWOT</span>
+      <span class="badge">🎯 Stratégies TOWS</span>
+      <span class="badge">📚 Sources documentées</span>
+    </div>
+  </div>
+
+  <div class="action-bar">
+    <button class="btn btn-primary" onclick="openAddModal()">➕ Ajouter un élément</button>
+    <button class="btn btn-success" onclick="exportPDF()">📄 Exporter PDF</button>
+    <button class="btn btn-secondary" onclick="saveToStorage()">💾 Sauvegarder</button>
+    <button class="btn btn-danger" onclick="confirmReset()">🗑️ Réinitialiser</button>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="showPanel('diagnostic')">📊 Diagnostic</button>
+    <button class="tab" onclick="showPanel('strategies')">🎯 Stratégies</button>
+    <button class="tab" onclick="showPanel('sources')">📚 Sources</button>
+    <button class="tab" onclick="showPanel('details')">📋 Détails</button>
+  </div>
+
+  <!-- DIAGNOSTIC -->
+  <div id="diagnostic" class="panel active">
+    <div class="grid-4">
+      <div class="stat-card force"><div class="stat-value" id="statForces">0</div><div class="stat-label">💪 FORCES</div></div>
+      <div class="stat-card faiblesse"><div class="stat-value" id="statFaiblesses">0</div><div class="stat-label">⚠️ FAIBLESSES</div></div>
+      <div class="stat-card opportunite"><div class="stat-value" id="statOpportunites">0</div><div class="stat-label">🚀 OPPORTUNITÉS</div></div>
+      <div class="stat-card menace"><div class="stat-value" id="statMenaces">0</div><div class="stat-label">🛡️ MENACES</div></div>
+    </div>
+
+    <div class="diagnosis-box" id="diagnosisBox">
+      <div class="diagnosis-title">💡 Synthèse du diagnostic</div>
+      <div class="diagnosis-text" id="diagnosisText">Complétez la matrice SWOT pour générer le diagnostic automatique.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">📋</div>
+        <div>
+          <h3>Matrice SWOT</h3>
+          <div class="subtitle">Éléments classés par priorité (Impact × Probabilité)</div>
+        </div>
+      </div>
+      <div class="swot-grid" id="swotGrid"></div>
+      <div class="legend">
+        <div><span class="swot-item-score high">≥16</span> Priorité haute</div>
+        <div><span class="swot-item-score med">9-15</span> Priorité moyenne</div>
+        <div><span class="swot-item-score low">&lt;9</span> Priorité basse</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STRATÉGIES -->
+  <div id="strategies" class="panel">
+    <div class="insight-box" style="margin-bottom:20px;">
+      <strong>Matrice TOWS :</strong> Croisement des facteurs internes (Forces/Faiblesses) et externes (Opportunités/Menaces) pour définir 4 orientations stratégiques.
+    </div>
+    
+    <div class="strategy-grid" id="strategyGrid"></div>
+    
+    <button class="btn btn-primary" style="margin-top:16px;" onclick="openStrategyModal()">➕ Modifier les stratégies</button>
+  </div>
+
+  <!-- SOURCES -->
+  <div id="sources" class="panel">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon info">📚</div>
+        <div>
+          <h3>Sources et références</h3>
+          <div class="subtitle">Études et données ayant servi à construire le diagnostic SWOT</div>
+        </div>
+      </div>
+      <div class="insight-box" style="margin-bottom:16px;">
+        Ces sources justifient les choix effectués dans la matrice SWOT. Chaque élément du diagnostic s'appuie sur une ou plusieurs de ces références.
+      </div>
+      <div class="source-grid" id="sourceGrid"></div>
+      <button class="btn btn-primary btn-sm" style="margin-top:14px;" onclick="openSourceModal()">➕ Ajouter une source</button>
+    </div>
+  </div>
+
+  <!-- DÉTAILS -->
+  <div id="details" class="panel">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon warning">📋</div>
+        <div>
+          <h3>Tableau détaillé SWOT</h3>
+          <div class="subtitle">Tous les éléments avec pondération et justification</div>
+        </div>
+      </div>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Quadrant</th>
+              <th>Élément</th>
+              <th>Justification</th>
+              <th>Impact</th>
+              <th>Prob.</th>
+              <th>Score</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="detailsBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL SWOT -->
+<div class="modal-overlay" id="swotModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="swotModalTitle">Ajouter un élément SWOT</h3>
+      <button class="modal-close" onclick="closeSwotModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Quadrant <span class="required">*</span></label>
+        <select id="editQuadrant">
+          <option value="Force">💪 Force (atout interne)</option>
+          <option value="Faiblesse">⚠️ Faiblesse (point à améliorer)</option>
+          <option value="Opportunité">🚀 Opportunité (facteur externe favorable)</option>
+          <option value="Menace">🛡️ Menace (risque externe)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Élément <span class="required">*</span></label>
+        <textarea id="editItem" placeholder="Décrivez l'élément de manière concrète et actionnable..."></textarea>
+        <div class="form-hint">Soyez précis : évitez les généralités, décrivez un fait concret</div>
+      </div>
+      <div class="form-group">
+        <label>Justification / Source</label>
+        <textarea id="editJustification" placeholder="Sur quoi vous basez-vous ? (Enquête, étude, observation...)"></textarea>
+        <div class="form-hint">Permet de défendre ce choix si questionné</div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Impact (1-5) <span class="required">*</span></label>
+          <select id="editImpact">
+            <option value="1">1 - Négligeable</option>
+            <option value="2">2 - Faible</option>
+            <option value="3" selected>3 - Modéré</option>
+            <option value="4">4 - Important</option>
+            <option value="5">5 - Critique</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Probabilité (1-5) <span class="required">*</span></label>
+          <select id="editProb">
+            <option value="1">1 - Très improbable</option>
+            <option value="2">2 - Peu probable</option>
+            <option value="3" selected>3 - Possible</option>
+            <option value="4">4 - Probable</option>
+            <option value="5">5 - Quasi certain</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeSwotModal()">Annuler</button>
+      <button class="btn btn-primary" onclick="saveSwotItem()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL STRATÉGIE -->
+<div class="modal-overlay" id="strategyModal">
+  <div class="modal">
+    <div class="modal-header" style="background:var(--purple);">
+      <h3 id="strategyModalTitle">Définir une stratégie</h3>
+      <button class="modal-close" onclick="closeStrategyModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Type de stratégie <span class="required">*</span></label>
+        <select id="strategyType" onchange="updateStrategyHelp()">
+          <option value="SO">SO — Forces × Opportunités (Offensif)</option>
+          <option value="WO">WO — Faiblesses × Opportunités (Rattrapage)</option>
+          <option value="ST">ST — Forces × Menaces (Défensif)</option>
+          <option value="WT">WT — Faiblesses × Menaces (Survie)</option>
+        </select>
+        <div class="form-hint" id="strategyHelp">Utiliser les forces pour saisir les opportunités</div>
+      </div>
+      <div class="form-group">
+        <label>Stratégie <span class="required">*</span></label>
+        <textarea id="strategyContent" placeholder="Décrivez la stratégie de manière concrète..."></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Décision</label>
+          <select id="strategyDecision">
+            <option value="GO">✅ GO — Lancer</option>
+            <option value="TEST">⚠️ TEST — Expérimenter</option>
+            <option value="STOP">❌ STOP — Reporter</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Indicateur clé</label>
+          <input type="text" id="strategyKPI" placeholder="Ex: 5 clients signés en Q1">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Première action (S1-S2)</label>
+        <input type="text" id="strategyAction" placeholder="Ex: Créer une offre packagée e-facture">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeStrategyModal()">Annuler</button>
+      <button class="btn btn-primary" onclick="saveStrategy()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL SOURCE -->
+<div class="modal-overlay" id="sourceModal">
+  <div class="modal">
+    <div class="modal-header" style="background:var(--info);">
+      <h3>Ajouter une source</h3>
+      <button class="modal-close" onclick="closeSourceModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Organisme / Auteur <span class="required">*</span></label>
+        <input type="text" id="sourceOrg" placeholder="Ex: France Num, ANSSI, Sondage Cabinet X...">
+      </div>
+      <div class="form-group">
+        <label>Titre <span class="required">*</span></label>
+        <input type="text" id="sourceTitle" placeholder="Ex: Baromètre France Num 2025...">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Année <span class="required">*</span></label>
+          <input type="text" id="sourceYear" placeholder="2025">
+        </div>
+        <div class="form-group">
+          <label>Type</label>
+          <select id="sourceType">
+            <option value="Étude publique">📊 Étude publique</option>
+            <option value="Réglementation">📜 Réglementation</option>
+            <option value="Enquête">📋 Enquête</option>
+            <option value="Données cabinet">🏢 Données cabinet</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>URL (optionnel)</label>
+        <input type="text" id="sourceUrl" placeholder="https://...">
+      </div>
+      <div class="form-group">
+        <label>Données clés extraites</label>
+        <textarea id="sourceData" placeholder="Listez les chiffres ou informations clés tirés de cette source..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeSourceModal()">Annuler</button>
+      <button class="btn btn-primary" onclick="saveSource()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="loading-overlay" id="loading"><div class="loading-spinner"><div class="spinner"></div><div>Export en cours...</div></div></div>
+
+<script>
+const STORAGE_KEY = 'swot_cabinet_v54';
+let editingIndex = -1;
+
+// === DONNÉES SWOT CONCRÈTES ===
+let swotData = [
+  // FORCES (5)
+  {quadrant:'Force',item:'Architecture SI 100% cloud (Pennylane/Dext + GED + signature électronique)',justification:'Choix de conception du cabinet — cf. Annexe 2 SI. Confirmé par sondage : outils recommandés par 90% des répondants.',impact:5,prob:5},
+  {quadrant:'Force',item:'Automatisation de la collecte (OCR, API bancaires, pré-saisie client)',justification:'Enquête : 80% des cabinets interrogés utilisent Dext ou équivalent. Gain de temps estimé 30%.',impact:5,prob:4},
+  {quadrant:'Force',item:'Offre packagée avec tarification transparente (forfaits mensuels)',justification:'Positionnement stratégique du cabinet. Tendance marché : clients TPE demandent visibilité sur coûts.',impact:4,prob:4},
+  {quadrant:'Force',item:'Structure légère sans locaux (100% télétravail)',justification:'Choix fondateur. Économie estimée ~18k€/an vs location bureau IDF.',impact:4,prob:5},
+  {quadrant:'Force',item:'Conformité RGPD et LCB-FT intégrée dès la conception',justification:'Exigence réglementaire anticipée. Différenciation vs cabinets traditionnels.',impact:4,prob:4},
+  
+  // FAIBLESSES (5)
+  {quadrant:'Faiblesse',item:'Notoriété inexistante (cabinet en création)',justification:'Constat factuel — aucun historique client. Nécessite effort marketing important.',impact:4,prob:5},
+  {quadrant:'Faiblesse',item:'Capacité de production limitée (fondateur seul au démarrage)',justification:'Simulation : saturation estimée à ~35-40 clients avec 1 personne.',impact:4,prob:4},
+  {quadrant:'Faiblesse',item:'Dépendance aux outils tiers (Pennylane, Dext, banques)',justification:'Risque si changement tarifaire ou API. Sondage : 2 cabinets ont subi des hausses >30%.',impact:3,prob:3},
+  {quadrant:'Faiblesse',item:'Pas de réseau professionnel établi (prescripteurs, partenaires)',justification:'Cabinet nouveau. Réseau à construire (avocats, banquiers, CGP...).',impact:4,prob:4},
+  {quadrant:'Faiblesse',item:'Compétences RH et juridiques limitées en interne',justification:'Profil fondateur = expertise comptable. Social/juridique = partenariats à nouer.',impact:3,prob:4},
+  
+  // OPPORTUNITÉS (5)
+  {quadrant:'Opportunité',item:'Obligation e-facture : réception sept. 2026, émission TPE sept. 2027',justification:'Calendrier DGFIP officiel (service-public.fr, janvier 2026). Fenêtre de marché.',impact:5,prob:5},
+  {quadrant:'Opportunité',item:'Demande d\'accompagnement digital en hausse chez les TPE',justification:'France Num 2025 : 40% des TPE déclarent que le numérique augmente leur CA. Besoin d\'accompagnement.',impact:4,prob:4},
+  {quadrant:'Opportunité',item:'Adoption croissante de l\'IA par les TPE (26% en 2025, ×2 vs 2024)',justification:'Baromètre France Num 2025. Opportunité conseil IA / automatisation.',impact:4,prob:3},
+  {quadrant:'Opportunité',item:'Pénurie de profils comptables → valeur du conseil augmente',justification:'OMECA 2024 : 60% des cabinets ont des difficultés de recrutement.',impact:4,prob:4},
+  {quadrant:'Opportunité',item:'Clients TPE recherchent transparence et réactivité (vs cabinets traditionnels)',justification:'Enquête : "réactivité" et "communication" citées comme critères n°1 et n°2.',impact:4,prob:4},
+  
+  // MENACES (5)
+  {quadrant:'Menace',item:'Concurrence des plateformes low-cost (Indy, Dougs, Comptastart...)',justification:'Veille concurrentielle. Offres à partir de 69€/mois. Pression sur les prix.',impact:4,prob:4},
+  {quadrant:'Menace',item:'Risque cyber : 16% des TPE victimes d\'incident en 12 mois',justification:'Cybermalveillance 2025. Impact réputation si données client compromises.',impact:5,prob:3},
+  {quadrant:'Menace',item:'Marché atomisé : 70% des cabinets sont des TPE (<10 salariés)',justification:'OMECA 2024. Concurrence nombreuse, différenciation nécessaire.',impact:3,prob:5},
+  {quadrant:'Menace',item:'Évolution rapide des outils : risque d\'obsolescence technologique',justification:'Sondage : 3 cabinets ont dû changer d\'outil principal en 2 ans.',impact:3,prob:3},
+  {quadrant:'Menace',item:'Clients TPE fragiles économiquement (risque impayés)',justification:'Cible TPE = trésorerie tendue. Nécessite process recouvrement solide.',impact:4,prob:3}
+];
+
+// === STRATÉGIES ===
+let strategiesData = {
+  SO: {content:'Lancer une offre "Accompagnement e-facture + transformation digitale" packagée à prix fixe',decision:'GO',kpi:'5 clients signés en Q1 2026',action:'Créer landing page dédiée + webinaire gratuit "e-facture : êtes-vous prêt ?"'},
+  WO: {content:'Développer la notoriété via content marketing (articles, LinkedIn, webinaires) ciblé TPE digitales',decision:'GO',kpi:'1000 visiteurs/mois sur le site + 500 abonnés LinkedIn',action:'Publier 2 articles/mois + 1 webinaire/trimestre'},
+  ST: {content:'Se différencier par la sécurité : certification cyber, RGPD natif, transparence sur les pratiques',decision:'GO',kpi:'0 incident sécurité + obtention label Cyber',action:'Rédiger PSSI + audit sécurité initial'},
+  WT: {content:'Sélectionner les clients par scoring (solvabilité, maturité digitale) pour limiter les risques',decision:'TEST',kpi:'100% des prospects scorés avant devis',action:'Créer grille de scoring + process qualification'}
+};
+
+// === SOURCES ===
+let sourcesData = [
+  {org:'France Num / DGE',title:'Baromètre France Num 2025 : le numérique dans les TPE PME',year:'2025',type:'Étude publique',url:'https://www.francenum.gouv.fr',data:'69% ont logiciel facturation • 70% compétences numériques • 26% utilisent IA • 40% CA augmenté grâce au numérique'},
+  {org:'Cybermalveillance.gouv.fr',title:'Baromètre maturité cyber TPE-PME 2025',year:'2025',type:'Étude publique',url:'https://www.cybermalveillance.gouv.fr',data:'16% victimes incident • 44% se sentent exposées • 58% pensent être protégées • 75% budget cyber <2k€/an'},
+  {org:'OMECA',title:'Baromètre des métiers de l\'expertise comptable',year:'2024',type:'Étude publique',url:'https://www.omeca.org',data:'70% cabinets <10 salariés • 60% difficultés recrutement • 57% ont recruté en 2023'},
+  {org:'Service-public.fr / DGFIP',title:'Calendrier facturation électronique obligatoire',year:'2026',type:'Réglementation',url:'https://www.service-public.fr',data:'01/09/2026 : réception obligatoire • 01/09/2026 : émission GE+ETI • 01/09/2027 : émission TPE/PME'},
+  {org:'Sondage Cabinet X',title:'Enquête auprès de 10 cabinets EC numériques',year:'2025',type:'Enquête',url:'',data:'Outils recommandés : Pennylane, Dext, MEG • Critères clients : réactivité, transparence • 80% utilisent OCR/automatisation'}
+];
+
+// === FONCTIONS ===
+function showPanel(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+  
+  if (id === 'diagnostic') renderDiagnostic();
+  if (id === 'strategies') renderStrategies();
+  if (id === 'sources') renderSources();
+  if (id === 'details') renderDetails();
+}
+
+function getScoreClass(s) {
+  return s >= 16 ? 'high' : s >= 9 ? 'med' : 'low';
+}
+
+function esc(s) {
+  return (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+// === DIAGNOSTIC ===
+function renderDiagnostic() {
+  const f = swotData.filter(s => s.quadrant === 'Force');
+  const w = swotData.filter(s => s.quadrant === 'Faiblesse');
+  const o = swotData.filter(s => s.quadrant === 'Opportunité');
+  const t = swotData.filter(s => s.quadrant === 'Menace');
+
+  document.getElementById('statForces').textContent = f.length;
+  document.getElementById('statFaiblesses').textContent = w.length;
+  document.getElementById('statOpportunites').textContent = o.length;
+  document.getElementById('statMenaces').textContent = t.length;
+
+  // Diagnostic auto
+  let diag = '';
+  const fScore = f.reduce((a, x) => a + x.impact * x.prob, 0);
+  const wScore = w.reduce((a, x) => a + x.impact * x.prob, 0);
+  const oScore = o.reduce((a, x) => a + x.impact * x.prob, 0);
+  const tScore = t.reduce((a, x) => a + x.impact * x.prob, 0);
+
+  if (fScore > wScore && oScore > tScore) {
+    diag = '✅ <strong>Position favorable</strong> : Les forces dominent les faiblesses et les opportunités sont supérieures aux menaces. Stratégie offensive recommandée (SO) : exploiter les atouts pour saisir les opportunités du marché.';
+  } else if (fScore > wScore && tScore >= oScore) {
+    diag = '🛡️ <strong>Position défensive</strong> : Les forces sont solides mais l\'environnement est menaçant. Stratégie défensive recommandée (ST) : utiliser les forces pour se protéger des risques.';
+  } else if (wScore >= fScore && oScore > tScore) {
+    diag = '🔄 <strong>Position de rattrapage</strong> : Des faiblesses à combler mais des opportunités à saisir. Stratégie de rattrapage recommandée (WO) : profiter des opportunités pour corriger les faiblesses.';
+  } else {
+    diag = '⚠️ <strong>Position de vigilance</strong> : Faiblesses et menaces prédominantes. Stratégie de survie recommandée (WT) : minimiser les risques et renforcer les fondamentaux.';
+  }
+  document.getElementById('diagnosisText').innerHTML = diag;
+
+  // Grille SWOT
+  const quads = [
+    {n: 'Forces', c: 'force', i: '💪', d: f},
+    {n: 'Faiblesses', c: 'faiblesse', i: '⚠️', d: w},
+    {n: 'Opportunités', c: 'opportunite', i: '🚀', d: o},
+    {n: 'Menaces', c: 'menace', i: '🛡️', d: t}
+  ];
+
+  document.getElementById('swotGrid').innerHTML = quads.map(q => {
+    const sorted = [...q.d].sort((a, b) => (b.impact * b.prob) - (a.impact * a.prob));
+    return `
+      <div class="swot-quadrant">
+        <div class="swot-header ${q.c}">
+          <span>${q.i} ${q.n}</span>
+          <span class="count">${q.d.length}</span>
+        </div>
+        <div class="swot-body">
+          ${sorted.length === 0 ? '<div style="color:#9ca3af;text-align:center;padding:30px;">Aucun élément</div>' : 
+            sorted.map((it, i) => {
+              const idx = swotData.indexOf(it);
+              const score = it.impact * it.prob;
+              return `
+                <div class="swot-item ${q.c}" onclick="openEditModal(${idx})">
+                  <div class="swot-item-header">
+                    <div class="swot-item-text">${esc(it.item)}</div>
+                    <span class="swot-item-score ${getScoreClass(score)}">${score}</span>
+                  </div>
+                  ${it.justification ? `<div class="swot-item-meta">📎 ${esc(it.justification).substring(0, 60)}...</div>` : ''}
+                </div>
+              `;
+            }).join('')
+          }
+          <button class="add-btn" onclick="openAddModalQ('${q.n.slice(0, -1)}')">+ Ajouter</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// === STRATÉGIES ===
+function renderStrategies() {
+  const types = [
+    {k: 'SO', n: 'Forces × Opportunités', l: 'OFFENSIF', c: 'so', desc: 'Exploiter les forces pour saisir les opportunités'},
+    {k: 'WO', n: 'Faiblesses × Opportunités', l: 'RATTRAPAGE', c: 'wo', desc: 'Corriger les faiblesses grâce aux opportunités'},
+    {k: 'ST', n: 'Forces × Menaces', l: 'DÉFENSIF', c: 'st', desc: 'Utiliser les forces pour contrer les menaces'},
+    {k: 'WT', n: 'Faiblesses × Menaces', l: 'SURVIE', c: 'wt', desc: 'Minimiser faiblesses et éviter les menaces'}
+  ];
+
+  document.getElementById('strategyGrid').innerHTML = types.map(t => {
+    const s = strategiesData[t.k];
+    return `
+      <div class="strategy-card">
+        <div class="strategy-header ${t.c}">
+          <div>
+            <div class="strategy-type">${t.k}</div>
+            <div class="strategy-label">${t.l}</div>
+          </div>
+          ${s && s.decision ? `<span class="strategy-decision">${s.decision}</span>` : ''}
+        </div>
+        <div class="strategy-body">
+          ${s && s.content ? `
+            <div class="strategy-content">${esc(s.content)}</div>
+            <div class="strategy-details">
+              ${s.kpi ? `<div class="strategy-detail"><span class="strategy-detail-label">📊 Indicateur</span><span class="strategy-detail-value">${esc(s.kpi)}</span></div>` : ''}
+              ${s.action ? `<div class="strategy-detail"><span class="strategy-detail-label">⚡ Action S1-S2</span><span class="strategy-detail-value">${esc(s.action)}</span></div>` : ''}
+            </div>
+          ` : `
+            <div style="color:#9ca3af;text-align:center;padding:20px;">
+              <p style="margin-bottom:10px;">${t.desc}</p>
+              <button class="btn btn-sm btn-primary" onclick="openStrategyModalFor('${t.k}')">Définir</button>
+            </div>
+          `}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// === SOURCES ===
+function renderSources() {
+  document.getElementById('sourceGrid').innerHTML = sourcesData.map((s, i) => `
+    <div class="source-card">
+      <div class="source-id">${esc(s.type)}</div>
+      <div class="source-org">${esc(s.org)}</div>
+      <div class="source-title">${esc(s.title)} (${s.year})</div>
+      ${s.url ? `<div class="source-url">${esc(s.url)}</div>` : ''}
+      ${s.data ? `<div class="source-meta" style="margin-top:8px;padding:8px;background:white;border-radius:6px;"><strong>Données clés :</strong> ${esc(s.data)}</div>` : ''}
+    </div>
+  `).join('');
+}
+
+// === DÉTAILS ===
+function renderDetails() {
+  document.getElementById('detailsBody').innerHTML = swotData.map((it, i) => {
+    const score = it.impact * it.prob;
+    return `
+      <tr>
+        <td><span style="padding:4px 8px;border-radius:4px;font-size:11px;background:var(--gray-100);font-weight:600;">${it.quadrant}</span></td>
+        <td style="font-size:12px;">${esc(it.item)}</td>
+        <td style="font-size:11px;color:var(--gray-500);">${esc(it.justification) || '-'}</td>
+        <td style="text-align:center;font-weight:600;">${it.impact}</td>
+        <td style="text-align:center;font-weight:600;">${it.prob}</td>
+        <td style="text-align:center;"><span class="swot-item-score ${getScoreClass(score)}">${score}</span></td>
+        <td>
+          <div style="display:flex;gap:4px;">
+            <button class="btn-icon" onclick="openEditModal(${i})">✏️</button>
+            <button class="btn-icon danger" onclick="deleteItem(${i})">🗑️</button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+// === MODALES SWOT ===
+function openAddModal() {
+  editingIndex = -1;
+  document.getElementById('swotModalTitle').textContent = 'Ajouter un élément SWOT';
+  document.getElementById('editQuadrant').value = 'Force';
+  document.getElementById('editItem').value = '';
+  document.getElementById('editJustification').value = '';
+  document.getElementById('editImpact').value = '3';
+  document.getElementById('editProb').value = '3';
+  document.getElementById('swotModal').classList.add('show');
+}
+
+function openAddModalQ(q) {
+  openAddModal();
+  document.getElementById('editQuadrant').value = q;
+}
+
+function openEditModal(i) {
+  editingIndex = i;
+  const it = swotData[i];
+  document.getElementById('swotModalTitle').textContent = 'Modifier l\'élément';
+  document.getElementById('editQuadrant').value = it.quadrant;
+  document.getElementById('editItem').value = it.item;
+  document.getElementById('editJustification').value = it.justification || '';
+  document.getElementById('editImpact').value = it.impact;
+  document.getElementById('editProb').value = it.prob;
+  document.getElementById('swotModal').classList.add('show');
+}
+
+function closeSwotModal() {
+  document.getElementById('swotModal').classList.remove('show');
+  editingIndex = -1;
+}
+
+function saveSwotItem() {
+  const item = {
+    quadrant: document.getElementById('editQuadrant').value,
+    item: document.getElementById('editItem').value.trim(),
+    justification: document.getElementById('editJustification').value.trim(),
+    impact: parseInt(document.getElementById('editImpact').value),
+    prob: parseInt(document.getElementById('editProb').value)
+  };
+  
+  if (!item.item) {
+    alert('L\'élément est requis');
+    return;
+  }
+  
+  if (editingIndex >= 0) {
+    swotData[editingIndex] = item;
+  } else {
+    swotData.push(item);
+  }
+  
+  closeSwotModal();
+  renderDiagnostic();
+  saveToStorage();
+  toast(editingIndex >= 0 ? 'Élément modifié' : 'Élément ajouté');
+}
+
+function deleteItem(i) {
+  if (confirm('Supprimer cet élément ?')) {
+    swotData.splice(i, 1);
+    renderDiagnostic();
+    renderDetails();
+    saveToStorage();
+    toast('Élément supprimé');
+  }
+}
+
+// === MODALES STRATÉGIE ===
+function openStrategyModal() {
+  document.getElementById('strategyModalTitle').textContent = 'Définir une stratégie';
+  document.getElementById('strategyType').value = 'SO';
+  document.getElementById('strategyType').disabled = false;
+  document.getElementById('strategyContent').value = '';
+  document.getElementById('strategyDecision').value = 'GO';
+  document.getElementById('strategyKPI').value = '';
+  document.getElementById('strategyAction').value = '';
+  updateStrategyHelp();
+  document.getElementById('strategyModal').classList.add('show');
+}
+
+function openStrategyModalFor(type) {
+  const s = strategiesData[type] || {};
+  document.getElementById('strategyModalTitle').textContent = 'Stratégie ' + type;
+  document.getElementById('strategyType').value = type;
+  document.getElementById('strategyType').disabled = true;
+  document.getElementById('strategyContent').value = s.content || '';
+  document.getElementById('strategyDecision').value = s.decision || 'GO';
+  document.getElementById('strategyKPI').value = s.kpi || '';
+  document.getElementById('strategyAction').value = s.action || '';
+  updateStrategyHelp();
+  document.getElementById('strategyModal').classList.add('show');
+}
+
+function closeStrategyModal() {
+  document.getElementById('strategyModal').classList.remove('show');
+}
+
+function updateStrategyHelp() {
+  const helps = {
+    SO: 'Utiliser les forces pour saisir les opportunités',
+    WO: 'Corriger les faiblesses en profitant des opportunités',
+    ST: 'Utiliser les forces pour se protéger des menaces',
+    WT: 'Minimiser les faiblesses pour éviter les menaces'
+  };
+  document.getElementById('strategyHelp').textContent = helps[document.getElementById('strategyType').value];
+}
+
+function saveStrategy() {
+  const type = document.getElementById('strategyType').value;
+  const content = document.getElementById('strategyContent').value.trim();
+  
+  if (!content) {
+    alert('La stratégie est requise');
+    return;
+  }
+  
+  strategiesData[type] = {
+    content,
+    decision: document.getElementById('strategyDecision').value,
+    kpi: document.getElementById('strategyKPI').value.trim(),
+    action: document.getElementById('strategyAction').value.trim()
+  };
+  
+  closeStrategyModal();
+  renderStrategies();
+  saveToStorage();
+  toast('Stratégie enregistrée');
+}
+
+// === MODALES SOURCE ===
+function openSourceModal() {
+  document.getElementById('sourceOrg').value = '';
+  document.getElementById('sourceTitle').value = '';
+  document.getElementById('sourceYear').value = '2025';
+  document.getElementById('sourceType').value = 'Étude publique';
+  document.getElementById('sourceUrl').value = '';
+  document.getElementById('sourceData').value = '';
+  document.getElementById('sourceModal').classList.add('show');
+}
+
+function closeSourceModal() {
+  document.getElementById('sourceModal').classList.remove('show');
+}
+
+function saveSource() {
+  const source = {
+    org: document.getElementById('sourceOrg').value.trim(),
+    title: document.getElementById('sourceTitle').value.trim(),
+    year: document.getElementById('sourceYear').value.trim(),
+    type: document.getElementById('sourceType').value,
+    url: document.getElementById('sourceUrl').value.trim(),
+    data: document.getElementById('sourceData').value.trim()
+  };
+  
+  if (!source.org || !source.title || !source.year) {
+    alert('Organisme, titre et année sont requis');
+    return;
+  }
+  
+  sourcesData.push(source);
+  closeSourceModal();
+  renderSources();
+  saveToStorage();
+  toast('Source ajoutée');
+}
+
+// === STOCKAGE ===
+function saveToStorage() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({swotData, strategiesData, sourcesData}));
+}
+
+function loadFromStorage() {
+  try {
+    const data = localStorage.getItem(STORAGE_KEY);
+    if (data) {
+      const parsed = JSON.parse(data);
+      if (parsed.swotData) swotData = parsed.swotData;
+      if (parsed.strategiesData) strategiesData = parsed.strategiesData;
+      if (parsed.sourcesData) sourcesData = parsed.sourcesData;
+    }
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+function confirmReset() {
+  if (confirm('Réinitialiser toutes les données ?')) {
+    localStorage.removeItem(STORAGE_KEY);
+    location.reload();
+  }
+}
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// === EXPORT PDF ===
+function exportPDF() {
+  document.getElementById('loading').classList.add('show');
+  
+  setTimeout(() => {
+    try {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF('p', 'mm', 'a4');
+      const m = 10, pw = 210, ph = 297, cw = pw - 2 * m;
+      let y = 10, pn = 1;
+
+      // Fonction de nettoyage
+      function clean(s) {
+        if (!s) return '';
+        return s
+          .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+          .replace(/[éèêë]/gi, 'e')
+          .replace(/[àâä]/gi, 'a')
+          .replace(/[ùûü]/gi, 'u')
+          .replace(/[îï]/gi, 'i')
+          .replace(/[ôö]/gi, 'o')
+          .replace(/[ç]/gi, 'c')
+          .replace(/[œ]/gi, 'oe')
+          .replace(/[æ]/gi, 'ae')
+          .replace(/[ñ]/gi, 'n')
+          .replace(/[''""`]/g, "'")
+          .replace(/[«»""]/g, '"')
+          .replace(/[—–]/g, '-')
+          .replace(/[×]/g, 'x')
+          .replace(/[€]/g, 'EUR')
+          .replace(/[^\x00-\x7F]/g, '');
+      }
+
+      function addFooter() {
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(7);
+        doc.setTextColor(140, 140, 140);
+        doc.text('Annexe 3 - Diagnostic SWOT', m, ph - 6);
+        doc.text('Page ' + pn, pw - m - 12, ph - 6);
+      }
+
+      function newPage() {
+        addFooter();
+        doc.addPage();
+        pn++;
+        y = 12;
+      }
+
+      function checkPageBreak(needed) {
+        if (y + needed > ph - 15) {
+          newPage();
+          return true;
+        }
+        return false;
+      }
+
+      // Fonction pour wrapper le texte sur plusieurs lignes
+      function wrapText(text, maxWidth, fontSize) {
+        doc.setFontSize(fontSize);
+        const words = text.split(' ');
+        const lines = [];
+        let currentLine = '';
+        
+        words.forEach(word => {
+          const testLine = currentLine ? currentLine + ' ' + word : word;
+          const testWidth = doc.getTextWidth(testLine);
+          if (testWidth > maxWidth && currentLine) {
+            lines.push(currentLine);
+            currentLine = word;
+          } else {
+            currentLine = testLine;
+          }
+        });
+        if (currentLine) lines.push(currentLine);
+        return lines;
+      }
+
+      // === PAGE 1 : DIAGNOSTIC SWOT ===
+      
+      // Header
+      doc.setFillColor(30, 58, 95);
+      doc.rect(0, 0, pw, 24, 'F');
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(14);
+      doc.setTextColor(255, 255, 255);
+      doc.text('DIAGNOSTIC SWOT - CABINET 100% NUMERIQUE', m, 12);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.text('Annexe 3 | ' + new Date().toLocaleDateString('fr-FR'), m, 19);
+      y = 32;
+
+      // Données
+      const f = swotData.filter(s => s.quadrant === 'Force');
+      const w = swotData.filter(s => s.quadrant === 'Faiblesse');
+      const o = swotData.filter(s => s.quadrant === 'Opportunité');
+      const t = swotData.filter(s => s.quadrant === 'Menace');
+
+      // Stats en ligne
+      const stats = [
+        {l: 'FORCES', v: f.length, c: [5, 150, 105]},
+        {l: 'FAIBLESSES', v: w.length, c: [220, 38, 38]},
+        {l: 'OPPORTUNITES', v: o.length, c: [37, 99, 235]},
+        {l: 'MENACES', v: t.length, c: [217, 119, 6]}
+      ];
+      
+      const bw = (cw - 6) / 4;
+      stats.forEach((s, i) => {
+        const x = m + i * (bw + 2);
+        doc.setFillColor(250, 250, 252);
+        doc.rect(x, y, bw, 12, 'F');
+        doc.setDrawColor(s.c[0], s.c[1], s.c[2]);
+        doc.setLineWidth(1);
+        doc.line(x, y, x, y + 12);
+        
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(16);
+        doc.setTextColor(s.c[0], s.c[1], s.c[2]);
+        doc.text(String(s.v), x + bw/2, y + 6, {align: 'center'});
+        
+        doc.setFontSize(6);
+        doc.setTextColor(100, 100, 100);
+        doc.text(s.l, x + bw/2, y + 10, {align: 'center'});
+      });
+      y += 18;
+
+      // MATRICE SWOT - Format liste complète
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(11);
+      doc.setTextColor(30, 58, 95);
+      doc.text('MATRICE SWOT', m, y);
+      y += 8;
+
+      const quads = [
+        {n: 'FORCES', d: f, hc: [5, 150, 105]},
+        {n: 'FAIBLESSES', d: w, hc: [220, 38, 38]},
+        {n: 'OPPORTUNITES', d: o, hc: [37, 99, 235]},
+        {n: 'MENACES', d: t, hc: [217, 119, 6]}
+      ];
+
+      quads.forEach(q => {
+        checkPageBreak(15);
+        
+        // Header quadrant
+        doc.setFillColor(q.hc[0], q.hc[1], q.hc[2]);
+        doc.rect(m, y, cw, 7, 'F');
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(9);
+        doc.setTextColor(255, 255, 255);
+        doc.text(q.n + ' (' + q.d.length + ')', m + 4, y + 5);
+        y += 10;
+
+        // Elements tries par score
+        const sorted = [...q.d].sort((a, b) => (b.impact * b.prob) - (a.impact * a.prob));
+        
+        sorted.forEach((it, idx) => {
+          const score = it.impact * it.prob;
+          const txt = clean(it.item);
+          const lines = wrapText(txt, cw - 25, 8);
+          const blockHeight = lines.length * 4 + 4;
+          
+          checkPageBreak(blockHeight + 2);
+          
+          // Fond alterné
+          if (idx % 2 === 0) {
+            doc.setFillColor(250, 251, 253);
+            doc.rect(m, y - 1, cw, blockHeight, 'F');
+          }
+          
+          // Score
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(8);
+          const scoreCol = score >= 16 ? [220, 38, 38] : score >= 9 ? [217, 119, 6] : [5, 150, 105];
+          doc.setTextColor(scoreCol[0], scoreCol[1], scoreCol[2]);
+          doc.text('[' + score + ']', m + 2, y + 3);
+          
+          // Texte complet
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(8);
+          doc.setTextColor(40, 40, 40);
+          lines.forEach((line, li) => {
+            doc.text(line, m + 18, y + 3 + (li * 4));
+          });
+          
+          y += blockHeight;
+        });
+        
+        y += 6;
+      });
+
+      // STRATEGIES TOWS
+      checkPageBreak(30);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(11);
+      doc.setTextColor(30, 58, 95);
+      doc.text('STRATEGIES TOWS', m, y);
+      y += 8;
+
+      const stratList = [
+        {k: 'SO', n: 'Offensif (Forces x Opportunites)', c: [5, 150, 105]},
+        {k: 'WO', n: 'Rattrapage (Faiblesses x Opportunites)', c: [124, 58, 237]},
+        {k: 'ST', n: 'Defensif (Forces x Menaces)', c: [37, 99, 235]},
+        {k: 'WT', n: 'Survie (Faiblesses x Menaces)', c: [217, 119, 6]}
+      ];
+
+      stratList.forEach(st => {
+        const s = strategiesData[st.k];
+        if (!s || !s.content) return;
+
+        const contentLines = wrapText(clean(s.content), cw - 10, 8);
+        let blockHeight = 12 + (contentLines.length * 4);
+        if (s.kpi) blockHeight += 5;
+        if (s.action) blockHeight += 5;
+        
+        checkPageBreak(blockHeight + 5);
+
+        // Barre couleur
+        doc.setFillColor(st.c[0], st.c[1], st.c[2]);
+        doc.rect(m, y, 3, blockHeight, 'F');
+
+        // Fond
+        doc.setFillColor(252, 252, 254);
+        doc.rect(m + 4, y, cw - 4, blockHeight, 'F');
+
+        // Titre
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(9);
+        doc.setTextColor(st.c[0], st.c[1], st.c[2]);
+        doc.text(st.k + ' - ' + st.n, m + 7, y + 5);
+        
+        // Decision
+        doc.setFontSize(8);
+        doc.setTextColor(60, 60, 60);
+        doc.text('Decision: ' + (s.decision || 'GO'), m + cw - 35, y + 5);
+
+        // Contenu complet
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8);
+        doc.setTextColor(50, 50, 50);
+        let cy = y + 10;
+        contentLines.forEach(line => {
+          doc.text(line, m + 7, cy);
+          cy += 4;
+        });
+
+        // KPI
+        if (s.kpi) {
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(7);
+          doc.setTextColor(80, 80, 80);
+          doc.text('KPI: ', m + 7, cy);
+          doc.setFont('helvetica', 'normal');
+          doc.text(clean(s.kpi), m + 17, cy);
+          cy += 5;
+        }
+
+        // Action
+        if (s.action) {
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(7);
+          doc.setTextColor(80, 80, 80);
+          doc.text('Action S1-S2: ', m + 7, cy);
+          doc.setFont('helvetica', 'normal');
+          doc.text(clean(s.action), m + 30, cy);
+        }
+
+        y += blockHeight + 4;
+      });
+
+      addFooter();
+
+      // === PAGE SUIVANTE : TABLEAU DETAIL ===
+      newPage();
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(11);
+      doc.setTextColor(30, 58, 95);
+      doc.text('DETAIL DES ELEMENTS SWOT', m, y);
+      y += 8;
+
+      // Trier par quadrant
+      const allItems = [...swotData].sort((a, b) => {
+        const order = {'Force': 1, 'Faiblesse': 2, 'Opportunité': 3, 'Menace': 4};
+        return (order[a.quadrant] || 5) - (order[b.quadrant] || 5);
+      });
+
+      const qColors = {
+        'Force': [5, 150, 105],
+        'Faiblesse': [220, 38, 38],
+        'Opportunité': [37, 99, 235],
+        'Menace': [217, 119, 6]
+      };
+
+      allItems.forEach((it, idx) => {
+        const score = it.impact * it.prob;
+        const txt = clean(it.item);
+        const justif = it.justification ? clean(it.justification) : '';
+        
+        const txtLines = wrapText(txt, cw - 50, 8);
+        const justifLines = justif ? wrapText('Justification: ' + justif, cw - 20, 7) : [];
+        
+        const blockHeight = 8 + (txtLines.length * 4) + (justifLines.length * 3.5);
+        
+        checkPageBreak(blockHeight + 4);
+        
+        const qc = qColors[it.quadrant] || [100, 100, 100];
+        
+        // Barre couleur
+        doc.setFillColor(qc[0], qc[1], qc[2]);
+        doc.rect(m, y, 3, blockHeight, 'F');
+        
+        // Fond
+        if (idx % 2 === 0) {
+          doc.setFillColor(252, 252, 254);
+          doc.rect(m + 4, y, cw - 4, blockHeight, 'F');
+        }
+        
+        // Quadrant + Score
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(8);
+        doc.setTextColor(qc[0], qc[1], qc[2]);
+        const quadrantName = it.quadrant === 'Opportunité' ? 'Opportunite' : it.quadrant;
+        doc.text(quadrantName.toUpperCase(), m + 7, y + 5);
+        
+        // Score
+        const scoreCol = score >= 16 ? [220, 38, 38] : score >= 9 ? [217, 119, 6] : [5, 150, 105];
+        doc.setTextColor(scoreCol[0], scoreCol[1], scoreCol[2]);
+        doc.text('Score: ' + score + ' (Impact ' + it.impact + ' x Prob ' + it.prob + ')', m + cw - 55, y + 5);
+        
+        // Texte complet
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8);
+        doc.setTextColor(40, 40, 40);
+        let ty = y + 10;
+        txtLines.forEach(line => {
+          doc.text(line, m + 7, ty);
+          ty += 4;
+        });
+        
+        // Justification
+        if (justifLines.length > 0) {
+          ty += 1;
+          doc.setFontSize(7);
+          doc.setTextColor(100, 100, 100);
+          justifLines.forEach(line => {
+            doc.text(line, m + 7, ty);
+            ty += 3.5;
+          });
+        }
+        
+        y += blockHeight + 3;
+      });
+
+      addFooter();
+
+      // Sauvegarder
+      doc.save('Annexe_3_SWOT.pdf');
+      document.getElementById('loading').classList.remove('show');
+      toast('PDF exporte');
+
+    } catch (e) {
+      document.getElementById('loading').classList.remove('show');
+      console.error(e);
+      alert('Erreur: ' + e.message);
+    }
+  }, 150);
+}
+// === INIT ===
+loadFromStorage();
+renderDiagnostic();
+</script>
+</body>
+</html>

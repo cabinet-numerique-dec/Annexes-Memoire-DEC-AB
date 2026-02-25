@@ -1,0 +1,1723 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Annexe 17 — Générateur de Newsletter Client & Calendrier Éditorial | Cabinet 100% Numérique</title>
+  <style>
+    :root {
+      --primary: #1e3a5f;
+      --primary-light: #2d5a8a;
+      --secondary: #0d9488;
+      --secondary-light: #14b8a6;
+      --accent: #f59e0b;
+      --danger: #dc2626;
+      --success: #059669;
+      --warning: #d97706;
+      --info: #2563eb;
+      --purple: #7c3aed;
+      --gray-50: #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-300: #d1d5db;
+      --gray-500: #6b7280;
+      --gray-600: #4b5563;
+      --gray-700: #374151;
+      --gray-800: #1f2937;
+      --radius: 12px;
+      --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: linear-gradient(135deg, var(--gray-100) 0%, #e0e7ef 100%);
+      color: var(--gray-700);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    .container { max-width: 1400px; margin: 0 auto; padding: 24px; }
+
+    /* ── Header ── */
+    .header {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      color: white; border-radius: var(--radius);
+      padding: 32px; margin-bottom: 24px;
+      position: relative; overflow: hidden;
+    }
+    .header::before {
+      content: ""; position: absolute; top: -50%; right: -10%;
+      width: 300px; height: 300px;
+      background: rgba(255,255,255,0.05); border-radius: 50%;
+    }
+    .header h1 { font-size: 22px; font-weight: 700; margin-bottom: 8px; position: relative; }
+    .header p { opacity: 0.9; font-size: 14px; max-width: 900px; position: relative; }
+    .header-meta { display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
+    .badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(255,255,255,0.15);
+      padding: 6px 14px; border-radius: 20px;
+      font-size: 12px; font-weight: 600;
+    }
+    .badge-accent { background: var(--secondary); color: white; }
+    .badge-email { background: var(--purple); color: white; }
+
+    /* ── Buttons ── */
+    .action-bar { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 24px; border: none; border-radius: 8px;
+      font-size: 14px; font-weight: 600; cursor: pointer;
+      transition: all 0.2s; text-decoration: none;
+    }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: var(--primary-light); transform: translateY(-2px); box-shadow: var(--shadow); }
+    .btn-secondary { background: var(--gray-200); color: var(--gray-700); }
+    .btn-secondary:hover { background: var(--gray-300); transform: translateY(-2px); }
+    .btn-success { background: var(--success); color: white; }
+    .btn-success:hover { background: #047857; transform: translateY(-2px); }
+    .btn-warning { background: var(--accent); color: white; }
+    .btn-warning:hover { background: var(--warning); }
+    .btn-danger { background: var(--danger); color: white; }
+    .btn-danger:hover { background: #b91c1c; }
+    .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
+    .btn-outline:hover { background: var(--primary); color: white; }
+    .btn-purple { background: var(--purple); color: white; }
+    .btn-purple:hover { background: #6d28d9; transform: translateY(-2px); }
+    .btn-sm { padding: 6px 14px; font-size: 12px; }
+
+    /* ── Tabs ── */
+    .tabs {
+      display: flex; gap: 4px; background: white; padding: 8px;
+      border-radius: var(--radius); box-shadow: var(--shadow);
+      margin-bottom: 24px; flex-wrap: wrap;
+    }
+    .tab {
+      padding: 10px 16px; border: none; background: transparent;
+      font-size: 13px; font-weight: 600; color: var(--gray-600);
+      border-radius: 8px; cursor: pointer; transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .tab:hover { background: var(--gray-100); }
+    .tab.active { background: var(--primary); color: white; }
+
+    /* ── Panels ── */
+    .panel { display: none; animation: fadeIn 0.3s ease; }
+    .panel.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* ── Cards ── */
+    .card {
+      background: white; border-radius: var(--radius);
+      padding: 24px; box-shadow: var(--shadow); margin-bottom: 20px;
+    }
+    .card-header {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 16px; padding-bottom: 16px;
+      border-bottom: 1px solid var(--gray-200);
+    }
+    .card-icon {
+      width: 48px; height: 48px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      border-radius: 10px; display: flex; align-items: center; justify-content: center;
+      font-size: 22px; color: white; flex-shrink: 0;
+    }
+    .card-icon.secondary { background: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-light) 100%); }
+    .card-icon.accent { background: linear-gradient(135deg, var(--accent) 0%, #fbbf24 100%); }
+    .card-icon.danger { background: linear-gradient(135deg, var(--danger) 0%, #ef4444 100%); }
+    .card-icon.success { background: linear-gradient(135deg, var(--success) 0%, #34d399 100%); }
+    .card-icon.purple { background: linear-gradient(135deg, var(--purple) 0%, #a78bfa 100%); }
+    .card-icon.info { background: linear-gradient(135deg, var(--info) 0%, #60a5fa 100%); }
+    .card h3 { font-size: 18px; font-weight: 700; color: var(--gray-800); }
+    .card .subtitle { color: var(--gray-500); font-size: 13px; margin-top: 2px; }
+    .card-actions { margin-left: auto; display: flex; gap: 8px; flex-shrink: 0; }
+
+    /* ── Forms ── */
+    .form-group { margin-bottom: 20px; }
+    .form-group label {
+      display: block; font-size: 12px; font-weight: 600;
+      color: var(--gray-600); margin-bottom: 6px; text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%; padding: 12px 16px;
+      border: 2px solid var(--gray-200); border-radius: 8px;
+      font-size: 14px; font-family: inherit;
+      transition: all 0.2s; background: white;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none; border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.1);
+    }
+    .form-group textarea { min-height: 100px; resize: vertical; }
+    .form-hint { font-size: 11px; color: var(--gray-500); margin-top: 6px; }
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    /* ── Topics checkbox grid ── */
+    .topics-grid {
+      display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px;
+    }
+    .topic-label {
+      display: flex; align-items: center; gap: 6px;
+      padding: 8px 14px; border-radius: 20px;
+      border: 2px solid var(--gray-200); font-size: 13px;
+      cursor: pointer; transition: all 0.2s; font-weight: 500;
+    }
+    .topic-label:hover { border-color: var(--primary); background: var(--gray-50); }
+    .topic-label input { accent-color: var(--primary); }
+    .topic-label input:checked + span { color: var(--primary); font-weight: 700; }
+
+    /* ── Stat Cards ── */
+    .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 20px; }
+    .stat-card {
+      background: white; border-radius: var(--radius); padding: 20px;
+      box-shadow: var(--shadow); text-align: center;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .stat-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+    .stat-value {
+      font-size: 32px; font-weight: 800;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .stat-label { font-size: 13px; color: var(--gray-600); margin-top: 4px; font-weight: 500; }
+    .stat-trend { font-size: 11px; margin-top: 8px; padding: 4px 10px; border-radius: 20px; display: inline-block; }
+    .stat-trend.up { background: #d1fae5; color: var(--success); }
+    .stat-trend.neutral { background: var(--gray-100); color: var(--gray-600); }
+
+    /* ── Prompt Output ── */
+    .prompt-output {
+      background: var(--gray-800); color: #e2e8f0;
+      border-radius: 10px; padding: 24px;
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 13px; line-height: 1.7;
+      white-space: pre-wrap; word-wrap: break-word;
+      max-height: 500px; overflow-y: auto;
+      position: relative;
+    }
+    .prompt-output::before {
+      content: 'PROMPT GÉNÉRÉ';
+      position: absolute; top: 8px; right: 12px;
+      font-size: 10px; color: var(--secondary);
+      font-weight: 700; letter-spacing: 1px;
+    }
+
+    /* ── Email Preview ── */
+    .email-preview {
+      background: #fff; border: 1px solid #e0e0e0;
+      border-radius: 8px; max-width: 600px;
+      margin: 0 auto;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      overflow: hidden;
+    }
+    .email-preview-bar {
+      background: var(--gray-100); padding: 10px 16px;
+      border-bottom: 1px solid #e0e0e0;
+      font-size: 12px; color: var(--gray-500);
+    }
+    .email-preview-bar strong { color: var(--gray-700); }
+    .email-preview-header {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      padding: 24px 20px; text-align: center; color: white;
+    }
+    .email-preview-header h2 { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+    .email-preview-header p { font-size: 12px; opacity: 0.85; }
+    .email-preview-content {
+      padding: 20px; font-size: 14px;
+      color: #333; line-height: 1.7;
+    }
+    .email-preview-content h2 { font-size: 17px; color: var(--primary); margin: 20px 0 10px; font-weight: 700; border-bottom: 2px solid var(--gray-200); padding-bottom: 6px; }
+    .email-preview-content h3 { font-size: 15px; color: var(--primary); margin: 16px 0 8px; font-weight: 700; }
+    .email-preview-content h4 { font-size: 14px; color: var(--primary-light); margin: 14px 0 6px; font-weight: 600; }
+    .email-preview-content p { margin: 8px 0; }
+    .email-preview-content ul, .email-preview-content ol { margin: 8px 0 8px 20px; padding: 0; }
+    .email-preview-content li { margin-bottom: 4px; }
+    .email-preview-content strong { color: var(--gray-800); }
+    .email-preview-content em { font-style: italic; color: var(--gray-600); }
+    .email-preview-content hr { border: none; border-top: 1px solid var(--gray-200); margin: 16px 0; }
+    .email-preview-content blockquote { border-left: 3px solid var(--secondary); padding: 8px 14px; margin: 12px 0; background: var(--gray-50); border-radius: 0 6px 6px 0; font-style: italic; color: var(--gray-600); }
+    .email-preview-content .nl-date-badge { display: inline-block; background: var(--primary); color: white; padding: 2px 10px; border-radius: 4px; font-size: 12px; font-weight: 600; margin-right: 6px; }
+    .email-preview-content .nl-highlight { background: linear-gradient(to bottom, transparent 60%, #fef3c7 60%); padding: 0 2px; font-weight: 600; }
+    .email-preview-content .nl-section-divider { text-align: center; margin: 20px 0; color: var(--gray-300); font-size: 18px; letter-spacing: 8px; }
+    .email-preview-cta {
+      text-align: center; padding: 8px 20px 20px;
+    }
+    .email-preview-cta a {
+      display: inline-block; background: var(--secondary);
+      color: white; padding: 12px 28px; border-radius: 6px;
+      text-decoration: none; font-weight: 600; font-size: 14px;
+    }
+    .email-preview-footer {
+      background: var(--gray-50); padding: 16px 20px;
+      border-top: 1px solid #e0e0e0;
+      font-size: 11px; color: #999; text-align: center; line-height: 1.6;
+    }
+    .email-preview-footer a { color: var(--info); text-decoration: none; }
+
+    /* ── Templates ── */
+    .templates-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .template-card {
+      background: var(--gray-50); border: 2px solid var(--gray-200);
+      border-radius: var(--radius); padding: 20px;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .template-card:hover {
+      border-color: var(--primary); transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    }
+    .template-icon { font-size: 2rem; margin-bottom: 12px; }
+    .template-title { font-weight: 700; color: var(--primary); margin-bottom: 8px; font-size: 14px; }
+    .template-desc { font-size: 12px; color: var(--gray-500); line-height: 1.5; }
+
+    /* ── Calendar ── */
+    .calendar-table { width: 100%; border-collapse: collapse; }
+    .calendar-table th {
+      background: var(--primary); color: white;
+      padding: 10px 12px; text-align: left; font-size: 12px; font-weight: 600;
+    }
+    .calendar-table th:first-child { border-radius: 8px 0 0 0; }
+    .calendar-table th:last-child { border-radius: 0 8px 0 0; }
+    .calendar-table td {
+      padding: 10px 12px; border-bottom: 1px solid var(--gray-200);
+      font-size: 13px; vertical-align: top;
+    }
+    .calendar-table tbody tr:hover { background: var(--gray-50); }
+    .calendar-table tr.row-critical { background: linear-gradient(to right, #fef2f2, #fff); font-weight: 600; }
+    .calendar-table tr.row-important { background: linear-gradient(to right, #fffbeb, #fff); }
+
+    /* ── Status badges ── */
+    .status-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 12px; border-radius: 20px;
+      font-size: 11px; font-weight: 600;
+    }
+    .status-ok { background: #d1fae5; color: var(--success); }
+    .status-warn { background: #fef3c7; color: var(--warning); }
+    .status-danger { background: #fee2e2; color: var(--danger); }
+    .status-info { background: #dbeafe; color: var(--info); }
+    .status-purple { background: #ede9fe; color: var(--purple); }
+
+    /* ── History Table ── */
+    .history-table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+    .history-table th, .history-table td {
+      padding: 12px 14px; text-align: left;
+      border-bottom: 1px solid var(--gray-200); font-size: 13px;
+    }
+    .history-table th {
+      background: var(--gray-50); font-weight: 700;
+      color: var(--primary); font-size: 11px;
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .history-table tr:hover { background: var(--gray-50); }
+
+    /* ── Insight Boxes ── */
+    .insight-box {
+      background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+      border-left: 4px solid var(--success);
+      padding: 16px 20px; border-radius: 0 8px 8px 0; margin: 16px 0;
+    }
+    .insight-box.warning { background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border-left-color: var(--warning); }
+    .insight-box.info { background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border-left-color: var(--info); }
+    .insight-box.danger { background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border-left-color: var(--danger); }
+    .insight-box strong { color: var(--gray-800); }
+
+    /* ── Deontologie Grid ── */
+    .deonto-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px;
+    }
+
+    /* ── Guide Tables ── */
+    .guide-table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+    .guide-table thead tr { background: var(--primary); color: white; }
+    .guide-table th { padding: 10px 14px; text-align: left; font-size: 12px; font-weight: 600; }
+    .guide-table td { padding: 10px 14px; border-bottom: 1px solid var(--gray-200); font-size: 13px; }
+    .guide-table tbody tr:nth-child(even) { background: var(--gray-50); }
+    .guide-table tbody tr:hover { background: rgba(30, 58, 95, 0.04); }
+
+    /* ── Checklist ── */
+    .check-item {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 12px 14px; border-radius: 8px; cursor: pointer;
+      transition: all 0.2s; border: 1px solid transparent; margin-bottom: 4px;
+    }
+    .check-item:hover { background: var(--gray-50); border-color: var(--gray-200); }
+    .check-item.done { background: #ecfdf5; border-color: #a7f3d0; }
+    .check-box {
+      width: 22px; height: 22px; border: 2px solid var(--gray-300);
+      border-radius: 5px; display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-top: 2px; font-size: 13px; font-weight: 700;
+      color: white; transition: all 0.2s;
+    }
+    .check-item.done .check-box { background: var(--success); border-color: var(--success); }
+
+    /* ── KPI Cards ── */
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px; }
+    .kpi-card {
+      background: white; border-radius: var(--radius); padding: 18px;
+      box-shadow: var(--shadow); text-align: center; border-top: 3px solid;
+    }
+    .kpi-value { font-size: 28px; font-weight: 800; line-height: 1; }
+    .kpi-label { font-size: 11px; color: var(--gray-500); margin-top: 4px; }
+    .kpi-target { font-size: 10px; color: var(--gray-500); margin-top: 2px; font-style: italic; }
+
+    /* ── Source footnotes ── */
+    .source-note {
+      font-size: 11px; color: var(--gray-500); font-style: italic;
+      margin-top: 12px; padding-top: 12px;
+      border-top: 1px solid var(--gray-200);
+    }
+    .source-note a { color: var(--info); text-decoration: none; }
+    .source-note a:hover { text-decoration: underline; }
+
+    /* ── Modal ── */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(15,23,42,0.6);
+      display: none; align-items: center; justify-content: center;
+      z-index: 9998; padding: 20px;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal {
+      background: white; border-radius: var(--radius);
+      max-width: 600px; width: 100%; max-height: 80vh;
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); overflow: hidden;
+    }
+    .modal-header {
+      background: var(--primary); color: white;
+      padding: 16px 20px; display: flex;
+      justify-content: space-between; align-items: center;
+    }
+    .modal-title { font-weight: 700; font-size: 16px; }
+    .modal-close {
+      background: rgba(255,255,255,0.2); border: none; color: white;
+      padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: 600;
+    }
+    .modal-close:hover { background: rgba(255,255,255,0.3); }
+    .modal-body { padding: 20px; overflow-y: auto; max-height: 60vh; }
+    .modal-footer {
+      padding: 16px 20px; border-top: 1px solid var(--gray-200);
+      display: flex; justify-content: flex-end; gap: 12px;
+    }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed; bottom: 24px; right: 24px;
+      background: var(--gray-800); color: white;
+      padding: 14px 20px; border-radius: 10px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+      transform: translateY(100px); opacity: 0;
+      transition: all 0.3s ease; z-index: 9999;
+      font-size: 14px; font-weight: 500;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+
+    /* ── Print ── */
+    @media print {
+      body { background: white; }
+      .container { padding: 0; max-width: none; }
+      .tabs, .action-bar, .toast, .modal-overlay { display: none !important; }
+      .panel { display: block !important; page-break-inside: avoid; margin-bottom: 30px; }
+      .card { box-shadow: none; border: 1px solid var(--gray-200); }
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      .header { padding: 20px; }
+      .header h1 { font-size: 18px; }
+      .container { padding: 16px; }
+      .form-row { grid-template-columns: 1fr; }
+      .grid-4 { grid-template-columns: 1fr 1fr; }
+      .deonto-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="header">
+    <h1>Annexe 17 — Générateur de newsletter client et calendrier éditorial</h1>
+    <p>Outil de production de prompts IA structurés pour la rédaction de newsletters mensuelles dans le cadre de la communication récurrente d'un cabinet d'expertise comptable 100 % numérique. Calendrier éditorial 2026 aligné sur les échéances fiscales et sociales.</p>
+    <div class="header-meta">
+      <span class="badge">Outil opérationnel</span>
+      <span class="badge badge-email">Email B2B</span>
+      <span class="badge badge-accent">Art. 152 CD (éd. janv. 2026)</span>
+      <span class="badge">8 modèles prédéfinis</span>
+      <span class="badge">RGPD — Prospection email</span>
+    </div>
+  </div>
+
+  <!-- ACTION BAR -->
+  <div class="action-bar">
+    <button class="btn btn-primary" onclick="generatePrompt()">Générer le Prompt IA</button>
+    <button class="btn btn-secondary" onclick="exportData()">Export JSON</button>
+    <button class="btn btn-secondary" onclick="importData()">Import JSON</button>
+    <button class="btn btn-warning" onclick="loadCasPratique()">Cas pratique cabinet X</button>
+    <button class="btn btn-danger" onclick="resetData()">Réinitialiser</button>
+  </div>
+
+  <input type="file" id="importFile" accept=".json" style="display:none" onchange="handleImport(event)">
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active" onclick="showPanel('generator')">Générateur</button>
+    <button class="tab" onclick="showPanel('templates')">Modèles</button>
+    <button class="tab" onclick="showPanel('calendar')">Calendrier 2026</button>
+    <button class="tab" onclick="showPanel('history')">Historique</button>
+    <button class="tab" onclick="showPanel('conformite')">Conformité</button>
+  </div>
+
+  <!-- ═══════════ PANEL: GÉNÉRATEUR ═══════════ -->
+  <div id="generator" class="panel active">
+
+    <div class="insight-box info">
+      <strong>Mode opératoire</strong><br>
+      Cet outil génère des prompts optimisés pour l'IA (ChatGPT, Claude, etc.) afin de produire des newsletters mensuelles conformes au cadre déontologique. Le processus se déroule en quatre étapes : (1) configuration du cabinet et de la cible, (2) sélection du mois et des thématiques, (3) génération du prompt structuré intégrant les échéances fiscales du mois, (4) relecture obligatoire du contenu généré avant tout envoi. L'IA assiste la rédaction — elle ne se substitue pas à la responsabilité professionnelle de l'expert-comptable.
+    </div>
+
+    <!-- Configuration cabinet -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon purple">&#x1f4e7;</div>
+        <div>
+          <h3>Configuration du cabinet</h3>
+          <div class="subtitle">Informations intégrées dans le prompt — Le nom du cabinet et le positionnement sont repris dans l'édito</div>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="cabinetName">Nom du cabinet</label>
+          <input type="text" id="cabinetName" placeholder="Ex : Cabinet X" oninput="updatePreview()">
+        </div>
+        <div class="form-group">
+          <label for="cabinetPosition">Positionnement (tagline)</label>
+          <input type="text" id="cabinetPosition" placeholder="Ex : Expert-comptable 100% digital — TPE, startups et indépendants" oninput="updatePreview()">
+          <p class="form-hint">Repris dans l'en-tête de la newsletter. Doit refléter la promesse de valeur du cabinet.</p>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="senderName">Nom de l'expéditeur</label>
+          <input type="text" id="senderName" placeholder="Ex : Jean Dupont, Expert-Comptable" oninput="updatePreview()">
+        </div>
+        <div class="form-group">
+          <label for="senderEmail">Email expéditeur</label>
+          <input type="email" id="senderEmail" placeholder="Ex : newsletter@cabinet-x.fr" oninput="updatePreview()">
+          <p class="form-hint">Art. 13-14 RGPD — identité de l'expéditeur obligatoire dans chaque envoi.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Paramètres de génération -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon accent">&#x2699;</div>
+        <div>
+          <h3>Paramètres de génération</h3>
+          <div class="subtitle">Variables injectées dans le prompt — Le mois sélectionné charge automatiquement les échéances depuis le calendrier</div>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="nlMonth">Mois concerné</label>
+          <select id="nlMonth" onchange="updatePreview()">
+            <option value="janvier">Janvier 2026</option>
+            <option value="fevrier">Février 2026</option>
+            <option value="mars">Mars 2026</option>
+            <option value="avril">Avril 2026</option>
+            <option value="mai">Mai 2026</option>
+            <option value="juin">Juin 2026</option>
+            <option value="juillet">Juillet 2026</option>
+            <option value="aout">Août 2026</option>
+            <option value="septembre" selected>Septembre 2026</option>
+            <option value="octobre">Octobre 2026</option>
+            <option value="novembre">Novembre 2026</option>
+            <option value="decembre">Décembre 2026</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="nlTarget">Cible principale</label>
+          <select id="nlTarget">
+            <option value="tpe">TPE et indépendants</option>
+            <option value="startup">Startups et scale-ups</option>
+            <option value="pme">PME structurées</option>
+            <option value="liberal">Professions libérales</option>
+            <option value="mixte" selected>Portefeuille mixte</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="nlTone">Ton éditorial</label>
+          <select id="nlTone">
+            <option value="accessible" selected>Accessible et pédagogique</option>
+            <option value="professionnel">Professionnel et formel</option>
+            <option value="dynamique">Dynamique et engageant</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="nlLength">Longueur cible</label>
+          <select id="nlLength">
+            <option value="court">Court (300-400 mots)</option>
+            <option value="moyen" selected>Moyen (500-700 mots)</option>
+            <option value="long">Long (800-1 000 mots)</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="nlCTA">Call-to-action principal</label>
+          <select id="nlCTA" onchange="updatePreview()">
+            <option value="rdv" selected>Prendre rendez-vous (Calendly)</option>
+            <option value="contact">Contacter le cabinet</option>
+            <option value="webinar">S'inscrire à un webinar</option>
+            <option value="guide">Télécharger un guide pratique</option>
+            <option value="aucun">Aucun CTA</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="nlPlatform">Plateforme d'envoi</label>
+          <select id="nlPlatform">
+            <option value="brevo" selected>Brevo (ex-Sendinblue) — RGPD FR</option>
+            <option value="mailjet">Mailjet — RGPD FR</option>
+            <option value="mailchimp">Mailchimp — US (SCC)</option>
+            <option value="autre">Autre plateforme</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Thématiques à traiter (cocher 2 à 4 maximum)</label>
+        <div class="topics-grid" id="topicsGrid"></div>
+      </div>
+
+      <div class="form-group">
+        <label for="nlSpecific">Contenu spécifique à intégrer (optionnel)</label>
+        <textarea id="nlSpecific" placeholder="Ex : Nouveau collaborateur recruté, changement de tarifs, focus sectoriel, événement à venir…"></textarea>
+        <p class="form-hint">Ces éléments seront intégrés dans la section « Actualités du cabinet » de la newsletter.</p>
+      </div>
+
+      <div style="display:flex;gap:12px;flex-wrap:wrap;">
+        <button class="btn btn-primary" onclick="generatePrompt()">Générer le prompt IA</button>
+        <button class="btn btn-outline" onclick="loadFromCalendar()">&#x1f4c5; Charger depuis calendrier</button>
+      </div>
+    </div>
+
+    <!-- Prompt output -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon" style="background:linear-gradient(135deg,var(--gray-700),var(--gray-800))">&#x1f4dd;</div>
+        <div>
+          <h3>Prompt généré</h3>
+          <div class="subtitle">À copier dans ChatGPT, Claude ou tout assistant IA — Relecture humaine obligatoire avant envoi</div>
+        </div>
+        <div class="card-actions">
+          <button class="btn btn-success btn-sm" onclick="copyPrompt()">Copier</button>
+          <button class="btn btn-outline btn-sm" onclick="saveToHistory()">Sauvegarder</button>
+        </div>
+      </div>
+      <div class="prompt-output" id="promptOutput">Cliquez sur « Générer le prompt IA » pour créer votre prompt personnalisé…</div>
+    </div>
+
+    <!-- Paste & Preview -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon purple">&#x1f441;</div>
+        <div>
+          <h3>Prévisualisation de la newsletter</h3>
+          <div class="subtitle">Collez le contenu généré par l'IA après relecture — Rendu email fidèle avec prise en charge du format Markdown</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="pasteResult">Contenu relu à prévisualiser</label>
+        <textarea id="pasteResult" style="min-height:160px" placeholder="Collez ici le contenu de la newsletter généré par l'IA après relecture et validation.&#10;&#10;Formats reconnus :&#10;# Titre principal  /  ## Sous-titre  /  ### Section&#10;**texte en gras**  /  *texte en italique*&#10;- Liste à puces  /  1. Liste numérotée&#10;--- (séparateur)  /  > Citation&#10;&#10;Le rendu s'affiche en temps réel dans la prévisualisation ci-dessous." oninput="updatePreview()"></textarea>
+        <p class="form-hint">Supporte le format Markdown (titres, gras, listes, etc.) — La prévisualisation se met à jour en temps réel.</p>
+      </div>
+
+      <!-- Email preview mockup -->
+      <div class="email-preview" id="emailPreview">
+        <div class="email-preview-bar">
+          <strong>De :</strong> <span id="prevSender">Expert-Comptable</span> &lt;<span id="prevEmail">newsletter@cabinet.fr</span>&gt;<br>
+          <strong>Objet :</strong> <span id="prevSubject">Newsletter — Votre cabinet vous informe</span>
+        </div>
+        <div class="email-preview-header">
+          <h2 id="prevCabinetName">Cabinet X</h2>
+          <p id="prevTagline">Expert-comptable 100% digital</p>
+        </div>
+        <div class="email-preview-content" id="prevContent">
+          <p style="color:#999;font-style:italic;">Le contenu de votre newsletter apparaîtra ici une fois collé dans le champ ci-dessus…</p>
+        </div>
+        <div class="email-preview-cta" id="prevCTABlock">
+          <a href="#" onclick="return false;" id="prevCTAText">Prendre rendez-vous</a>
+        </div>
+        <div class="email-preview-footer">
+          <span id="prevCabFooter">Cabinet X</span> — Expert-comptable inscrit au Tableau de l'Ordre<br>
+          <a href="#">Se désinscrire</a> | <a href="#">Gérer mes préférences</a><br>
+          <span style="font-size:10px;">Conformément au RGPD (art. 21), vous pouvez vous opposer à tout moment à la réception de cette newsletter.</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══════════ PANEL: MODÈLES ═══════════ -->
+  <div id="templates" class="panel">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon accent">&#x1f4cb;</div>
+        <div>
+          <h3>Modèles de newsletters prédéfinis</h3>
+          <div class="subtitle">Cliquez sur un modèle pour pré-remplir le générateur — Chaque modèle correspond à un objectif de communication différent</div>
+        </div>
+      </div>
+      <div class="templates-grid">
+        <div class="template-card" onclick="loadTemplate('editorial-mensuel')">
+          <div class="template-icon">&#x1f4f0;</div>
+          <div class="template-title">Édito mensuel classique</div>
+          <div class="template-desc">Structure standard : édito du dirigeant, actualité fiscale, échéances du mois, conseil pratique, CTA rendez-vous. Format polyvalent adapté à tout portefeuille.</div>
+        </div>
+        <div class="template-card" onclick="loadTemplate('alerte-reglementaire')">
+          <div class="template-icon">&#x26a0;</div>
+          <div class="template-title">Alerte réglementaire</div>
+          <div class="template-desc">Newsletter ciblée sur une réforme ou une échéance critique. Ton urgent mais pédagogique. Idéal pour la facturation électronique (sept. 2026).</div>
+        </div>
+        <div class="template-card" onclick="loadTemplate('guide-echeances')">
+          <div class="template-icon">&#x1f4c5;</div>
+          <div class="template-title">Guide des échéances</div>
+          <div class="template-desc">Focus intégral sur les dates fiscales et sociales du mois. Format « checklist » : dates, montants, actions à entreprendre. Fort potentiel d'ouverture.</div>
+        </div>
+        <div class="template-card" onclick="loadTemplate('cas-client')">
+          <div class="template-icon">&#x1f3c6;</div>
+          <div class="template-title">Témoignage client</div>
+          <div class="template-desc">Storytelling autour d'un accompagnement réussi — strictement anonymisé (Ordonnance 1945, art. 21 + art. 147 CD). Problème, solution, résultat chiffré.</div>
+        </div>
+        <div class="template-card" onclick="loadTemplate('bienvenue')">
+          <div class="template-icon">&#x1f44b;</div>
+          <div class="template-title">Bienvenue nouveau client</div>
+          <div class="template-desc">Email d'onboarding : présentation du cabinet, des outils mis à disposition, des interlocuteurs et du fonctionnement. Envoi unique à l'intégration.</div>
+        </div>
+        <div class="template-card" onclick="loadTemplate('bilan-annuel')">
+          <div class="template-icon">&#x1f4ca;</div>
+          <div class="template-title">Bilan & perspectives</div>
+          <div class="template-desc">Newsletter de fin d'année ou de mi-exercice. Rétrospective des accompagnements, perspectives, vœux. Renforce le positionnement conseil.</div>
+        </div>
+        <div class="template-card" onclick="loadTemplate('webinar-event')">
+          <div class="template-icon">&#x1f3a4;</div>
+          <div class="template-title">Invitation événement</div>
+          <div class="template-desc">Promotion d'un webinar, atelier ou événement du cabinet. Structure AIDA (attention, intérêt, désir, action). CTA inscription.</div>
+        </div>
+        <div class="template-card" onclick="loadTemplate('conseil-dirigeant')">
+          <div class="template-icon">&#x1f4a1;</div>
+          <div class="template-title">Conseil au dirigeant</div>
+          <div class="template-desc">Newsletter thématique : optimisation fiscale, gestion de trésorerie, pilotage d'activité. Positionne le cabinet comme partenaire stratégique.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ PANEL: CALENDRIER 2026 ═══════════ -->
+  <div id="calendar" class="panel">
+
+    <div class="grid-4">
+      <div class="stat-card">
+        <div class="stat-value">12</div>
+        <div class="stat-label">Newsletters planifiées</div>
+        <div class="stat-trend neutral">1 par mois</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="statSent">0</div>
+        <div class="stat-label">Envoyées</div>
+        <div class="stat-trend up">complétées</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">Sept.</div>
+        <div class="stat-label">Échéance critique</div>
+        <div class="stat-trend" style="background:#fee2e2;color:var(--danger);">Facturation élec.</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">&lt; 2h</div>
+        <div class="stat-label">Temps de production</div>
+        <div class="stat-trend neutral">par newsletter</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon accent">&#x1f4c5;</div>
+        <div>
+          <h3>Calendrier éditorial 2026</h3>
+          <div class="subtitle">Planification thématique sur 12 mois — Aligné sur les échéances DGFiP et URSSAF. Cliquez sur un mois pour charger le générateur.</div>
+        </div>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="calendar-table">
+          <thead>
+            <tr>
+              <th>Mois</th>
+              <th>Thème principal</th>
+              <th>Échéances clés</th>
+              <th>CTA suggéré</th>
+              <th>Priorité</th>
+            </tr>
+          </thead>
+          <tbody id="calendarBody"></tbody>
+        </table>
+      </div>
+      <div class="source-note">
+        Sources : DGFiP — Calendrier fiscal 2026. URSSAF — Échéancier des cotisations 2026. DGFiP — Facturation électronique, calendrier de déploiement (art. 91 LF 2024).
+      </div>
+    </div>
+
+    <div class="insight-box warning">
+      <strong>Facturation électronique — Point de vigilance éditorial</strong><br>
+      L'obligation de réception entre en vigueur le 1<sup>er</sup> septembre 2026 pour toutes les entreprises assujetties à la TVA. L'obligation d'émission est fixée au 1<sup>er</sup> septembre 2026 pour les grandes entreprises et ETI, et au 1<sup>er</sup> septembre 2027 pour les PME, TPE et micro-entreprises. Les newsletters d'août, septembre et octobre doivent impérativement traiter ce sujet. Le terme « PDP » est obsolète — utiliser « PA (Plateforme Agréée) » conformément à la terminologie en vigueur.
+    </div>
+  </div>
+
+  <!-- ═══════════ PANEL: HISTORIQUE ═══════════ -->
+  <div id="history" class="panel">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">&#x1f4ca;</div>
+        <div>
+          <h3>Historique des prompts générés</h3>
+          <div class="subtitle">Retrouvez et réutilisez vos prompts précédents — Traçabilité de la production de contenu</div>
+        </div>
+        <div class="card-actions">
+          <button class="btn btn-outline btn-sm" onclick="clearHistory()">Vider</button>
+        </div>
+      </div>
+      <table class="history-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Mois</th>
+            <th>Cible</th>
+            <th>Thématiques</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="historyTableBody">
+          <tr><td colspan="5" style="text-align:center;color:var(--gray-500);font-style:italic;">Aucun historique</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ═══════════ PANEL: CONFORMITÉ ═══════════ -->
+  <div id="conformite" class="panel">
+
+    <!-- Cadre juridique -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon danger">&#x2696;</div>
+        <div>
+          <h3>Sécurisation déontologique de la newsletter</h3>
+          <div class="subtitle">Cadre de conformité intégré au prompt — Références normatives précises</div>
+        </div>
+      </div>
+
+      <p style="margin-bottom:16px; line-height:1.8; color:var(--gray-700); font-size:14px;">
+        L'envoi de newsletters par un expert-comptable inscrit au Tableau de l'Ordre est encadré par le code de déontologie (décret n°2012-432, modifié en janvier 2026), le RGPD et les recommandations CNIL sur la prospection B2B. L'outil intègre ces contraintes directement dans le prompt généré et dans la checklist de conformité. La sécurisation repose sur une séquence systématique : vérification de la base légale d'envoi, contrôle du contenu (secret, anonymisation, prudence), relecture humaine obligatoire, puis validation avant expédition.
+      </p>
+
+      <div class="deonto-grid">
+        <div>
+          <div class="insight-box" style="margin-top:0;">
+            <strong>Contenu autorisé dans la newsletter</strong><br><br>
+            Informations fiscales générales et échéances publiques.<br>
+            Présentation factuelle des services du cabinet.<br>
+            Veille juridique et sectorielle à caractère général.<br>
+            Témoignages clients strictement anonymisés (Ordonnance 1945, art. 21 + art. 147 CD).<br>
+            Invitation à des événements (webinar, atelier, conférence).<br>
+            Conseils pratiques génériques assortis du rappel de consulter un professionnel.
+          </div>
+        </div>
+        <div>
+          <div class="insight-box danger" style="margin-top:0;">
+            <strong>Contenu interdit dans la newsletter</strong><br><br>
+            Conseil fiscal ou juridique personnalisé (« vous devez… »).<br>
+            Comparaison directe avec des confrères (art. 152 CD).<br>
+            Promesses de résultats fiscaux ou d'économies chiffrées.<br>
+            Données confidentielles de clients (Ordonnance 1945, art. 21 + art. 147 CD).<br>
+            Tarifs agressifs ou remises promotionnelles.<br>
+            Contenu généré par IA non relu par l'expert-comptable.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cadre juridique email -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon info">&#x1f4e8;</div>
+        <div>
+          <h3>Cadre juridique de l'envoi par email</h3>
+          <div class="subtitle">RGPD + CNIL + L. 34-5 CPCE — Distinguer clients existants et prospects</div>
+        </div>
+      </div>
+      <table class="guide-table">
+        <thead>
+          <tr><th>Source</th><th>Obligation</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>Art. 152, al. 1 et 3 — CD OEC</strong><br><span style="font-size:11px;color:var(--gray-500)">Éd. janvier 2026</span></td><td>La communication professionnelle procure une information utile, avec discrétion et dignité. Aucune inexactitude ni élément comparatif.</td></tr>
+          <tr><td><strong>Art. 152, al. 2 — CD OEC</strong><br><span style="font-size:11px;color:var(--gray-500)">Éd. janvier 2026</span></td><td>Le démarchage est mis en œuvre avec discrétion, sans porter atteinte à la dignité, au secret professionnel ni à la loyauté envers les clients et les confrères.</td></tr>
+          <tr><td><strong>RGPD art. 6-7</strong><br><span style="font-size:11px;color:var(--gray-500)">UE 2016/679</span></td><td>Base légale du traitement : intérêt légitime (clients existants) ou consentement explicite (prospects). Preuve du consentement conservée.</td></tr>
+          <tr><td><strong>RGPD art. 21</strong><br><span style="font-size:11px;color:var(--gray-500)">Droit d'opposition</span></td><td>Lien de désinscription obligatoire et fonctionnel dans chaque envoi. Délai de prise en compte : immédiat.</td></tr>
+          <tr><td><strong>CNIL — Prospection B2B</strong></td><td>Prospection B2B par email autorisée sans consentement préalable si l'objet est en rapport avec l'activité professionnelle du destinataire et si les coordonnées ont été obtenues directement. Désinscription obligatoire.</td></tr>
+          <tr><td><strong>L. 34-5 CPCE</strong></td><td>Interdiction de la prospection par email sans consentement préalable pour les personnes physiques (B2C). Exception B2B si lien professionnel préexistant.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Checklist conformité -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon success">&#x2705;</div>
+        <div>
+          <h3>Checklist de conformité (8 points)</h3>
+          <div class="subtitle">À valider avant chaque envoi — Score affiché en temps réel</div>
+        </div>
+        <div class="card-actions">
+          <span id="checkScore" style="font-weight:700;font-size:14px;color:var(--gray-500);">0 / 8</span>
+        </div>
+      </div>
+      <div id="checklistContainer"></div>
+    </div>
+
+    <!-- Benchmark & Grille de suivi -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon secondary">&#x1f4c8;</div>
+        <div>
+          <h3>Benchmark sectoriel et grille de suivi</h3>
+          <div class="subtitle">Référentiels de performance email B2B — À utiliser comme cibles après les premiers envois réels</div>
+        </div>
+      </div>
+
+      <div class="insight-box info" style="margin-top:0;">
+        <strong>Méthodologie de pilotage</strong><br>
+        Les indicateurs ci-dessous sont issus de benchmarks sectoriels B2B publiés. Ils servent de cibles de référence pour piloter la performance de la newsletter une fois le cabinet opérationnel. La mesure effective ne peut intervenir qu'après un minimum de trois envois consécutifs (soit M+3 après le lancement), via les analytics de la plateforme d'envoi retenue (Brevo, Mailjet, etc.). L'outil ne pré-remplit aucune valeur fictive : les résultats doivent refléter la réalité.
+      </div>
+
+      <table class="guide-table" style="margin-top:16px;">
+        <thead>
+          <tr><th>Indicateur</th><th>Moyenne B2B</th><th>Cabinet performant</th><th>Source</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Taux d'ouverture</td><td>25-30 %</td><td>&gt; 40 %</td><td>Brevo, <em>Email Benchmark B2B</em>, 2025</td></tr>
+          <tr><td>Taux de clic</td><td>3-5 %</td><td>&gt; 8 %</td><td>Mailchimp, <em>Industry Benchmarks</em>, 2024</td></tr>
+          <tr><td>Taux de désinscription</td><td>0,3-0,5 %</td><td>&lt; 0,2 %</td><td>Brevo, <em>Email Benchmark B2B</em>, 2025</td></tr>
+          <tr><td>Taux de délivrabilité</td><td>&gt; 95 %</td><td>&gt; 98 %</td><td>Mailjet, <em>Deliverability Report</em>, 2024</td></tr>
+          <tr><td>NPS newsletter</td><td>30-40</td><td>&gt; 50</td><td>Plezi, <em>Baromètre Content Marketing B2B</em>, 2025</td></tr>
+        </tbody>
+      </table>
+
+      <div style="margin-top:20px;">
+        <h4 style="color:var(--primary);font-size:14px;font-weight:700;margin-bottom:12px;">Grille de suivi post-déploiement (à compléter après chaque envoi)</h4>
+        <div style="overflow-x:auto;">
+          <table class="guide-table">
+            <thead>
+              <tr>
+                <th>Mois d'envoi</th>
+                <th>Ouverture (%)</th>
+                <th>Clic (%)</th>
+                <th>Désinscription (%)</th>
+                <th>Délivrabilité (%)</th>
+                <th>Missions générées</th>
+                <th>Commentaire</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td style="color:var(--gray-400);font-style:italic;">M+3</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td style="color:var(--gray-400);font-style:italic;">Premier envoi prévu après acquisition de 3 clients actifs</td></tr>
+              <tr><td style="color:var(--gray-400);font-style:italic;">M+4</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+              <tr><td style="color:var(--gray-400);font-style:italic;">M+5</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+              <tr><td style="color:var(--gray-400);font-style:italic;">M+6</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td style="color:var(--gray-400);font-style:italic;">Premier bilan trimestriel</td></tr>
+              <tr><td style="color:var(--gray-400);font-style:italic;">…</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="form-hint" style="margin-top:8px;">Cette grille est un modèle de suivi. Les données sont à compléter manuellement à partir des statistiques de la plateforme d'envoi (Brevo, Mailjet, etc.) après chaque campagne effective.</p>
+      </div>
+    </div>
+
+    <!-- RGPD -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">&#x1f512;</div>
+        <div>
+          <h3>Protection des données personnelles (RGPD)</h3>
+          <div class="subtitle">Fonctionnement local et précautions d'usage</div>
+        </div>
+      </div>
+      <p style="line-height:1.8;font-size:14px;color:var(--gray-700);">
+        L'outil fonctionne intégralement en local (navigateur) : aucune donnée n'est transmise à un serveur externe. Les informations saisies sont stockées via <code>localStorage</code> sur le poste de l'utilisateur uniquement.
+      </p>
+      <p style="margin-top:10px;line-height:1.8;font-size:14px;color:var(--gray-700);">
+        Toutefois, le contenu généré par l'IA (ChatGPT, Claude, etc.) transite par les serveurs du fournisseur choisi. L'expert-comptable doit donc :
+      </p>
+      <div class="insight-box info" style="margin-top:12px;">
+        <strong>Ne jamais saisir de données personnelles clients</strong> dans le prompt (Ordonnance 1945, art. 21 + art. 147 CD + art. 5-6 RGPD).<br>
+        <strong>Vérifier la politique de confidentialité</strong> du fournisseur d'IA (conservation, réutilisation pour entraînement).<br>
+        <strong>Privilégier les options « sans historique »</strong> proposées par certains fournisseurs (ex : mode API, désactivation de l'entraînement).
+      </div>
+      <div class="source-note">
+        Références : Règlement (UE) 2016/679 (RGPD), art. 5 et 6 — CNIL, recommandations sur l'utilisation de l'IA générative en entreprise — Ordonnance n° 45-2138 du 19 sept. 1945, art. 21 (secret professionnel) et art. 147 CD (discrétion) — Art. 4 du règlement (UE) 2024/1689 (AI Act) — obligation de maîtrise de l'IA (AI literacy), applicable depuis le 2 février 2025.
+      </div>
+    </div>
+
+    <!-- Références -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">&#x1f4da;</div>
+        <div>
+          <h3>Références</h3>
+          <div class="subtitle">Sources utilisées pour la conception de l'outil</div>
+        </div>
+      </div>
+      <table class="guide-table">
+        <thead>
+          <tr><th>Domaine</th><th>Source</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>Code de déontologie OEC</strong></td><td>Décret n°2012-432 modifié — Art. 147 (discrétion), 152 (communication). Éd. janvier 2026.</td></tr>
+          <tr><td><strong>Ordonnance du 19 sept. 1945</strong></td><td>Ordonnance n° 45-2138 — Art. 21 (secret professionnel).</td></tr>
+          <tr><td><strong>RGPD</strong></td><td>Règlement (UE) 2016/679 — Art. 6-7 (base légale), 13-14 (information), 21 (opposition), 44-49 (transferts)</td></tr>
+          <tr><td><strong>CNIL</strong></td><td>Recommandations prospection électronique B2B (2023). Recommandations IA générative en entreprise.</td></tr>
+          <tr><td><strong>L. 34-5 CPCE</strong></td><td>Code des postes et communications électroniques — Prospection par voie électronique</td></tr>
+          <tr><td><strong>AI Act</strong></td><td>Règlement (UE) 2024/1689 — Art. 4, AI literacy, applicable 02/02/2025</td></tr>
+          <tr><td><strong>DGFiP</strong></td><td>Calendrier fiscal 2026, facturation électronique (art. 91 LF 2024)</td></tr>
+          <tr><td><strong>Benchmarks email</strong></td><td>Brevo Benchmark B2B 2025 — Mailchimp Industry Benchmarks — Mailjet Deliverability Report — Plezi Baromètre 2025</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+// =====================================================
+// DATA STORE
+// =====================================================
+const STORAGE_KEY = 'annexe17_newsletter_v3';
+
+let appData = {
+  history: [],
+  checklist: {},
+  settings: {}
+};
+
+// =====================================================
+// CALENDAR DATA — Échéances DGFiP / URSSAF 2026
+// =====================================================
+const CALENDAR = [
+  { month: 'Janvier', key: 'janvier', theme: 'Bilan de fin d\'année, bonnes résolutions fiscales', deadlines: 'TVA CA3, DSN décembre, cotisations URSSAF T4', cta: 'Prendre RDV bilan', priority: 0 },
+  { month: 'Février', key: 'fevrier', theme: 'Préparation déclarations, IFU', deadlines: 'IFU (15/02), taxe sur salaires (15/02)', cta: 'Télécharger guide IFU', priority: 0 },
+  { month: 'Mars', key: 'mars', theme: '1er acompte IS, optimisation fiscale', deadlines: 'Acompte IS (15/03), DSN, TVA', cta: 'RDV stratégie fiscale', priority: 0 },
+  { month: 'Avril', key: 'avril', theme: 'Préparation liasses fiscales, clôture', deadlines: 'Préparation clôture 31/12', cta: 'Vérifier votre dossier', priority: 0 },
+  { month: 'Mai', key: 'mai', theme: 'Liasses fiscales, solde IS', deadlines: 'Liasse (05/05), TDFC (19/05), Solde IS (15/05)', cta: 'RDV restitution bilan', priority: 0 },
+  { month: 'Juin', key: 'juin', theme: 'AGO approbation des comptes, 2e acompte IS', deadlines: 'AGO (30/06), 2e acompte IS (15/06)', cta: 'Préparer votre AG', priority: 0 },
+  { month: 'Juillet', key: 'juillet', theme: 'Acompte TVA, préparation été', deadlines: 'Acompte TVA 55 % (15/07), DSN', cta: 'Anticiper la rentrée', priority: 0 },
+  { month: 'Août', key: 'aout', theme: 'Préparation facturation électronique', deadlines: 'Dernière ligne droite FE — Choix PA', cta: 'Webinar FE gratuit', priority: 1 },
+  { month: 'Septembre', key: 'septembre', theme: 'FACTURATION ÉLECTRONIQUE — Obligation de réception', deadlines: 'Obligation réception FE (01/09), 3e acompte IS (15/09)', cta: 'Diagnostic FE gratuit', priority: 2 },
+  { month: 'Octobre', key: 'octobre', theme: 'Retour FE, ajustements, suivi PA', deadlines: 'TVA, DSN, bilan FE M+1', cta: 'RDV ajustement FE', priority: 1 },
+  { month: 'Novembre', key: 'novembre', theme: 'Anticipation clôture, prévisionnel N+1', deadlines: 'Préparation bilan, prévisionnel', cta: 'RDV prévisionnel', priority: 0 },
+  { month: 'Décembre', key: 'decembre', theme: 'CFE, 4e acompte IS, vœux, bilan de l\'année', deadlines: 'CFE (15/12), 4e acompte IS, acompte TVA', cta: 'Vœux + rétrospective', priority: 0 }
+];
+
+const TOPICS = [
+  { id: 'fiscal', label: 'Actualité fiscale' },
+  { id: 'echeances', label: 'Échéances du mois' },
+  { id: 'fe', label: 'Facturation électronique 2026' },
+  { id: 'social', label: 'Actualité sociale / RH' },
+  { id: 'tresorerie', label: 'Gestion de trésorerie' },
+  { id: 'outils', label: 'Outils numériques' },
+  { id: 'juridique', label: 'Actualité juridique' },
+  { id: 'cabinet', label: 'Actualités du cabinet' },
+  { id: 'conseil', label: 'Conseils au dirigeant' },
+  { id: 'temoignage', label: 'Témoignage client (anonymisé)' }
+];
+
+const CHECKLIST = [
+  { id: 'ck1', text: 'Lien de désinscription fonctionnel dans chaque envoi', ref: 'RGPD art. 21 + L. 34-5 CPCE' },
+  { id: 'ck2', text: 'Base légale identifiée : intérêt légitime (clients) ou consentement (prospects)', ref: 'RGPD art. 6-7' },
+  { id: 'ck3', text: 'Mentions obligatoires : identité expéditeur, coordonnées cabinet, objet explicite', ref: 'RGPD art. 13-14' },
+  { id: 'ck4', text: 'Contenu conforme à la dignité de la profession (pas de tarifs agressifs, pas de comparaison)', ref: 'Art. 152 CD (éd. janv. 2026)' },
+  { id: 'ck5', text: 'Relecture humaine obligatoire de tout contenu généré par IA avant envoi', ref: 'Responsabilité professionnelle EC' },
+  { id: 'ck6', text: 'Aucune donnée client confidentielle dans le contenu (anonymisation des témoignages)', ref: 'Ordonnance 1945, art. 21 + Art. 147 CD (secret et discrétion)' },
+  { id: 'ck7', text: 'Registre des consentements et des désinscriptions tenu à jour', ref: 'RGPD art. 7(1) + CNIL recommandations' },
+  { id: 'ck8', text: 'Hébergement de la plateforme d\'envoi conforme RGPD (UE ou SCC valides)', ref: 'RGPD art. 44-49' }
+];
+
+// =====================================================
+// INITIALIZATION
+// =====================================================
+document.addEventListener('DOMContentLoaded', function() {
+  loadData();
+  renderTopics();
+  renderCalendar();
+  renderHistory();
+  renderChecklist();
+});
+
+// =====================================================
+// PANEL NAVIGATION
+// =====================================================
+function showPanel(panelId) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById(panelId).classList.add('active');
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+}
+
+// =====================================================
+// TOPICS RENDERING
+// =====================================================
+function renderTopics() {
+  const grid = document.getElementById('topicsGrid');
+  grid.innerHTML = '';
+  TOPICS.forEach(t => {
+    grid.innerHTML += `<label class="topic-label"><input type="checkbox" name="topic" value="${t.id}"><span>${t.label}</span></label>`;
+  });
+}
+
+// =====================================================
+// CALENDAR RENDERING
+// =====================================================
+function renderCalendar() {
+  const tbody = document.getElementById('calendarBody');
+  tbody.innerHTML = '';
+  CALENDAR.forEach(c => {
+    const rowClass = c.priority === 2 ? ' class="row-critical"' : c.priority === 1 ? ' class="row-important"' : '';
+    const badge = c.priority === 2
+      ? '<span class="status-badge status-danger">CRITIQUE</span>'
+      : c.priority === 1
+        ? '<span class="status-badge status-warn">Important</span>'
+        : '<span class="status-badge status-ok">Standard</span>';
+    tbody.innerHTML += `<tr${rowClass} style="cursor:pointer" onclick="loadMonthFromCalendar('${c.key}')">
+      <td><strong>${c.month}</strong></td>
+      <td>${c.theme}</td>
+      <td style="font-size:12px">${c.deadlines}</td>
+      <td style="font-size:12px">${c.cta}</td>
+      <td>${badge}</td>
+    </tr>`;
+  });
+}
+
+function loadMonthFromCalendar(monthKey) {
+  document.getElementById('nlMonth').value = monthKey;
+  loadFromCalendar();
+  showPanel('generator');
+  document.querySelectorAll('.tab').forEach(t => {
+    t.classList.remove('active');
+    if (t.textContent.includes('Générateur')) t.classList.add('active');
+  });
+  toast('Mois chargé — Complétez les paramètres et générez le prompt');
+}
+
+// =====================================================
+// PROMPT GENERATOR
+// =====================================================
+function generatePrompt() {
+  const cab = document.getElementById('cabinetName').value || 'Cabinet X';
+  const position = document.getElementById('cabinetPosition').value || 'Expert-comptable 100% digital';
+  const sender = document.getElementById('senderName').value || 'L\'expert-comptable';
+  const month = document.getElementById('nlMonth').value;
+  const target = document.getElementById('nlTarget').value;
+  const tone = document.getElementById('nlTone').value;
+  const length = document.getElementById('nlLength').value;
+  const cta = document.getElementById('nlCTA').value;
+  const platform = document.getElementById('nlPlatform').value;
+  const specific = document.getElementById('nlSpecific').value;
+
+  const selectedTopics = [];
+  document.querySelectorAll('input[name="topic"]:checked').forEach(c => selectedTopics.push(c.value));
+  if (selectedTopics.length === 0) { toast('Sélectionnez au moins une thématique'); return; }
+
+  const TARGET_MAP = { tpe: 'TPE et indépendants', startup: 'Startups et scale-ups', pme: 'PME structurées', liberal: 'Professions libérales', mixte: 'Portefeuille mixte (TPE, startups, indépendants)' };
+  const TONE_MAP = { accessible: 'accessible et pédagogique, vulgarisant les concepts techniques sans condescendance', professionnel: 'professionnel et institutionnel, sobre et factuel', dynamique: 'dynamique et engageant, avec un style direct et moderne' };
+  const LENGTH_MAP = { court: '300 à 400 mots', moyen: '500 à 700 mots', long: '800 à 1 000 mots' };
+  const CTA_MAP = { rdv: 'incitant à prendre rendez-vous (ex : lien Calendly)', contact: 'encourageant à contacter le cabinet par email ou téléphone', webinar: 'invitant à s\'inscrire à un événement ou webinar du cabinet', guide: 'proposant de télécharger un guide pratique ou une checklist', aucun: '' };
+    const PLATFORM_MAP = { brevo: 'Brevo (RGPD FR — hébergement UE)', mailjet: 'Mailjet (RGPD FR — hébergement UE)', mailchimp: 'Mailchimp (US — Clauses Contractuelles Types SCC à vérifier)', autre: 'Autre plateforme (vérifier conformité RGPD art. 44-49)' };
+  const TOPIC_MAP = { fiscal: 'Actualité fiscale du mois', echeances: 'Échéances fiscales et sociales (dates précises)', fe: 'Facturation électronique (réforme sept. 2026)', social: 'Actualité sociale et RH', tresorerie: 'Conseils en gestion de trésorerie', outils: 'Outils numériques pour le dirigeant', juridique: 'Actualité juridique des entreprises', cabinet: 'Actualités et nouveautés du cabinet', conseil: 'Conseils stratégiques au dirigeant', temoignage: 'Témoignage client anonymisé (problème → solution → résultat)' };
+
+  const calMonth = CALENDAR.find(c => c.key === month);
+  const deadlines = calMonth ? calMonth.deadlines : 'Vérifier le calendrier fiscal';
+  const monthLabel = calMonth ? calMonth.month : month;
+
+  let p = `Tu es un expert en communication pour cabinets d'expertise comptable en France. `;
+  p += `Rédige une newsletter mensuelle professionnelle pour le cabinet "${cab}".\n\n`;
+
+  p += `CONTEXTE DU CABINET\n`;
+  p += `- Cabinet : ${cab}\n`;
+  p += `- Positionnement : ${position}\n`;
+  p += `- Expéditeur : ${sender}\n`;
+  p += `- Mois concerné : ${monthLabel} 2026\n`;
+  p += `- Cible : ${TARGET_MAP[target]}\n`;
+  p += `- Ton : ${TONE_MAP[tone]}\n`;
+  p += `- Longueur : ${LENGTH_MAP[length]}\n`;
+  p += `- Échéances du mois : ${deadlines}\n`;
+  p += `- Plateforme d'envoi : ${PLATFORM_MAP[platform]}\n\n`;
+
+  p += `THÉMATIQUES À TRAITER\n`;
+  selectedTopics.forEach(t => { p += `- ${TOPIC_MAP[t]}\n`; });
+
+  if (specific.trim()) {
+    p += `\nCONTENU SPÉCIFIQUE À INTÉGRER\n${specific}\n`;
+  }
+
+  // Contexte facturation électronique si mois concerné
+  if (['aout', 'septembre', 'octobre'].includes(month)) {
+    p += `\nCONTEXTE RÉGLEMENTAIRE — FACTURATION ÉLECTRONIQUE 2026\n`;
+    p += `- Réception obligatoire pour TOUTES les entreprises assujetties à la TVA au 1er septembre 2026\n`;
+    p += `- Émission obligatoire : 1er septembre 2026 (GE et ETI), 1er septembre 2027 (PME, TPE, micro)\n`;
+    p += `- Plateformes : Chorus Pro (secteur public) ou PA — Plateformes Agréées (ex-PDP) enregistrées par la DGFiP\n`;
+    p += `- Formats obligatoires : Factur-X, UBL ou CII\n`;
+    p += `- E-reporting : transmission des données de transaction à l'administration fiscale\n`;
+    p += `- ATTENTION : ne plus utiliser le terme "PDP" — utiliser "PA (Plateforme Agréée)"\n\n`;
+  }
+
+  p += `\nSTRUCTURE ATTENDUE DE LA NEWSLETTER\n`;
+  p += `1. Objet de l'email : accrocheur, clair, < 60 caractères (proposer 3 variantes)\n`;
+  p += `2. Pré-header : complément de l'objet, < 90 caractères (proposer 2 variantes)\n`;
+  p += `3. Édito (2-3 phrases d'accroche personnalisée signée par l'expert-comptable)\n`;
+  p += `4. Sommaire rapide (liste des sujets traités)\n`;
+  p += `5. Focus principal (développement du sujet majeur du mois)\n`;
+  p += `6. Échéances clés du mois (dates précises, montants si pertinent)\n`;
+  p += `7. "Le saviez-vous ?" (information utile et méconnue en lien avec le thème)\n`;
+  if (cta !== 'aucun') p += `8. Call-to-action (${CTA_MAP[cta]})\n`;
+  p += `9. Pied de page : coordonnées cabinet, lien de désinscription, mentions RGPD\n\n`;
+
+  p += `RÈGLES DÉONTOLOGIQUES OBLIGATOIRES\n`;
+  p += `- Ne JAMAIS donner de conseil fiscal ou juridique personnalisé ("vous devez..."). Utiliser "en général", "il est recommandé de consulter votre expert-comptable"\n`;
+  p += `- Ne JAMAIS comparer le cabinet avec des confrères (art. 152 CD)\n`;
+  p += `- Ne JAMAIS promettre de résultats fiscaux spécifiques ou d'économies chiffrées\n`;
+  p += `- Ne JAMAIS inclure de données confidentielles de clients (art. 21 Ordonnance 1945 + art. 147 CD)\n`;
+  p += `- Toujours mentionner que les informations sont à caractère général et ne se substituent pas à un conseil personnalisé\n`;
+  p += `- Inclure obligatoirement : identité expéditeur, coordonnées du cabinet, lien de désinscription\n`;
+  p += `- L'AI Act (art. 4) impose une obligation de maîtrise de l'IA : le contenu doit être relu et validé par un professionnel\n\n`;
+
+  p += `CONSIGNES DE RÉDACTION\n`;
+  p += `- Langage clair et accessible, éviter le jargon excessif\n`;
+  p += `- Intégrer des données chiffrées et des dates précises (vérifiées)\n`;
+  p += `- Structurer avec des titres courts et lisibles\n`;
+  p += `- Personnaliser en mentionnant le nom du cabinet\n`;
+  p += `- Inclure des conseils pratiques et actionnables\n`;
+  p += `- Terminer sur une note positive et engageante\n`;
+  p += `- Penser "scannable" : le lecteur survole avant de lire — aérer, boldir, structurer\n\n`;
+
+  p += `SECTION RELECTURE INTERNE (ne pas publier)\n`;
+  p += `Après rédaction, fournir une auto-évaluation sur 8 critères :\n`;
+  p += `1. Exactitude des faits (dates, seuils, montants vérifiés ?)\n`;
+  p += `2. Absence d'invention (aucun chiffre, date ou seuil non sourcé ?)\n`;
+  p += `3. Respect du secret professionnel et anonymisation\n`;
+  p += `4. Clarté et accessibilité pour un non-spécialiste\n`;
+  p += `5. Cohérence ton / CTA / cible\n`;
+  p += `6. Lisibilité et aération (titres, paragraphes courts)\n`;
+  p += `7. Conformité déontologique (Ordonnance 1945 art. 21, art. 147 et 152 CD)\n`;
+  p += `8. Orthographe et grammaire\n\n`;
+
+  p += `Rédige maintenant la newsletter complète :`;
+
+  document.getElementById('promptOutput').textContent = p;
+  appData.lastPrompt = p;
+  appData.lastMeta = { month: monthLabel, target: TARGET_MAP[target], topics: selectedTopics.map(t => TOPIC_MAP[t]) };
+  saveData();
+  toast('Prompt généré (' + p.split(' ').length + ' mots)');
+}
+
+// =====================================================
+// PREVIEW
+// =====================================================
+function updatePreview() {
+  const content = document.getElementById('pasteResult').value;
+  const cab = document.getElementById('cabinetName').value || 'Cabinet X';
+  const position = document.getElementById('cabinetPosition').value || 'Expert-comptable 100% digital';
+  const sender = document.getElementById('senderName').value || 'Expert-Comptable';
+  const email = document.getElementById('senderEmail').value || 'newsletter@cabinet.fr';
+  const month = document.getElementById('nlMonth').value;
+  const calMonth = CALENDAR.find(c => c.key === month);
+  const monthLabel = calMonth ? calMonth.month : month;
+
+  document.getElementById('prevSender').textContent = sender;
+  document.getElementById('prevEmail').textContent = email;
+  document.getElementById('prevSubject').textContent = `Newsletter ${monthLabel} 2026 — ${cab}`;
+  document.getElementById('prevCabinetName').textContent = cab;
+  document.getElementById('prevTagline').textContent = position;
+  document.getElementById('prevCabFooter').textContent = cab;
+
+  // Update CTA text
+  const ctaVal = document.getElementById('nlCTA').value;
+  const CTA_PREVIEW = { rdv: 'Prendre rendez-vous', contact: 'Nous contacter', webinar: 'S\'inscrire au webinar', guide: 'Télécharger le guide', aucun: '' };
+  const ctaBlock = document.getElementById('prevCTABlock');
+  const ctaText = document.getElementById('prevCTAText');
+  if (ctaVal === 'aucun') {
+    ctaBlock.style.display = 'none';
+  } else {
+    ctaBlock.style.display = 'block';
+    ctaText.textContent = CTA_PREVIEW[ctaVal] || 'Prendre rendez-vous';
+  }
+
+  const contentEl = document.getElementById('prevContent');
+  if (content.trim()) {
+    contentEl.innerHTML = markdownToEmailHTML(content);
+  } else {
+    contentEl.innerHTML = '<p style="color:#999;font-style:italic;">Le contenu de votre newsletter apparaîtra ici une fois collé dans le champ ci-dessus…</p>';
+  }
+}
+
+/**
+ * Convertit du texte brut / markdown simplifié en HTML propre pour la prévisualisation email.
+ */
+function markdownToEmailHTML(text) {
+  var lines = text.split('\n');
+  var html = '';
+  var inUl = false;
+  var inOl = false;
+  var inBlockquote = false;
+  var buffer = [];
+
+  function flushBuffer() {
+    if (buffer.length > 0) {
+      var para = buffer.join(' ').trim();
+      if (para) html += '<p>' + inlineFormat(para) + '</p>';
+      buffer = [];
+    }
+  }
+
+  function closeLists() {
+    if (inUl) { html += '</ul>'; inUl = false; }
+    if (inOl) { html += '</ol>'; inOl = false; }
+  }
+
+  function closeBlockquote() {
+    if (inBlockquote) { html += '</blockquote>'; inBlockquote = false; }
+  }
+
+  function inlineFormat(str) {
+    // Échapper le HTML
+    str = str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    // Liens [text](url)
+    str = str.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" style="color:#2563eb;text-decoration:none;">$1</a>');
+    // Gras : **text**
+    str = str.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    str = str.replace(/__(.+?)__/g, '<strong>$1</strong>');
+    // Italique simple : *text* (on évite les lookbehind pour la compatibilité navigateur)
+    str = str.replace(/(?:^|\s)\*([^*]+)\*(?:\s|$|[.,;:!?)])/g, function(match, p1) {
+      return match.replace('*' + p1 + '*', '<em>' + p1 + '</em>');
+    });
+    return str;
+  }
+
+  for (var i = 0; i < lines.length; i++) {
+    var raw = lines[i];
+    var trimmed = raw.trim();
+
+    // Ligne vide
+    if (trimmed === '') {
+      flushBuffer();
+      closeLists();
+      closeBlockquote();
+      continue;
+    }
+
+    // Séparateur ---
+    if (/^[-_*]{3,}$/.test(trimmed)) {
+      flushBuffer(); closeLists(); closeBlockquote();
+      html += '<div class="nl-section-divider">\u2022 \u2022 \u2022</div>';
+      continue;
+    }
+
+    // Titres # ## ### ####
+    var headingMatch = trimmed.match(/^(#{1,4})\s+(.+)$/);
+    if (headingMatch) {
+      flushBuffer(); closeLists(); closeBlockquote();
+      var level = Math.min(headingMatch[1].length + 1, 4);
+      html += '<h' + level + '>' + inlineFormat(headingMatch[2]) + '</h' + level + '>';
+      continue;
+    }
+
+    // Ligne entièrement MAJUSCULES (titre implicite si ≥ 5 car, aucun minuscule a-z)
+    if (trimmed.length >= 5 && trimmed === trimmed.toUpperCase() && /[A-Z]/.test(trimmed) && !/[a-z]/.test(trimmed)) {
+      flushBuffer(); closeLists(); closeBlockquote();
+      var titleCase = trimmed.charAt(0).toUpperCase() + trimmed.slice(1).toLowerCase();
+      html += '<h3>' + inlineFormat(titleCase) + '</h3>';
+      continue;
+    }
+
+    // Numéros de section type "3. Édito" ou "6. Échéances clés"
+    var sectionMatch = trimmed.match(/^(\d+)\.\s+([A-ZÀ-Ü].{2,})$/);
+    if (sectionMatch && !inOl) {
+      flushBuffer(); closeLists(); closeBlockquote();
+      html += '<h3>' + inlineFormat(sectionMatch[1] + '. ' + sectionMatch[2]) + '</h3>';
+      continue;
+    }
+
+    // Citations >
+    if (raw.charAt(0) === '>' || (raw.length > 1 && raw.charAt(0) === '>' )) {
+      flushBuffer(); closeLists();
+      var quoteText = trimmed.replace(/^>\s*/, '');
+      if (!inBlockquote) { html += '<blockquote>'; inBlockquote = true; }
+      html += inlineFormat(quoteText) + '<br>';
+      continue;
+    } else if (inBlockquote) {
+      closeBlockquote();
+    }
+
+    // Listes à puces : - texte ou • texte (pas ** pour ne pas confondre avec gras)
+    var ulMatch = trimmed.match(/^[-\u2022]\s+(.+)$/);
+    if (ulMatch) {
+      flushBuffer(); closeBlockquote();
+      if (inOl) { html += '</ol>'; inOl = false; }
+      if (!inUl) { html += '<ul>'; inUl = true; }
+      html += '<li>' + inlineFormat(ulMatch[1]) + '</li>';
+      continue;
+    }
+
+    // Listes numérotées dans un contexte de liste (ex: déjà dans une liste)
+    var olMatch = trimmed.match(/^(\d+)[.)]\s+(.+)$/);
+    if (olMatch && (inOl || parseInt(olMatch[1]) <= 2 || buffer.length === 0)) {
+      flushBuffer(); closeBlockquote();
+      if (inUl) { html += '</ul>'; inUl = false; }
+      if (!inOl) { html += '<ol>'; inOl = true; }
+      html += '<li>' + inlineFormat(olMatch[2]) + '</li>';
+      continue;
+    }
+
+    // Emojis en début de ligne (📅 🔔 ⚠️ 💡 etc.) → traiter comme item de liste visuel
+    if (/^[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/u.test(trimmed)) {
+      flushBuffer(); closeLists(); closeBlockquote();
+      html += '<p style="padding-left:4px;">' + inlineFormat(trimmed) + '</p>';
+      continue;
+    }
+
+    // Texte normal
+    closeLists();
+    buffer.push(trimmed);
+  }
+
+  flushBuffer();
+  closeLists();
+  closeBlockquote();
+
+  return html || '<p style="color:#999;font-style:italic;">Contenu vide</p>';
+}
+
+// =====================================================
+// TEMPLATES
+// =====================================================
+function loadTemplate(templateId) {
+  const templates = {
+    'editorial-mensuel': { month: 'septembre', target: 'mixte', tone: 'accessible', length: 'moyen', cta: 'rdv', topics: ['fiscal', 'echeances', 'cabinet'], specific: '' },
+    'alerte-reglementaire': { month: 'septembre', target: 'mixte', tone: 'professionnel', length: 'moyen', cta: 'rdv', topics: ['fe', 'echeances'], specific: 'Focus urgent : obligation de réception des factures électroniques au 1er septembre 2026. Le cabinet accompagne ses clients dans le choix de la PA et le paramétrage des outils.' },
+    'guide-echeances': { month: 'janvier', target: 'tpe', tone: 'accessible', length: 'court', cta: 'contact', topics: ['echeances', 'fiscal'], specific: 'Format checklist : toutes les dates du mois avec les actions à entreprendre.' },
+    'cas-client': { month: 'octobre', target: 'startup', tone: 'dynamique', length: 'moyen', cta: 'rdv', topics: ['temoignage', 'outils'], specific: 'Cas anonymisé : accompagnement d\'une startup SaaS dans sa migration vers la facturation électronique. Résultat : zéro retard, conformité J-30.' },
+    'bienvenue': { month: 'janvier', target: 'mixte', tone: 'dynamique', length: 'moyen', cta: 'contact', topics: ['cabinet', 'outils'], specific: 'Email d\'onboarding : présentation de l\'équipe, des outils collaboratifs (portail client, Pennylane), des horaires de disponibilité et du fonctionnement du cabinet.' },
+    'bilan-annuel': { month: 'decembre', target: 'mixte', tone: 'accessible', length: 'long', cta: 'rdv', topics: ['cabinet', 'fiscal', 'conseil'], specific: 'Rétrospective de l\'année : faits marquants, réformes intégrées, perspectives 2027. Vœux personnalisés.' },
+    'webinar-event': { month: 'aout', target: 'tpe', tone: 'dynamique', length: 'court', cta: 'webinar', topics: ['fe', 'outils'], specific: 'Webinar gratuit le 25 août : "Facturation électronique — Ce qui change au 1er septembre". Inscription via Calendly. Places limitées.' },
+    'conseil-dirigeant': { month: 'mars', target: 'pme', tone: 'professionnel', length: 'long', cta: 'rdv', topics: ['conseil', 'tresorerie', 'fiscal'], specific: 'Thème : optimisation de la rémunération du dirigeant — arbitrage dividendes vs salaire au regard de la flat tax et des cotisations sociales.' }
+  };
+
+  const tpl = templates[templateId];
+  if (!tpl) return;
+
+  document.getElementById('nlMonth').value = tpl.month;
+  document.getElementById('nlTarget').value = tpl.target;
+  document.getElementById('nlTone').value = tpl.tone;
+  document.getElementById('nlLength').value = tpl.length;
+  document.getElementById('nlCTA').value = tpl.cta;
+  document.getElementById('nlSpecific').value = tpl.specific;
+
+  document.querySelectorAll('input[name="topic"]').forEach(c => { c.checked = false; });
+  tpl.topics.forEach(t => {
+    const el = document.querySelector(`input[name="topic"][value="${t}"]`);
+    if (el) el.checked = true;
+  });
+
+  showPanel('generator');
+  document.querySelectorAll('.tab').forEach(t => {
+    t.classList.remove('active');
+    if (t.textContent.includes('Générateur')) t.classList.add('active');
+  });
+  toast('Modèle chargé — Ajustez les paramètres puis générez le prompt');
+}
+
+// =====================================================
+// LOAD FROM CALENDAR
+// =====================================================
+function loadFromCalendar() {
+  const month = document.getElementById('nlMonth').value;
+  const calMonth = CALENDAR.find(c => c.key === month);
+  if (!calMonth) { toast('Mois non trouvé dans le calendrier'); return; }
+
+  document.querySelectorAll('input[name="topic"]').forEach(c => { c.checked = false; });
+  document.querySelector('input[name="topic"][value="echeances"]').checked = true;
+
+  const theme = calMonth.theme.toLowerCase();
+  if (theme.includes('fiscal') || theme.includes('is') || theme.includes('ifu') || theme.includes('liasse')) {
+    const el = document.querySelector('input[name="topic"][value="fiscal"]');
+    if (el) el.checked = true;
+  }
+  if (calMonth.priority > 0) {
+    const el = document.querySelector('input[name="topic"][value="fe"]');
+    if (el) el.checked = true;
+  }
+  if (theme.includes('social') || theme.includes('paie') || theme.includes('droit')) {
+    const el = document.querySelector('input[name="topic"][value="social"]');
+    if (el) el.checked = true;
+  }
+
+  toast('Thématiques chargées depuis le calendrier (' + calMonth.month + ')');
+}
+
+// =====================================================
+// CHECKLIST
+// =====================================================
+function renderChecklist() {
+  const container = document.getElementById('checklistContainer');
+  container.innerHTML = '';
+  CHECKLIST.forEach(ck => {
+    const done = appData.checklist[ck.id] ? ' done' : '';
+    const check = appData.checklist[ck.id] ? '✓' : '';
+    container.innerHTML += `<div class="check-item${done}" onclick="toggleCheck('${ck.id}')">
+      <div class="check-box">${check}</div>
+      <div>
+        <div style="font-size:13px;font-weight:600">${ck.text}</div>
+        <div style="font-size:10px;color:var(--gray-500);font-style:italic;margin-top:2px">Réf. : ${ck.ref}</div>
+      </div>
+    </div>`;
+  });
+  updateCheckScore();
+}
+
+function toggleCheck(id) {
+  appData.checklist[id] = !appData.checklist[id];
+  saveData();
+  renderChecklist();
+}
+
+function updateCheckScore() {
+  let done = 0;
+  CHECKLIST.forEach(ck => { if (appData.checklist[ck.id]) done++; });
+  const el = document.getElementById('checkScore');
+  el.textContent = done + ' / 8';
+  el.style.color = done === 8 ? 'var(--success)' : done >= 5 ? 'var(--warning)' : 'var(--danger)';
+}
+
+// =====================================================
+// HISTORY
+// =====================================================
+function saveToHistory() {
+  const prompt = document.getElementById('promptOutput').textContent;
+  if (prompt.startsWith('Cliquez sur')) { toast('Générez d\'abord un prompt'); return; }
+
+  const meta = appData.lastMeta || {};
+  appData.history.unshift({
+    id: Date.now(),
+    createdAt: new Date().toISOString(),
+    month: meta.month || '—',
+    target: meta.target || '—',
+    topics: meta.topics || [],
+    prompt: prompt
+  });
+  saveData();
+  renderHistory();
+  toast('Prompt sauvegardé dans l\'historique');
+}
+
+function renderHistory() {
+  let html = '';
+  appData.history.forEach(entry => {
+    const topics = (entry.topics || []).join(', ');
+    html += `<tr>
+      <td>${formatDateTime(entry.createdAt)}</td>
+      <td>${entry.month}</td>
+      <td>${entry.target}</td>
+      <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${topics}</td>
+      <td>
+        <button class="btn btn-sm btn-outline" onclick="viewHistoryPrompt(${entry.id})">Voir</button>
+        <button class="btn btn-sm btn-outline" onclick="copyHistoryPrompt(${entry.id})">Copier</button>
+        <button class="btn btn-sm btn-outline" onclick="deleteHistory(${entry.id})">Suppr.</button>
+      </td>
+    </tr>`;
+  });
+  if (!html) html = '<tr><td colspan="5" style="text-align:center;color:var(--gray-500);font-style:italic;">Aucun historique</td></tr>';
+  document.getElementById('historyTableBody').innerHTML = html;
+}
+
+function viewHistoryPrompt(id) {
+  const entry = appData.history.find(h => h.id === id);
+  if (!entry) return;
+  document.getElementById('promptOutput').textContent = entry.prompt;
+  showPanel('generator');
+  document.querySelectorAll('.tab').forEach(t => {
+    t.classList.remove('active');
+    if (t.textContent.includes('Générateur')) t.classList.add('active');
+  });
+  toast('Prompt chargé depuis l\'historique');
+}
+
+function copyHistoryPrompt(id) {
+  const entry = appData.history.find(h => h.id === id);
+  if (!entry) return;
+  navigator.clipboard.writeText(entry.prompt).then(() => toast('Prompt copié'));
+}
+
+function deleteHistory(id) {
+  if (!confirm('Supprimer cet historique ?')) return;
+  appData.history = appData.history.filter(h => h.id !== id);
+  saveData();
+  renderHistory();
+  toast('Supprimé');
+}
+
+function clearHistory() {
+  if (!confirm('Vider tout l\'historique ?')) return;
+  appData.history = [];
+  saveData();
+  renderHistory();
+  toast('Historique vidé');
+}
+
+// =====================================================
+// CAS PRATIQUE CABINET X
+// =====================================================
+function loadCasPratique() {
+  document.getElementById('cabinetName').value = 'Cabinet X';
+  document.getElementById('cabinetPosition').value = 'Expert-comptable 100% digital — TPE, startups et indépendants';
+  document.getElementById('senderName').value = 'Monsieur X, Expert-Comptable';
+  document.getElementById('senderEmail').value = 'newsletter@cabinet-x.fr';
+  document.getElementById('nlMonth').value = 'septembre';
+  document.getElementById('nlTarget').value = 'mixte';
+  document.getElementById('nlTone').value = 'accessible';
+  document.getElementById('nlLength').value = 'moyen';
+  document.getElementById('nlCTA').value = 'rdv';
+  document.getElementById('nlPlatform').value = 'brevo';
+  document.getElementById('nlSpecific').value = 'Le cabinet accompagne ses clients dans la transition vers la facturation électronique depuis 6 mois. Webinar gratuit le 15 septembre. Nouveau collaborateur junior recruté en septembre.';
+
+  document.querySelectorAll('input[name="topic"]').forEach(c => { c.checked = false; });
+  ['fe', 'echeances', 'fiscal', 'cabinet'].forEach(id => {
+    const el = document.querySelector(`input[name="topic"][value="${id}"]`);
+    if (el) el.checked = true;
+  });
+
+  generatePrompt();
+
+  // Pré-remplir checklist
+  CHECKLIST.forEach(ck => { appData.checklist[ck.id] = true; });
+  renderChecklist();
+
+  saveData();
+  toast('Cas pratique Cabinet X chargé — Parcourez les onglets');
+}
+
+// =====================================================
+// COPY PROMPT
+// =====================================================
+function copyPrompt() {
+  const p = document.getElementById('promptOutput').textContent;
+  if (p.startsWith('Cliquez sur')) { toast('Générez d\'abord un prompt'); return; }
+  navigator.clipboard.writeText(p).then(() => toast('Prompt copié dans le presse-papiers')).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = p; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+    toast('Prompt copié');
+  });
+}
+
+// =====================================================
+// DATA PERSISTENCE
+// =====================================================
+function saveData() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(appData)); } catch(e) {}
+}
+
+function loadData() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) appData = JSON.parse(saved);
+  } catch(e) {}
+}
+
+function exportData() {
+  const blob = new Blob([JSON.stringify({
+    exportDate: new Date().toISOString(),
+    version: '3.0',
+    tool: 'Annexe 17 — Générateur newsletter client & calendrier éditorial',
+    ...appData
+  }, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `annexe17-newsletter-${new Date().toISOString().split('T')[0]}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('JSON exporté');
+}
+
+function importData() { document.getElementById('importFile').click(); }
+
+function handleImport(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const imported = JSON.parse(e.target.result);
+      if (imported.history) appData.history = imported.history;
+      if (imported.checklist) appData.checklist = imported.checklist;
+      saveData();
+      renderHistory();
+      renderChecklist();
+      toast('Données importées');
+    } catch(err) { toast('Erreur d\'import'); }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+function resetData() {
+  if (!confirm('Réinitialiser toutes les données ?')) return;
+  appData = { history: [], checklist: {}, settings: {} };
+  localStorage.removeItem(STORAGE_KEY);
+  renderHistory();
+  renderChecklist();
+  toast('Réinitialisé');
+}
+
+// =====================================================
+// UTILITIES
+// =====================================================
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+function formatDateTime(dateStr) {
+  try {
+    const d = new Date(dateStr);
+    return d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' })
+      + ' ' + d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+  } catch(e) { return dateStr; }
+}
+
+</script>
+</body>
+</html>

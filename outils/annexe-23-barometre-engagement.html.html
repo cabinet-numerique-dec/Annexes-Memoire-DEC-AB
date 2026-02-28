@@ -1,0 +1,1634 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Annexe 23 — Baromètre d'Engagement et Plan de Rétention</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+    :root {
+        --primary: #1e3a5f;
+        --primary-light: #2d5a8a;
+        --secondary: #0d9488;
+        --secondary-light: #14b8a6;
+        --accent: #f59e0b;
+        --danger: #dc2626;
+        --success: #059669;
+        --warning: #d97706;
+        --info: #2563eb;
+        --gray-50: #f9fafb;
+        --gray-100: #f3f4f6;
+        --gray-200: #e5e7eb;
+        --gray-300: #d1d5db;
+        --gray-400: #9ca3af;
+        --gray-500: #6b7280;
+        --gray-600: #4b5563;
+        --gray-700: #374151;
+        --gray-800: #1f2937;
+        --radius: 12px;
+        --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+        font-family: 'Segoe UI', system-ui, sans-serif;
+        background: linear-gradient(135deg, var(--gray-100) 0%, #e0e7ef 100%);
+        color: var(--gray-700);
+        line-height: 1.6;
+        min-height: 100vh;
+    }
+    .container { max-width: 1400px; margin: 0 auto; padding: 24px; }
+
+    /* ═══ HEADER ═══ */
+    .header {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+        color: white; border-radius: var(--radius); padding: 32px;
+        margin-bottom: 24px; position: relative; overflow: hidden;
+    }
+    .header::before {
+        content: ""; position: absolute; top: -50%; right: -10%;
+        width: 300px; height: 300px; background: rgba(255,255,255,0.05); border-radius: 50%;
+    }
+    .header h1 { font-size: 24px; font-weight: 700; margin-bottom: 8px; position: relative; }
+    .header p { opacity: 0.9; font-size: 14px; max-width: 900px; position: relative; }
+    .header-badges { display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap; position: relative; }
+    .badge {
+        display: inline-flex; align-items: center; gap: 6px;
+        background: rgba(255,255,255,0.15);
+        padding: 6px 14px; border-radius: 20px;
+        font-size: 12px; font-weight: 600;
+    }
+
+    /* ═══ TABS ═══ */
+    .tabs {
+        display: flex; gap: 4px; background: white; padding: 8px;
+        border-radius: var(--radius); box-shadow: var(--shadow);
+        margin-bottom: 24px; flex-wrap: wrap;
+    }
+    .tab {
+        flex: 1; padding: 10px 16px; border: none; background: transparent;
+        font-size: 13px; font-weight: 600; color: var(--gray-600);
+        border-radius: 8px; cursor: pointer; transition: all 0.2s;
+        text-align: center; font-family: inherit; white-space: nowrap;
+    }
+    .tab:hover { background: var(--gray-100); }
+    .tab.active { background: var(--primary); color: white; }
+    .panel { display: none; animation: fadeIn 0.3s ease; }
+    .panel.active { display: block; }
+    @keyframes fadeIn { from {opacity:0;transform:translateY(10px)} to {opacity:1;transform:translateY(0)} }
+
+    /* ═══ CARDS ═══ */
+    .card {
+        background: white; border-radius: var(--radius);
+        padding: 24px; box-shadow: var(--shadow); margin-bottom: 20px;
+    }
+    .card-header {
+        display: flex; align-items: center; gap: 12px;
+        margin-bottom: 16px; padding-bottom: 16px;
+        border-bottom: 1px solid var(--gray-200);
+    }
+    .card-icon {
+        width: 48px; height: 48px;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+        border-radius: 10px; display: flex; align-items: center; justify-content: center;
+        font-size: 22px; color: white; flex-shrink: 0;
+    }
+    .card-icon.secondary { background: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-light) 100%); }
+    .card-icon.accent { background: linear-gradient(135deg, var(--accent) 0%, #fbbf24 100%); }
+    .card-icon.danger { background: linear-gradient(135deg, var(--danger) 0%, #ef4444 100%); }
+    .card-icon.success { background: linear-gradient(135deg, var(--success) 0%, #34d399 100%); }
+    .card h3 { font-size: 18px; font-weight: 700; color: var(--gray-800); }
+    .card .subtitle { color: var(--gray-500); font-size: 13px; margin-top: 2px; }
+
+    /* ═══ INFO BOXES ═══ */
+    .info-box {
+        background: linear-gradient(135deg, #eff6ff, #dbeafe);
+        border-left: 4px solid var(--info);
+        border-radius: 0 8px 8px 0;
+        padding: 16px 20px; margin-bottom: 16px;
+    }
+    .info-box strong { color: var(--primary); font-size: 14px; display: block; margin-bottom: 4px; }
+    .info-box p, .info-box li { font-size: 13px; color: var(--gray-700); margin-bottom: 4px; }
+    .info-box.warn { background: linear-gradient(135deg, #fffbeb, #fef3c7); border-color: var(--accent); }
+    .info-box.warn strong { color: #92400e; }
+    .info-box.ok { background: linear-gradient(135deg, #f0fdf4, #dcfce7); border-color: var(--success); }
+    .info-box.ok strong { color: #065f46; }
+    .info-box.red { background: linear-gradient(135deg, #fef2f2, #fee2e2); border-color: var(--danger); }
+    .info-box.red strong { color: #991b1b; }
+
+    /* ═══ STAT CARDS ═══ */
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 20px; }
+    .stat-card {
+        background: white; border-radius: var(--radius); padding: 20px;
+        box-shadow: var(--shadow); text-align: center;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .stat-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+    .stat-value {
+        font-size: 32px; font-weight: 800;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .stat-card.success .stat-value { background: linear-gradient(135deg, var(--success) 0%, #34d399 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+    .stat-card.warning .stat-value { background: linear-gradient(135deg, var(--warning) 0%, var(--accent) 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+    .stat-card.danger .stat-value { background: linear-gradient(135deg, var(--danger) 0%, #f87171 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+    .stat-label { font-size: 13px; color: var(--gray-600); margin-top: 4px; font-weight: 500; }
+
+    /* ═══ METHODOLOGY STEPS ═══ */
+    .method-steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin: 16px 0; }
+    .method-step {
+        background: var(--gray-50); border: 1px solid var(--gray-200);
+        border-radius: 8px; padding: 16px; text-align: center; position: relative;
+    }
+    .method-step .step-num {
+        width: 32px; height: 32px; background: var(--primary); color: white;
+        border-radius: 50%; display: inline-flex; align-items: center; justify-content: center;
+        font-size: 14px; font-weight: 700; margin-bottom: 8px;
+    }
+    .method-step h4 { font-size: 14px; color: var(--gray-800); margin-bottom: 4px; }
+    .method-step p { font-size: 12px; color: var(--gray-500); }
+    .method-step .actor { font-size: 11px; font-weight: 600; color: var(--secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 6px; }
+
+    /* ═══ FORMS ═══ */
+    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-bottom: 14px; }
+    .form-group label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 13px; color: var(--gray-600); }
+    .form-help { font-size: 11px; color: var(--gray-400); margin-top: 3px; font-style: italic; }
+    input, select, textarea {
+        width: 100%; padding: 10px 14px; border: 2px solid var(--gray-200);
+        border-radius: 8px; font-size: 14px; transition: border-color 0.2s;
+        font-family: inherit; background: white;
+    }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); }
+    textarea { min-height: 70px; resize: vertical; }
+    .collab-sel { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+    .collab-sel label { font-weight: 600; font-size: 14px; color: var(--gray-700); white-space: nowrap; }
+    .collab-sel select { max-width: 400px; }
+
+    /* ═══ BUTTONS ═══ */
+    .btn {
+        display: inline-flex; align-items: center; gap: 8px;
+        padding: 12px 24px; border: none; border-radius: 8px;
+        font-size: 14px; font-weight: 600; cursor: pointer;
+        transition: all 0.2s; font-family: inherit; text-decoration: none;
+    }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: var(--primary-light); transform: translateY(-2px); box-shadow: var(--shadow); }
+    .btn-secondary { background: var(--gray-200); color: var(--gray-700); }
+    .btn-secondary:hover { background: var(--gray-300); }
+    .btn-success { background: var(--success); color: white; }
+    .btn-danger { background: var(--danger); color: white; }
+    .btn-accent { background: var(--accent); color: white; }
+    .btn-sm { padding: 8px 14px; font-size: 12px; }
+    .btn-group { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+
+    /* ═══ TABLES ═══ */
+    .tbl-wrap { overflow-x: auto; margin: 12px 0; border-radius: 8px; border: 1px solid var(--gray-200); }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th {
+        background: var(--primary); color: white;
+        padding: 12px 8px; text-align: center;
+        font-weight: 600; font-size: 13px; white-space: nowrap;
+    }
+    td { padding: 10px 8px; border-bottom: 1px solid var(--gray-100); vertical-align: middle; text-align: center; }
+    tr:hover { background: var(--gray-50); }
+    .tbl-in {
+        width: 100%; min-width: 50px; padding: 8px 6px;
+        border: 1px solid var(--gray-300); border-radius: 6px;
+        font-size: 13px; text-align: center; background: white; font-family: inherit;
+    }
+    .tbl-in:focus { outline: none; border-color: var(--primary); background: #fefce8; }
+
+    /* ═══ STATUS BADGES ═══ */
+    .status {
+        display: inline-flex; align-items: center; gap: 4px;
+        padding: 4px 12px; border-radius: 16px;
+        font-size: 12px; font-weight: 600; white-space: nowrap;
+    }
+    .status-faible { background: #d1fae5; color: var(--success); }
+    .status-modere { background: #fef3c7; color: #b45309; }
+    .status-eleve { background: #ffedd5; color: #c2410c; }
+    .status-critique { background: #fee2e2; color: var(--danger); }
+
+    /* ═══ SIGNAL GRID ═══ */
+    .signal-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 8px; }
+    .signal-row {
+        display: flex; align-items: center; padding: 10px 14px;
+        background: var(--gray-50); border-radius: 6px;
+        border-left: 3px solid transparent; cursor: pointer; transition: all 0.15s;
+    }
+    .signal-row:hover { background: #eff6ff; }
+    .signal-row.checked { background: #fef2f2; border-left-color: var(--danger); }
+    .signal-cb { width: 18px; height: 18px; margin-right: 10px; cursor: pointer; accent-color: var(--danger); }
+    .signal-lbl { flex: 1; font-size: 13px; color: var(--gray-700); }
+    .signal-pts { background: var(--primary); color: white; padding: 3px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+
+    /* ═══ SIGNAL OVERVIEW TABLE ═══ */
+    .sig-counter {
+        display: inline-flex; align-items: center; gap: 6px;
+        padding: 4px 12px; border-radius: 16px; font-size: 13px; font-weight: 700;
+    }
+    .sig-counter.alert { background: #fee2e2; color: var(--danger); }
+    .sig-counter.ok { background: #d1fae5; color: var(--success); }
+
+    /* ═══ ACTION CARDS ═══ */
+    .action-card {
+        background: white; border: 2px solid var(--gray-200); border-radius: 10px;
+        padding: 14px 18px; margin-bottom: 10px;
+        display: flex; align-items: center; gap: 14px;
+        transition: all 0.2s; cursor: pointer;
+    }
+    .action-card:hover { border-color: var(--primary); box-shadow: var(--shadow); }
+    .action-card.selected { border-color: var(--success); background: #f0fdf4; }
+    .action-prio {
+        width: 32px; height: 32px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        color: white; font-weight: 700; font-size: 13px; flex-shrink: 0;
+    }
+    .action-prio.urgent { background: var(--danger); }
+    .action-prio.important { background: var(--accent); }
+    .action-prio.normal { background: var(--primary); }
+    .action-content { flex: 1; }
+    .action-content h4 { font-size: 14px; color: var(--gray-800); margin-bottom: 2px; }
+    .action-content p { font-size: 12px; color: var(--gray-500); }
+    .action-meta { text-align: right; font-size: 14px; font-weight: 700; color: var(--primary); }
+    .action-budget { font-size: 11px; color: var(--gray-500); font-weight: 400; }
+
+    /* ═══ FINANCIAL BOX ═══ */
+    .financial-box {
+        background: linear-gradient(135deg, var(--gray-50), #e0e7ef);
+        border: 2px solid var(--primary);
+        border-radius: var(--radius); padding: 24px; margin-top: 20px;
+    }
+    .financial-box h4 { color: var(--primary); font-size: 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+    .financial-row {
+        display: flex; justify-content: space-between; align-items: center;
+        padding: 10px 0; border-bottom: 1px solid var(--gray-200); font-size: 14px;
+    }
+    .financial-row:last-child { border-bottom: none; }
+    .financial-row .label { color: var(--gray-600); }
+    .financial-row .value { font-weight: 700; color: var(--gray-800); font-size: 16px; }
+    .financial-row .formula { font-size: 11px; color: var(--gray-400); font-style: italic; }
+    .ratio-box {
+        background: var(--primary); color: white; padding: 20px;
+        border-radius: 10px; text-align: center; margin-top: 16px;
+    }
+    .ratio-value { font-size: 36px; font-weight: 800; }
+    .ratio-label { font-size: 14px; opacity: 0.85; margin-top: 4px; }
+    .ratio-detail { font-size: 12px; opacity: 0.7; margin-top: 8px; }
+    .source-note {
+        font-size: 11px; color: var(--gray-400); margin-top: 12px;
+        padding-top: 10px; border-top: 1px dashed var(--gray-300);
+        font-style: italic;
+    }
+
+    /* ═══ DECISION CARDS ═══ */
+    .decision-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 16px 0; }
+    .decision-card {
+        border: 2px solid var(--gray-200); border-radius: var(--radius);
+        padding: 20px; text-align: center; cursor: pointer; transition: all 0.2s;
+    }
+    .decision-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+    .decision-card.selected.go { border-color: var(--success); background: #f0fdf4; }
+    .decision-card.selected.cond { border-color: var(--warning); background: #fffbeb; }
+    .decision-card.selected.nogo { border-color: var(--danger); background: #fef2f2; }
+    .decision-card h4 { font-size: 16px; margin: 8px 0 4px; }
+    .decision-card p { font-size: 12px; color: var(--gray-500); }
+
+    /* ═══ CHARTS ═══ */
+    .chart-container { position: relative; height: 220px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+    /* ═══ MODAL ═══ */
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 999; align-items: center; justify-content: center; }
+    .modal-overlay.show { display: flex; }
+    .modal { background: white; border-radius: var(--radius); padding: 28px; max-width: 460px; width: 90%; box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
+    .modal h2 { font-size: 18px; margin-bottom: 16px; color: var(--gray-800); }
+
+    /* ═══ TOAST ═══ */
+    .toast { position: fixed; bottom: 24px; right: 24px; background: var(--gray-800); color: white; padding: 12px 20px; border-radius: 10px; font-size: 14px; font-weight: 600; z-index: 999; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+    .toast.show { opacity: 1; }
+
+    /* ═══ TOOLTIP ═══ */
+    .tip {
+        display: inline-flex; align-items: center; justify-content: center;
+        width: 18px; height: 18px; background: var(--primary); color: white;
+        border-radius: 50%; font-size: 11px; font-weight: 700; cursor: help; position: relative;
+    }
+    .tip:hover::after {
+        content: attr(data-t); position: absolute; bottom: calc(100% + 8px);
+        left: 50%; transform: translateX(-50%); background: var(--gray-800);
+        color: white; padding: 10px 14px; border-radius: 8px;
+        font-size: 12px; font-weight: 400; white-space: normal;
+        width: 280px; text-align: left; z-index: 1000;
+        box-shadow: var(--shadow-lg); line-height: 1.5;
+    }
+
+    /* ═══ COLLAPSIBLE ═══ */
+    .collapse-body { transition: all 0.3s ease; overflow: hidden; }
+    .collapse-body.collapsed { max-height: 0; padding: 0; opacity: 0; overflow: hidden; }
+
+    /* ═══ PROGRESS BAR ═══ */
+    .progress-bar { height: 8px; background: var(--gray-200); border-radius: 4px; overflow: hidden; margin-top: 6px; }
+    .progress-fill { height: 100%; border-radius: 4px; transition: width 0.6s ease; }
+
+    footer { text-align: center; padding: 20px; color: var(--gray-400); font-size: 12px; }
+
+    @media(max-width:900px) { .form-grid, .grid-2, .method-steps, .decision-grid { grid-template-columns: 1fr; } .tabs { flex-wrap: wrap; } }
+    @media print {
+        .no-print { display: none!important; }
+        body { background: white; }
+        .card { box-shadow: none; border: 1px solid #ddd; page-break-inside: avoid; }
+    }
+</style>
+</head>
+<body>
+<div class="container">
+
+    <!-- ═══════════════════════════════════════════ HEADER ═══ -->
+    <div class="header">
+        <h1>Annexe 23 — Baromètre d'Engagement et Plan de Rétention</h1>
+        <p>Outil de diagnostic, scoring et aide à la décision pour la fidélisation des collaborateurs du cabinet numérique. Démarche structurée : mesure → analyse → action → arbitrage.</p>
+        <div class="header-badges">
+            <span class="badge" style="background:var(--info);">📊 eNPS + 11 Questions</span>
+            <span class="badge" style="background:var(--warning);">👁️ 15 Signaux faibles</span>
+            <span class="badge" style="background:var(--secondary);">⚖️ Normes intégrées (NPMQ, RGPD, C. trav.)</span>
+            <span class="badge" style="background:rgba(255,255,255,0.2);">📄 Export PDF</span>
+        </div>
+        <div style="background:rgba(255,255,255,0.1);border-left:4px solid var(--accent);padding:16px 20px;border-radius:0 8px 8px 0;margin-top:20px;">
+            <p style="font-size:14px;margin-bottom:6px;"><strong>Démarche en 4 étapes :</strong> 1) Configurez le cabinet et les paramètres — 2) Saisissez les réponses et observez les signaux faibles — 3) Analysez le dashboard et les scores — 4) Arbitrez le plan d'action et exportez.</p>
+            <p style="font-size:13px;opacity:0.85;"><strong>Référentiel :</strong> Art. L.4121-1, L.6315-1 C. trav. · NPMQ §22, §32-33 · Art. 148 Code de déontologie (Décret n° 2012-432 modifié) · RGPD art. 5, 6 · IDCC 0787.</p>
+        </div>
+    </div>
+
+    <!-- BANNER SUPPRIMÉE -->
+
+    <!-- ACTIONS RAPIDES -->
+    <div class="no-print" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
+        <button class="btn btn-accent" onclick="loadCasPratique()">📂 Cas pratique Cabinet X</button>
+        <button class="btn btn-primary" onclick="genererPDF()">📄 Export PDF</button>
+        <button class="btn btn-secondary" onclick="exporterJSON()">💾 Exporter JSON</button>
+        <label class="btn btn-secondary" style="cursor:pointer;">📥 Importer JSON<input type="file" accept=".json" onchange="handleImport(event)" style="display:none;"></label>
+        <button class="btn btn-danger btn-sm" onclick="resetAll()">🔄 Réinitialiser</button>
+    </div>
+
+    <!-- TABS — 4 ONGLETS -->
+    <div class="tabs no-print">
+        <button class="tab active" id="tabConfig" onclick="showTab('config')">1. Configuration</button>
+        <button class="tab" id="tabQuest" onclick="showTab('quest')">2. Questionnaire & Signaux</button>
+        <button class="tab" id="tabDash" onclick="showTab('dash')">3. Dashboard & Analyse</button>
+        <button class="tab" id="tabActions" onclick="showTab('actions')">4. Plan d'action & Export</button>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ TAB 1 : CONFIGURATION ═══ -->
+    <div class="panel active" id="panelConfig">
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon">⚙️</div>
+                <div><h3>Paramétrage du cabinet</h3><div class="subtitle">Identité, campagne et paramètres financiers</div></div>
+            </div>
+            <div class="form-grid">
+                <div class="form-group"><label>Nom du cabinet</label><input id="nomCabinet" value="Cabinet X"></div>
+                <div class="form-group"><label>Campagne</label><input id="campagne" value="S1-2026" placeholder="Ex : S1-2026"></div>
+                <div class="form-group"><label>Date d'évaluation</label><input id="dateEval" type="date"></div>
+            </div>
+            <div class="form-grid" style="margin-top:10px;">
+                <div class="form-group">
+                    <label>Salaire brut annuel du dirigeant/manager (€) <span class="tip" data-t="Sert à calculer automatiquement le coût horaire chargé : salaire × 1,45 (charges patronales moyennes) ÷ 1 607 h/an (durée légale). Base IDCC 0787, accord n° 48, déc. 2025.">?</span></label>
+                    <input id="salaireManager" type="number" value="50000" min="25000" max="150000" step="1000" onchange="calcCoutHoraire();save();">
+                    <div class="form-help" id="helpCoutH">Coût horaire chargé auto-calculé : <strong id="coutHoraireAff">45 €/h</strong> — (brut × 1,45 ÷ 1 607 h)</div>
+                    <input type="hidden" id="coutHoraire" value="45">
+                </div>
+                <div class="form-group">
+                    <label>Scénario coût de remplacement <span class="tip" data-t="Source française : entretien n° 5 (Annexe 25), consultant RH spécialisé EC. Fourchette : 15 000-25 000 € pour un recrutement échoué. Contexte : 49 % des cabinets déclarent des difficultés de recrutement (OMECA S2 2025, n = 301), allongeant les délais et les coûts.">?</span></label>
+                    <select id="scenarioDepart" onchange="updateScenario();save();" style="padding:10px 14px;border:1px solid var(--gray-300);border-radius:8px;font-size:14px;font-family:inherit;background:white;">
+                        <option value="bas">Hypothèse basse — 15 000 € (recrutement interne, profil junior)</option>
+                        <option value="median" selected>Hypothèse médiane — 20 000 € (profil confirmé, cabinet)</option>
+                        <option value="haut">Hypothèse haute — 30 000 € (profil senior, marché tendu)</option>
+                        <option value="custom">Personnalisé</option>
+                    </select>
+                    <div class="form-help">Source : entretien n° 5, Annexe 25 (fourchette 15 000-30 000 €). Contexte : 49 % de difficultés de recrutement (OMECA S2 2025).</div>
+                </div>
+                <div class="form-group" id="groupCustomDepart" style="display:none;">
+                    <label>Coût de remplacement personnalisé (€) <span class="tip" data-t="Inclut : frais de recrutement (annonces, cabinet), période de tuilage, perte de productivité transitoire, coûts administratifs (solde de tout compte, portabilité prévoyance).">?</span></label>
+                    <input id="coutDepartCustom" type="number" value="20000" min="5000" max="100000" step="1000" onchange="save();">
+                </div>
+            </div>
+            <div class="form-grid" style="margin-top:10px;">
+                <div class="form-group">
+                    <label>Taux de revalorisation salariale (%) <span class="tip" data-t="Pourcentage d'augmentation envisagé dans le cadre d'une action de rétention. Repères : inflation 2025 ≈ 1,5-2 % (INSEE) ; augmentation médiane branche EC ≈ 2-4 % (OMECA S2 2025) ; rattrapage marché tendu ≈ 5-8 %. L'IDCC 0787 ne fixe pas de plafond mais impose le respect des minima conventionnels. À adapter au profil, à l'ancienneté et au marché local.">?</span></label>
+                    <select id="tauxRevalo" onchange="updateRevalo();save();" style="padding:10px 14px;border:1px solid var(--gray-300);border-radius:8px;font-size:14px;font-family:inherit;background:white;">
+                        <option value="2">2 % — ajustement inflation (INSEE, 2025 : ~1,8 %)</option>
+                        <option value="3">3 % — revalorisation courante branche EC (OMECA S2 2025)</option>
+                        <option value="5" selected>5 % — rattrapage compétitif (marché tendu, profil confirmé)</option>
+                        <option value="8">8 % — rétention urgente (profil senior, risque de départ imminent)</option>
+                        <option value="custom_revalo">Personnalisé</option>
+                    </select>
+                    <div class="form-help">Repères : inflation INSEE 2025 ≈ 1,8 % · médiane branche IDCC 0787 ≈ 2-4 % (OMECA S2 2025) · rattrapage marché ≈ 5-8 %.</div>
+                </div>
+                <div class="form-group" id="groupCustomRevalo" style="display:none;">
+                    <label>Taux personnalisé (%) <span class="tip" data-t="Saisissez le taux que vous envisagez. Le coût annualisé sera calculé automatiquement (salaire brut × taux %).">?</span></label>
+                    <input id="tauxRevaloCustom" type="number" value="5" min="1" max="30" step="0.5" onchange="save();">
+                </div>
+                <div class="form-group">
+                    <label>Budget formation annuel par personne (€) <span class="tip" data-t="Fourchette observée en cabinet EC : 1 500 – 3 000 €/an/pers. (entretien n° 5, Annexe 25). Financement partiel OPCO Atlas possible. La NPMQ §22, A22-3 impose le maintien des compétences par la formation continue.">?</span></label>
+                    <select id="budgetFormation" onchange="updateFormation();save();" style="padding:10px 14px;border:1px solid var(--gray-300);border-radius:8px;font-size:14px;font-family:inherit;background:white;">
+                        <option value="1500" selected>1 500 € — formation standard (e-learning, webinaires)</option>
+                        <option value="2000">2 000 € — formation intermédiaire (certifiante courte)</option>
+                        <option value="3000">3 000 € — formation avancée (certifiante longue, DU)</option>
+                        <option value="custom_form">Personnalisé</option>
+                    </select>
+                    <div class="form-help">Source : entretien n° 5, Annexe 25. Financement partiel OPCO Atlas. Obligation NPMQ §22, A22-3.</div>
+                </div>
+                <div class="form-group" id="groupCustomFormation" style="display:none;">
+                    <label>Budget formation personnalisé (€/an/pers.)</label>
+                    <input id="budgetFormationCustom" type="number" value="2000" min="500" max="10000" step="100" onchange="save();">
+                </div>
+            </div>
+            <!-- Détail de la décomposition du coût de départ -->
+            <div style="margin-top:12px;padding:14px 18px;background:var(--gray-50);border-radius:8px;border-left:4px solid var(--info);font-size:13px;color:var(--gray-600);">
+                <strong style="color:var(--primary);font-size:13px;">📋 Décomposition indicative du coût de remplacement</strong>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px;margin-top:8px;">
+                    <span>• Recrutement (annonces, temps) : 2 000 – 5 000 €</span>
+                    <span>• Période de tuilage (1-3 mois) : 3 000 – 8 000 €</span>
+                    <span>• Perte productivité transitoire : 4 000 – 6 000 €</span>
+                    <span>• Coûts admin. (STC, prévoyance) : 1 000 – 2 000 €</span>
+                    <span>• Perte de savoir-faire client : difficilement chiffrable</span>
+                    <span>• Impact moral sur l'équipe : difficilement chiffrable</span>
+                </div>
+                <div style="margin-top:8px;font-size:12px;color:var(--gray-500);">Sources : entretien n° 5, Annexe 25 (consultant RH cabinets EC). Fourchette totale : 15 000 – 25 000 € par départ. Contexte : 49 % des cabinets EC déclarent des difficultés de recrutement (OMECA, S2 2025, n = 301).</div>
+            </div>
+        </div>
+
+        <!-- ═══ GUIDE MÉTHODOLOGIQUE POUR LE DIRIGEANT ═══ -->
+        <div class="card">
+            <div class="card-header" style="cursor:pointer;" onclick="this.parentElement.querySelector('.collapse-body').classList.toggle('collapsed');">
+                <div class="card-icon" style="background:linear-gradient(135deg,#2563eb,#3b82f6);">📖</div>
+                <div style="flex:1;"><h3>Guide méthodologique — Comment utiliser cet outil</h3><div class="subtitle">Cliquez pour déplier — comprendre chaque paramètre, ses sources et sa logique</div></div>
+                <span style="font-size:18px;color:var(--gray-400);">▼</span>
+            </div>
+            <div class="collapse-body collapsed">
+                <div class="info-box" style="margin-bottom:14px;">
+                    <strong>📌 Finalité de l'outil</strong>
+                    <p>Ce baromètre est un <strong>outil d'aide à la décision</strong>, pas un instrument de mesure scientifique. Il structure une démarche de diagnostic de l'engagement collaborateur en quatre temps : mesure (eNPS + questionnaire), observation (signaux faibles managériaux), analyse (scoring multiaxes) et action (plan de rétention budgété). L'objectif est de <strong>réduire l'exposition financière</strong> liée au départ d'un collaborateur clé, en identifiant les risques en amont et en chiffrant les leviers d'action.</p>
+                </div>
+
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;">
+                    <div style="background:var(--gray-50);padding:16px;border-radius:8px;border-left:4px solid var(--primary);">
+                        <strong style="color:var(--primary);font-size:14px;">1. Salaire brut du dirigeant/manager</strong>
+                        <p style="font-size:12px;margin-top:6px;">Sert à calculer le <strong>coût horaire chargé</strong> du temps consacré aux actions de rétention (entretiens, diagnostic, réorganisation). Formule : salaire brut annuel × 1,45 (coefficient charges patronales moyennes) ÷ 1 607 h (durée légale annuelle, art. L.3121-41 C. trav.).</p>
+                        <p style="font-size:11px;color:var(--gray-500);margin-top:4px;">⚙️ Ce n'est pas une dépense supplémentaire : c'est un <strong>coût d'opportunité</strong> (temps soustrait à la production facturée).</p>
+                    </div>
+                    <div style="background:var(--gray-50);padding:16px;border-radius:8px;border-left:4px solid var(--warning);">
+                        <strong style="color:#92400e;font-size:14px;">2. Coût de remplacement</strong>
+                        <p style="font-size:12px;margin-top:6px;">Fourchette issue de l'entretien n° 5 (Annexe 25) : 15 000 – 25 000 € pour un départ en cabinet EC. Inclut le recrutement, le tuilage, la perte de productivité transitoire et les coûts administratifs. Hypothèse aggravante : 49 % des cabinets déclarent des difficultés de recrutement (OMECA, S2 2025, n = 301), ce qui allonge les délais et augmente les coûts.</p>
+                        <p style="font-size:11px;color:var(--gray-500);margin-top:4px;">⚠️ Les trois scénarios (bas/médian/haut) permettent de tester la sensibilité du résultat. Aucun n'est « juste » — ils encadrent une réalité variable.</p>
+                    </div>
+                    <div style="background:var(--gray-50);padding:16px;border-radius:8px;border-left:4px solid var(--success);">
+                        <strong style="color:#065f46;font-size:14px;">3. Taux de revalorisation salariale</strong>
+                        <p style="font-size:12px;margin-top:6px;"><strong>Comment choisir le taux ?</strong> Trois repères : (a) l'inflation INSEE 2025 ≈ 1,8 % constitue le plancher ; (b) la médiane de la branche IDCC 0787 se situe entre 2 et 4 % (OMECA S2 2025) ; (c) un rattrapage compétitif pour un profil en tension se situe entre 5 et 8 %.</p>
+                        <p style="font-size:12px;margin-top:4px;">Le choix dépend du <strong>contexte individuel</strong> : ancienneté, écart au marché, criticité du poste, score de risque du collaborateur. L'outil calcule le coût annualisé (récurrent) pour éclairer l'arbitrage.</p>
+                        <p style="font-size:11px;color:var(--gray-500);margin-top:4px;">📐 Vérifier que le salaire revalorisé reste ≥ minimum conventionnel IDCC 0787 (grille en vigueur).</p>
+                    </div>
+                    <div style="background:var(--gray-50);padding:16px;border-radius:8px;border-left:4px solid var(--secondary);">
+                        <strong style="color:var(--secondary);font-size:14px;">4. Budget formation</strong>
+                        <p style="font-size:12px;margin-top:6px;">Fourchette 1 500 – 3 000 €/an/pers. (entretien n° 5, Annexe 25). Inclut les formations certifiantes, e-learning, séminaires métier. Financement partiel possible via OPCO Atlas (prise en charge selon barème en vigueur). La NPMQ §22, A22-3 impose le maintien des compétences par la formation continue.</p>
+                        <p style="font-size:11px;color:var(--gray-500);margin-top:4px;">💡 Le budget saisi ici concerne uniquement l'action de rétention (formation supplémentaire ciblée), pas le budget formation global du cabinet.</p>
+                    </div>
+                </div>
+
+                <div class="info-box warn" style="margin-top:14px;">
+                    <strong>⚠️ Limites et précautions de lecture</strong>
+                    <p>• Les montants affichés sont des <strong>simulations paramétrables</strong> : ils dépendent entièrement des hypothèses saisies par l'utilisateur.</p>
+                    <p>• Le scoring de risque (0-100) est un <strong>indicateur composite interne</strong>, pas une probabilité statistique de départ. Il hiérarchise les urgences, il ne prédit pas l'avenir.</p>
+                    <p>• La mise en perspective financière (plan vs coût de départ) vise à <strong>éclairer l'arbitrage</strong>, pas à calculer un ROI. Un plan de rétention ne « rapporte » rien — il réduit une exposition.</p>
+                    <p>• Avec une équipe de 3-5 personnes, l'eNPS a une valeur <strong>indicative</strong>, pas statistique. C'est la triangulation avec les signaux faibles qui donne sa robustesse au diagnostic.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon secondary">👥</div>
+                <div><h3>Équipe du cabinet</h3><div class="subtitle">Collaborateurs à évaluer — ajoutez ou chargez le cas pratique</div></div>
+            </div>
+            <div id="miniENPS" style="display:none;padding:10px 16px;background:var(--gray-50);border-radius:8px;margin-bottom:12px;font-size:13px;"></div>
+            <div class="tbl-wrap">
+                <table>
+                    <thead><tr><th>#</th><th>Nom</th><th>Poste</th><th>Anc.</th><th>Salaire (€)</th><th>Phase (1-5)</th><th>Form. (%)</th><th>Signaux</th><th>Aperçu</th><th></th></tr></thead>
+                    <tbody id="bodyEquipe"></tbody>
+                </table>
+            </div>
+            <div class="btn-group no-print" style="margin-top:10px;">
+                <button class="btn btn-primary" onclick="openAddModal()">+ Ajouter un collaborateur</button>
+            </div>
+        </div>
+
+        <!-- SCORING -->
+        <div class="card">
+            <div class="card-header" style="cursor:pointer;" onclick="this.parentElement.querySelector('.collapse-body').classList.toggle('collapsed');">
+                <div class="card-icon accent">📐</div>
+                <div style="flex:1;"><h3>Scoring — pondération des 5 axes</h3><div class="subtitle">Méthodologie de calcul du score de risque (0-100)</div></div>
+                <span style="font-size:18px;color:var(--gray-400);">▼</span>
+            </div>
+            <div class="collapse-body">
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:16px;">
+                    <div style="background:var(--gray-50);padding:14px;border-radius:8px;border-left:4px solid var(--danger);"><strong style="font-size:28px;color:var(--danger);">40%</strong><br><span style="font-size:13px;font-weight:600;">Intention de départ (Q11)</span></div>
+                    <div style="background:var(--gray-50);padding:14px;border-radius:8px;border-left:4px solid var(--warning);"><strong style="font-size:28px;color:var(--warning);">25%</strong><br><span style="font-size:13px;font-weight:600;">Signaux faibles observés</span></div>
+                    <div style="background:var(--gray-50);padding:14px;border-radius:8px;border-left:4px solid var(--info);"><strong style="font-size:28px;color:var(--info);">20%</strong><br><span style="font-size:13px;font-weight:600;">Satisfaction moy. (Q2-Q10)</span></div>
+                    <div style="background:var(--gray-50);padding:14px;border-radius:8px;border-left:4px solid var(--secondary);"><strong style="font-size:28px;color:var(--secondary);">10%</strong><br><span style="font-size:13px;font-weight:600;">Phase d'intégration</span></div>
+                    <div style="background:var(--gray-50);padding:14px;border-radius:8px;border-left:4px solid var(--gray-500);"><strong style="font-size:28px;color:var(--gray-500);">5%</strong><br><span style="font-size:13px;font-weight:600;">Taux de formation</span></div>
+                </div>
+                <div style="display:flex;gap:12px;flex-wrap:wrap;font-size:14px;font-weight:600;">
+                    <span style="padding:6px 14px;background:#d1fae5;color:#065f46;border-radius:20px;">🟢 0-25 Faible</span>
+                    <span style="padding:6px 14px;background:#fef3c7;color:#b45309;border-radius:20px;">🟡 26-50 Modéré</span>
+                    <span style="padding:6px 14px;background:#ffedd5;color:#c2410c;border-radius:20px;">🟠 51-75 Élevé</span>
+                    <span style="padding:6px 14px;background:#fee2e2;color:#dc2626;border-radius:20px;">🔴 76-100 Critique</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ═══════════════════════════════════════════ TAB 2 : QUESTIONNAIRE ═══ -->
+    <div class="panel" id="panelQuest">
+        <!-- PDF QUESTIONNAIRE -->
+        <div style="margin-bottom:16px;display:flex;align-items:center;gap:12px;">
+            <button class="btn btn-accent" onclick="genererPDFQuestionnaire()">📄 Exporter le questionnaire PDF à distribuer</button>
+            <span style="font-size:13px;color:var(--gray-500);">11 questions · ~5 min · Confidentiel (RGPD art. 5, 6)</span>
+        </div>
+
+        <!-- SAISIE DES REPONSES -->
+        <div class="card no-print">
+            <div class="card-header">
+                <div class="card-icon">📝</div>
+                <div><h3>Saisie des réponses</h3><div class="subtitle">Retranscrivez les réponses du questionnaire papier</div></div>
+            </div>
+            <div class="collab-sel">
+                <label>Collaborateur :</label>
+                <select id="selQuest" onchange="renderQuestionnaire()"></select>
+            </div>
+            <div id="zoneQuest"></div>
+        </div>
+
+        <!-- SIGNAUX FAIBLES (INDIVIDUEL) -->
+        <div class="card no-print">
+            <div class="card-header">
+                <div class="card-icon danger">👁️</div>
+                <div style="flex:1"><h3>Signaux faibles observés</h3><div class="subtitle">Observations du manager — à ne jamais communiquer au collaborateur</div></div>
+                <div id="signalCounterIndiv" style="font-size:14px;font-weight:700;"></div>
+            </div>
+            <p style="font-size:12px;color:var(--danger);margin:0 0 12px;font-weight:600;">⚠️ Réservé au manager — observations quotidiennes, jamais communiquées au collaborateur.</p>
+            <div id="zoneSignaux"></div>
+        </div>
+
+    </div>
+
+    <!-- ═══════════════════════════════════════════ TAB 3 : DASHBOARD ═══ -->
+    <div class="panel" id="panelDash">
+        <div class="stat-grid" id="statGrid"></div>
+        <div id="dashInterpretation" class="card" style="display:none;"></div>
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon">📊</div>
+                <div><h3>Tableau de bord</h3><div class="subtitle">Vue d'ensemble de l'équipe — score de risque et eNPS</div></div>
+            </div>
+            <div class="tbl-wrap" id="dashTable"></div>
+        </div>
+        <div class="grid-2">
+            <div class="card"><div class="card-header"><div class="card-icon accent">📈</div><div><h3>Répartition eNPS</h3><div class="subtitle">Promoteurs / Passifs / Détracteurs</div></div></div><div class="chart-container"><canvas id="chartENPS"></canvas></div></div>
+            <div class="card"><div class="card-header"><div class="card-icon danger">📉</div><div><h3>Scores de risque</h3><div class="subtitle">Par collaborateur (0-100)</div></div></div><div class="chart-container"><canvas id="chartRisk"></canvas></div></div>
+        </div>
+        <!-- ANALYSE INDIVIDUELLE -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon secondary">🔍</div>
+                <div><h3>Analyse individuelle</h3><div class="subtitle">Décomposition du score et interprétation</div></div>
+            </div>
+            <div class="collab-sel">
+                <label>Collaborateur :</label>
+                <select id="selAnalyse" onchange="renderAnalyse()"></select>
+            </div>
+            <div id="zoneAnalyse"></div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ TAB 4 : PLAN D'ACTION ═══ -->
+    <div class="panel" id="panelActions">
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon success">🎯</div>
+                <div><h3>Plan d'action et arbitrage budgétaire</h3><div class="subtitle">Actions personnalisées et mise en perspective financière</div></div>
+            </div>
+            <div class="collab-sel">
+                <label>Collaborateur :</label>
+                <select id="selActions" onchange="renderActions()"></select>
+            </div>
+            <div id="zoneActions"></div>
+        </div>
+
+        <!-- DECISION GLOBALE -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon accent">⚖️</div>
+                <div><h3>Décision globale</h3><div class="subtitle">Synthèse des décisions individuelles et arbitrage du dirigeant</div></div>
+            </div>
+            <div class="decision-grid">
+                <div class="decision-card go" onclick="selectDecision('GO')">
+                    <div style="font-size:28px;">✅</div>
+                    <h4 style="color:var(--success);">GO</h4>
+                    <p>Plan validé sans réserve. Budget alloué.</p>
+                </div>
+                <div class="decision-card cond" onclick="selectDecision('COND')">
+                    <div style="font-size:28px;">⚠️</div>
+                    <h4 style="color:var(--warning);">GO Conditionnel</h4>
+                    <p>Actions prioritaires validées. Budget à confirmer.</p>
+                </div>
+                <div class="decision-card nogo" onclick="selectDecision('NOGO')">
+                    <div style="font-size:28px;">❌</div>
+                    <h4 style="color:var(--danger);">NO GO</h4>
+                    <p>Plan reporté. Réévaluation nécessaire.</p>
+                </div>
+            </div>
+
+            <div class="tbl-wrap">
+                <table>
+                    <thead><tr><th>Collaborateur</th><th>Score</th><th>Niveau</th><th>Actions</th><th>Budget</th><th>Statut</th></tr></thead>
+                    <tbody id="bodyDecision"></tbody>
+                </table>
+            </div>
+
+            <div class="form-group" style="margin-top:16px;">
+                <label>Commentaire du dirigeant</label>
+                <textarea id="commentDecision" placeholder="Synthèse de la décision, conditions, calendrier..."></textarea>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALS -->
+    <div class="modal-overlay" id="modalAdd"><div class="modal">
+        <h2>Ajouter un collaborateur</h2>
+        <div class="form-grid" style="grid-template-columns:1fr 1fr;">
+            <div class="form-group"><label>Nom</label><input id="newNom" placeholder="Ex : Jean D."></div>
+            <div class="form-group"><label>Poste</label><input id="newPoste" placeholder="Ex : Collaborateur comptable"></div>
+            <div class="form-group"><label>Ancienneté (années)</label><input id="newAnc" type="number" value="1" min="0"></div>
+            <div class="form-group"><label>Salaire brut annuel (€)</label><input id="newSalaire" type="number" value="32000" min="0" step="1000"></div>
+            <div class="form-group"><label>Phase d'intégration (1-5)</label><input id="newPhase" type="number" value="3" min="1" max="5"></div>
+            <div class="form-group"><label>Taux formation (%)</label><input id="newForm" type="number" value="50" min="0" max="100"></div>
+        </div>
+        <div class="btn-group"><button class="btn btn-primary" onclick="confirmAdd()">Ajouter</button><button class="btn btn-secondary" onclick="closeModal('modalAdd')">Annuler</button></div>
+    </div></div>
+
+    <div class="modal-overlay" id="modalDel"><div class="modal">
+        <h2>Confirmer la suppression</h2>
+        <p style="margin-bottom:16px;font-size:14px;">Supprimer ce collaborateur et toutes ses données (réponses, signaux, plan d'action) ?</p>
+        <div class="btn-group"><button class="btn btn-danger" onclick="confirmDelete()">Supprimer</button><button class="btn btn-secondary" onclick="closeModal('modalDel')">Annuler</button></div>
+    </div></div>
+
+    <div class="toast" id="toast"></div>
+    <footer>Annexe 23 — Baromètre d'Engagement et Plan de Rétention · Outil de simulation paramétrable<br><span style="font-size:11px;color:var(--gray-400);">Données stockées localement dans le navigateur (localStorage), non transmises à un serveur tiers. Accès réservé au poste de travail du dirigeant. RGPD art. 5, 6 · Art. L.4121-1 C. trav.</span></footer>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+// UTILITIES
+// ═══════════════════════════════════════════
+const $=id=>document.getElementById(id);
+const uid=()=>'c'+Date.now()+Math.random().toString(36).substr(2,4);
+const num=(v,d=0)=>{const n=Number(v);return isNaN(n)?d:n;};
+const fmt=n=>String(Math.round(Number(n))).replace(/\B(?=(\d{3})+(?!\d))/g,' ');
+
+// ═══════════════════════════════════════════
+// CONSTANTS
+// ═══════════════════════════════════════════
+const QUESTIONS = [
+    {id:'q1',code:'Q1',text:'Recommandation employeur (eNPS)',min:0,max:10,type:'enps'},
+    {id:'q2',code:'Q2',text:'Conditions de travail',min:1,max:5,type:'sat'},
+    {id:'q3',code:'Q3',text:'Communication direction',min:1,max:5,type:'sat'},
+    {id:'q4',code:'Q4',text:'Reconnaissance',min:1,max:5,type:'sat'},
+    {id:'q5',code:'Q5',text:'Clarté du rôle',min:1,max:5,type:'sat'},
+    {id:'q6',code:'Q6',text:'Ambiance de travail',min:1,max:5,type:'sat'},
+    {id:'q7',code:'Q7',text:'Équilibre vie pro/perso',min:1,max:5,type:'sat'},
+    {id:'q8',code:'Q8',text:'Charge de travail',min:1,max:5,type:'sat'},
+    {id:'q9',code:'Q9',text:'Rémunération',min:1,max:5,type:'sat'},
+    {id:'q10',code:'Q10',text:'Perspectives d\'évolution',min:1,max:5,type:'sat'},
+    {id:'q11',code:'Q11',text:'Intention de rester à 12 mois',min:1,max:5,type:'intent'}
+];
+
+const SIGNAUX = [
+    {id:'retards',label:'Retards ou absences répétés',poids:10},
+    {id:'productivite',label:'Baisse de productivité constatée',poids:10},
+    {id:'recherche',label:'Recherche d\'emploi détectée (LinkedIn, etc.)',poids:15},
+    {id:'augmentation',label:'Demande d\'augmentation refusée',poids:12},
+    {id:'conflit_equipe',label:'Conflit avec un collègue',poids:8},
+    {id:'management',label:'Tension avec le management',poids:12},
+    {id:'surcharge',label:'Surcharge de travail signalée',poids:10},
+    {id:'demotivation',label:'Démotivation visible (silence, retrait)',poids:10},
+    {id:'perspective',label:'Absence de perspective évoquée',poids:8},
+    {id:'reconnaissance',label:'Manque de reconnaissance exprimé',poids:8},
+    {id:'client_plainte',label:'Plainte client liée à ce collaborateur',poids:7},
+    {id:'formation_refus',label:'Refus de formation ou de mission',poids:6},
+    {id:'isolement',label:'Isolement dans l\'équipe',poids:8},
+    {id:'concurrent',label:'Approche par un concurrent identifiée',poids:12},
+    {id:'personnel',label:'Événement personnel difficile',poids:5}
+];
+const SIGNAUX_MAX = SIGNAUX.reduce((s,x)=>s+x.poids,0);
+
+const ACTIONS = [
+    {id:'entretien',label:'Entretien de rétention urgent',type:'Quick win',delai:'48h',coutDirect:0,heures:2,priorite:'urgent',drivers:['q11','recherche','demotivation'],desc:'Entretien individuel pour identifier les causes de désengagement',recurrent:false},
+    {id:'diagnostic',label:'Diagnostic approfondi (écoute active)',type:'Analyse',delai:'7 jours',coutDirect:0,heures:4,priorite:'urgent',drivers:['q11','management'],desc:'Session structurée avec grille d\'écoute',recurrent:false},
+    {id:'charge',label:'Réorganisation de la charge de travail',type:'Structurelle',delai:'15 jours',coutDirect:0,heures:8,priorite:'important',drivers:['q8','surcharge'],desc:'Analyse de charge, redistribution des dossiers',recurrent:false},
+    {id:'augmentation_sal',label:'Revalorisation salariale',type:'Structurelle',delai:'30 jours',coutDirect:'salaire_revalo',heures:2,priorite:'important',drivers:['q9','augmentation'],desc:'Conforme grille IDCC 0787 — coût annualisé (récurrent). Taux paramétrable.',recurrent:true},
+    {id:'formation_dev',label:'Formation développement compétences',type:'Engagement',delai:'60 jours',coutDirect:'formation',heures:2,priorite:'normal',drivers:['q10','perspective'],desc:'Formation certifiante, financement partiel OPCO Atlas (NPMQ §22, A22-3)',recurrent:false},
+    {id:'responsabilites',label:'Nouvelles responsabilités',type:'Reconnaissance',delai:'30 jours',coutDirect:0,heures:4,priorite:'normal',drivers:['q4','q5','reconnaissance'],desc:'Missions à forte valeur ajoutée',recurrent:false},
+    {id:'flexibilite',label:'Aménagement horaires / télétravail',type:'Qualité vie',delai:'15 jours',coutDirect:0,heures:2,priorite:'normal',drivers:['q2'],desc:'Extension de la flexibilité (avenant branche 2 fév. 2024, IDCC 0787)',recurrent:false},
+    {id:'mentorat',label:'Programme mentorat',type:'Développement',delai:'30 jours',coutDirect:0,heures:10,priorite:'normal',drivers:['q10','q5'],desc:'Accompagnement senior 2h/sem pendant 5 semaines',recurrent:false}
+];
+
+// ═══════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════
+let collabs=[], signaux={}, actionsSel={}, decisionsIndiv={}, decisionGlobale='', delTarget=-1, isDemoActive=false;
+
+// ═══════════════════════════════════════════
+// COÛT HORAIRE AUTO-CALCULÉ
+// ═══════════════════════════════════════════
+function calcCoutHoraire(){
+    const sal=num($('salaireManager').value,50000);
+    const ch=Math.round(sal*1.45/1607);
+    $('coutHoraire').value=ch;
+    $('coutHoraireAff').textContent=ch+' €/h';
+}
+function updateScenario(){
+    const sc=$('scenarioDepart').value;
+    const grp=$('groupCustomDepart');
+    if(sc==='custom'){grp.style.display='block';}else{grp.style.display='none';}
+}
+function updateRevalo(){
+    const v=$('tauxRevalo').value;
+    $('groupCustomRevalo').style.display=v==='custom_revalo'?'block':'none';
+}
+function updateFormation(){
+    const v=$('budgetFormation').value;
+    $('groupCustomFormation').style.display=v==='custom_form'?'block':'none';
+}
+function getTauxRevalo(){
+    const v=$('tauxRevalo').value;
+    if(v==='custom_revalo') return num($('tauxRevaloCustom').value,5)/100;
+    return num(v,5)/100;
+}
+function getTauxRevaloLabel(){
+    const v=$('tauxRevalo').value;
+    if(v==='custom_revalo') return $('tauxRevaloCustom').value+' % (personnalisé)';
+    const labels={'2':'2 % (inflation)','3':'3 % (médiane branche)','5':'5 % (rattrapage)','8':'8 % (rétention urgente)'};
+    return labels[v]||v+' %';
+}
+function getBudgetFormation(){
+    const v=$('budgetFormation').value;
+    if(v==='custom_form') return num($('budgetFormationCustom').value,2000);
+    return num(v,1500);
+}
+function getCoutDepart(c){
+    const sc=$('scenarioDepart').value;
+    if(sc==='custom') return num($('coutDepartCustom').value,20000);
+    const map={bas:15000,median:20000,haut:25000};
+    return map[sc]||20000;
+}
+
+// ═══════════════════════════════════════════
+// SCORING
+// ═══════════════════════════════════════════
+function isComplete(c){
+    return c.q1!==''&&c.q1!==undefined&&c.q11!==''&&c.q11!==undefined&&
+           c.q2!==''&&c.q3!==''&&c.q4!==''&&c.q5!==''&&c.q6!==''&&c.q7!==''&&c.q8!==''&&c.q9!==''&&c.q10!=='';
+}
+function calcScore(c){
+    if(!isComplete(c)) return {score:0,complete:false,idxI:0,idxS:0,idxSat:0,idxInt:0,idxF:0,moyQ:0,sigR:0};
+    const pI=0.40,pS=0.25,pSat=0.20,pInt=0.10,pF=0.05;
+    const idxI=((5-num(c.q11))/4)*100;
+    const sigR=SIGNAUX.reduce((s,x)=>s+(signaux[c.id]&&signaux[c.id][x.id]?x.poids:0),0);
+    const idxS=(sigR/SIGNAUX_MAX)*100;
+    const moyQ=(num(c.q2)+num(c.q3)+num(c.q4)+num(c.q5)+num(c.q6)+num(c.q7)+num(c.q8)+num(c.q9)+num(c.q10))/9;
+    const idxSat=((5-moyQ)/4)*100;
+    const idxInt=((5-num(c.phase,5))/4)*100;
+    const idxF=(1-num(c.formation,100)/100)*100;
+    const score=(idxI*pI)+(idxS*pS)+(idxSat*pSat)+(idxInt*pInt)+(idxF*pF);
+    return {score:Math.min(100,Math.max(0,Math.round(score))),complete:true,idxI:Math.round(idxI),idxS:Math.round(idxS),idxSat:Math.round(idxSat),idxInt:Math.round(idxInt),idxF:Math.round(idxF),moyQ:moyQ.toFixed(1),sigR};
+}
+function getNiveau(s){
+    if(s<=25) return {niv:'FAIBLE',cls:'status-faible',emoji:'🟢',action:'Semestriel',color:'var(--success)'};
+    if(s<=50) return {niv:'MODÉRÉ',cls:'status-modere',emoji:'🟡',action:'Mensuel',color:'var(--warning)'};
+    if(s<=75) return {niv:'ÉLEVÉ',cls:'status-eleve',emoji:'🟠',action:'30 jours',color:'#ea580c'};
+    return {niv:'CRITIQUE',cls:'status-critique',emoji:'🔴',action:'48h',color:'var(--danger)'};
+}
+function getENPS(q1){
+    const v=num(q1);
+    if(v>=9) return {label:'Promoteur',color:'var(--success)',dot:'🟢'};
+    if(v>=7) return {label:'Passif',color:'var(--warning)',dot:'🟡'};
+    return {label:'Détracteur',color:'var(--danger)',dot:'🔴'};
+}
+function getSignalCount(cid){
+    if(!signaux[cid]) return 0;
+    return Object.keys(signaux[cid]).filter(k=>signaux[cid][k]).length;
+}
+function getSignalPoids(cid){
+    if(!signaux[cid]) return 0;
+    return SIGNAUX.reduce((s,x)=>s+(signaux[cid][x.id]?x.poids:0),0);
+}
+
+// ═══════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════
+function showTab(id){
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    const map={config:'panelConfig',quest:'panelQuest',dash:'panelDash',actions:'panelActions'};
+    const tMap={config:'tabConfig',quest:'tabQuest',dash:'tabDash',actions:'tabActions'};
+    $(map[id]).classList.add('active');$(tMap[id]).classList.add('active');
+    if(id==='quest'){updateSelectors();renderQuestionnaire();}
+    if(id==='dash'){updateSelectors();renderDashboard();renderCharts();renderAnalyse();}
+    if(id==='actions'){updateSelectors();renderActions();renderDecisionTable();}
+    window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ═══════════════════════════════════════════
+// EQUIPE
+// ═══════════════════════════════════════════
+function renderEquipe(){
+    const tb=$('bodyEquipe');if(!tb)return;
+    tb.innerHTML='';
+    if(!collabs.length){
+        tb.innerHTML='<tr><td colspan="10" style="padding:28px;color:var(--gray-400);font-style:italic;font-size:14px;">Aucun collaborateur. Ajoutez-en ou chargez le cas pratique.</td></tr>';
+        $('miniENPS').style.display='none';save();return;
+    }
+    let prom=0,pass=0,det=0,nbOk=0;
+    collabs.forEach((c,i)=>{
+        const ok=isComplete(c);const calc=ok?calcScore(c):null;const niv=calc?getNiveau(calc.score):null;
+        let enpsH='',scoreH='';
+        if(c.q1!==''&&c.q1!==undefined){const v=num(c.q1);if(v>=9){prom++;enpsH='<span style="color:var(--success);font-size:12px;font-weight:600;">P</span>';}else if(v>=7){pass++;enpsH='<span style="color:var(--warning);font-size:12px;font-weight:600;">N</span>';}else{det++;enpsH='<span style="color:var(--danger);font-size:12px;font-weight:600;">D</span>';}}
+        if(ok){nbOk++;scoreH='<span style="color:'+niv.color+';font-size:12px;font-weight:700;">'+calc.score+'</span>';}
+        const sigCount=getSignalCount(c.id);
+        const sigBadge=sigCount>0?'<span style="background:#fee2e2;color:var(--danger);padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;">'+sigCount+'/15</span>':'<span style="background:#d1fae5;color:var(--success);padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;">0</span>';
+        tb.innerHTML+='<tr><td>'+(i+1)+'</td>'+
+            '<td><input class="tbl-in" value="'+c.nom+'" onchange="updC('+i+',\'nom\',this.value)" style="text-align:left;min-width:100px;"></td>'+
+            '<td><input class="tbl-in" value="'+(c.poste||'')+'" onchange="updC('+i+',\'poste\',this.value)" style="text-align:left;min-width:120px;"></td>'+
+            '<td><input class="tbl-in" type="number" value="'+(c.anciennete||'')+'" min="0" style="max-width:55px" onchange="updC('+i+',\'anciennete\',this.value)"></td>'+
+            '<td><input class="tbl-in" type="number" value="'+(c.salaire||'')+'" min="0" step="1000" style="max-width:75px" onchange="updC('+i+',\'salaire\',this.value)"></td>'+
+            '<td><input class="tbl-in" type="number" value="'+(c.phase||'')+'" min="1" max="5" style="max-width:50px" onchange="updC('+i+',\'phase\',this.value)"></td>'+
+            '<td><input class="tbl-in" type="number" value="'+(c.formation||'')+'" min="0" max="100" style="max-width:55px" onchange="updC('+i+',\'formation\',this.value)"></td>'+
+            '<td>'+sigBadge+'</td>'+
+            '<td>'+enpsH+' '+scoreH+'</td>'+
+            '<td><button class="btn btn-danger btn-sm" onclick="askDelete('+i+')" style="padding:4px 10px;font-size:12px;">✕</button></td></tr>';
+    });
+    if(nbOk>0){
+        const n=collabs.length,enps=Math.round(((prom-det)/n)*100);
+        $('miniENPS').innerHTML='<strong style="color:var(--primary);font-size:14px;">eNPS : '+(enps>0?'+':'')+enps+'</strong> — 🟢 '+prom+' P · 🟡 '+pass+' N · 🔴 '+det+' D — '+nbOk+'/'+n+' complets';
+        $('miniENPS').style.display='block';
+    } else $('miniENPS').style.display='none';
+    save();
+}
+function updC(i,f,v){collabs[i][f]=v;save();}
+function openAddModal(){$('modalAdd').classList.add('show');$('newNom').focus();}
+function closeModal(id){$(id).classList.remove('show');}
+function confirmAdd(){
+    const nom=$('newNom').value.trim();if(!nom){alert('Saisissez un nom.');return;}
+    collabs.push({id:uid(),nom,poste:$('newPoste').value.trim()||'Collaborateur',anciennete:$('newAnc').value,salaire:$('newSalaire').value,phase:$('newPhase').value,formation:$('newForm').value,q1:'',q2:'',q3:'',q4:'',q5:'',q6:'',q7:'',q8:'',q9:'',q10:'',q11:''});
+    closeModal('modalAdd');$('newNom').value='';$('newPoste').value='';renderEquipe();
+}
+function askDelete(i){delTarget=i;$('modalDel').classList.add('show');}
+function confirmDelete(){
+    if(delTarget>=0){const cid=collabs[delTarget].id;collabs.splice(delTarget,1);delete signaux[cid];delete actionsSel[cid];delete decisionsIndiv[cid];}
+    closeModal('modalDel');delTarget=-1;renderEquipe();
+}
+function resetAll(){
+    if(!confirm('Réinitialiser toute l\'évaluation ?'))return;
+    collabs=[];signaux={};actionsSel={};decisionsIndiv={};decisionGlobale='';isDemoActive=false;
+    $('nomCabinet').value='Cabinet X';$('campagne').value='S1-2026';$('salaireManager').value='50000';$('scenarioDepart').value='median';$('coutDepartCustom').value='20000';$('groupCustomDepart').style.display='none';$('commentDecision').value='';$('tauxRevalo').value='5';$('tauxRevaloCustom').value='5';$('budgetFormation').value='1500';$('budgetFormationCustom').value='2000';$('groupCustomRevalo').style.display='none';$('groupCustomFormation').style.display='none';
+    calcCoutHoraire();
+    document.querySelectorAll('.decision-card').forEach(c=>c.classList.remove('selected'));
+    renderEquipe();showTab('config');toast('Évaluation réinitialisée');
+}
+
+// ═══════════════════════════════════════════
+// CAS PRATIQUE — 3 COLLABORATEURS
+// ═══════════════════════════════════════════
+function loadCasPratique(){
+    $('nomCabinet').value='Cabinet X';$('campagne').value='S1-2026';$('dateEval').value='2026-02-10';
+    $('salaireManager').value='50000';$('scenarioDepart').value='median';$('groupCustomDepart').style.display='none';
+    calcCoutHoraire();
+    collabs=[
+        {id:'cp1',nom:'Marie L.',poste:'Collaboratrice comptable',anciennete:3,salaire:34000,phase:3,formation:80,q1:'9',q2:'4',q3:'5',q4:'4',q5:'4',q6:'4',q7:'5',q8:'4',q9:'3',q10:'4',q11:'5'},
+        {id:'cp2',nom:'Thomas M.',poste:'Chef de mission',anciennete:5,salaire:42000,phase:5,formation:75,q1:'6',q2:'3',q3:'4',q4:'2',q5:'3',q6:'3',q7:'4',q8:'2',q9:'2',q10:'3',q11:'3'},
+        {id:'cp3',nom:'Sophie G.',poste:'Responsable paie',anciennete:4,salaire:38000,phase:5,formation:40,q1:'3',q2:'2',q3:'2',q4:'1',q5:'2',q6:'2',q7:'2',q8:'1',q9:'1',q10:'1',q11:'1'}
+    ];
+    // ═══ SIGNAUX FAIBLES PRÉ-REMPLIS ═══
+    signaux={};
+    signaux['cp2']={surcharge:true,augmentation:true,demotivation:true};
+    signaux['cp3']={recherche:true,demotivation:true,augmentation:true,management:true,surcharge:true,retards:true,productivite:true,concurrent:true,perspective:true};
+    // ═══ ACTIONS PRÉ-SÉLECTIONNÉES ═══
+    actionsSel={};
+    collabs.forEach(c=>{const calc=calcScore(c);if(calc.complete&&calc.score>=26){const acts=getRecommendedActions(c,calc);actionsSel[c.id]=acts.map(a=>a.id);}});
+    decisionsIndiv={cp1:'NA',cp2:'RETENU',cp3:'RETENU'};decisionGlobale='COND';
+    $('commentDecision').value='Plan de rétention validé pour Thomas M. (modéré) et Sophie G. (critique). Entretien urgent sous 48h pour Sophie G. Décision finale après entretien : maintien du plan ou départ organisé si causes structurelles irréconciliables. Budget conditionné au Q2.';
+
+    isDemoActive=false;
+    save();
+    renderEquipe();
+
+    // ═══ NAVIGATION MANUELLE (sans showTab qui écrase la sélection) ═══
+    // 1. Activer l'onglet Questionnaire visuellement
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    $('panelQuest').classList.add('active');
+    $('tabQuest').classList.add('active');
+
+    // 2. Remplir les sélecteurs
+    updateSelectors();
+
+    // 3. FORCER Sophie G. (cp3) dans TOUS les sélecteurs AVANT tout rendu
+    ['selQuest','selAnalyse','selActions'].forEach(id=>{
+        const s=$(id);if(s) s.value='cp3';
+    });
+
+    // 4. Rendre le questionnaire AVEC cp3 sélectionné → signaux cochés
+    renderQuestionnaire();
+
+    // 5. Toast
+    toast('Cas pratique chargé — Sophie G. (critique, 9 signaux) affichée');
+}
+
+// ═══════════════════════════════════════════
+// SELECTORS
+// ═══════════════════════════════════════════
+function updateSelectors(){
+    ['selQuest','selAnalyse','selActions'].forEach(id=>{
+        const sel=$(id);if(!sel)return;const prev=sel.value;sel.innerHTML='';
+        collabs.forEach(c=>{
+            const opt=document.createElement('option');opt.value=c.id;
+            const ok=isComplete(c);const calc=ok?calcScore(c):null;const niv=calc?getNiveau(calc.score):null;
+            const sigN=getSignalCount(c.id);
+            let label=c.nom;
+            if(ok) label+=' — Score '+calc.score+' ('+niv.niv+')';
+            else label+=' — ⏳ Incomplet';
+            if(sigN>0) label+=' · 👁️'+sigN+' signaux';
+            opt.textContent=label;
+            sel.appendChild(opt);
+        });
+        if(prev&&collabs.find(c=>c.id===prev))sel.value=prev;
+    });
+}
+
+// Auto-select the most critical collaborator (highest score or most signals)
+function autoSelectMostCritical(selId){
+    const sel=$(selId);if(!sel||!collabs.length)return;
+    let best=null,bestScore=-1;
+    collabs.forEach(c=>{
+        const ok=isComplete(c);const calc=ok?calcScore(c):null;
+        const sc=calc?calc.score:0;
+        const sig=getSignalCount(c.id);
+        const combined=sc+sig*5;
+        if(combined>bestScore){bestScore=combined;best=c.id;}
+    });
+    if(best) sel.value=best;
+}
+
+// ═══════════════════════════════════════════
+// QUESTIONNAIRE RENDERING
+// ═══════════════════════════════════════════
+function renderQuestionnaire(){
+    const sel=$('selQuest');const zone=$('zoneQuest');const zoneS=$('zoneSignaux');
+    if(!sel||!zone||!sel.value){zone.innerHTML='';if(zoneS)zoneS.innerHTML='';return;}
+    const c=collabs.find(x=>x.id===sel.value);if(!c){zone.innerHTML='';if(zoneS)zoneS.innerHTML='';return;}
+
+    let h='<div class="tbl-wrap"><table><thead><tr><th style="width:60px;">Code</th><th>Question</th><th style="width:100px;">Échelle</th><th style="width:100px;">Réponse</th></tr></thead><tbody>';
+    QUESTIONS.forEach(q=>{
+        const val=c[q.id]||'';
+        h+='<tr><td style="font-weight:700;color:var(--primary);">'+q.code+'</td><td style="text-align:left;font-size:13px;">'+q.text+'</td><td style="font-size:12px;color:var(--gray-500);">'+q.min+' à '+q.max+'</td>';
+        h+='<td><input class="tbl-in" type="number" min="'+q.min+'" max="'+q.max+'" value="'+val+'" onchange="updQ(\''+c.id+'\',\''+q.id+'\',this.value)" style="font-weight:700;font-size:14px;'+(val?'background:#f0fdf4;border-color:var(--success);':'')+'"></td></tr>';
+    });
+    h+='</tbody></table></div>';
+
+    // Indicateur de complétude
+    const filled=QUESTIONS.filter(q=>c[q.id]!==''&&c[q.id]!==undefined).length;
+    const pct=Math.round((filled/QUESTIONS.length)*100);
+    h+='<div style="margin-top:12px;display:flex;align-items:center;gap:12px;">';
+    h+='<span style="font-size:13px;font-weight:600;color:var(--gray-600);">Complétude : '+filled+'/'+QUESTIONS.length+'</span>';
+    h+='<div class="progress-bar" style="flex:1;"><div class="progress-fill" style="width:'+pct+'%;background:'+(pct===100?'var(--success)':'var(--accent)');+'"></div></div>';
+    h+='<span style="font-size:13px;font-weight:700;color:'+(pct===100?'var(--success)':'var(--accent)')+';">'+pct+'%</span>';
+    h+='</div>';
+    zone.innerHTML=h;
+
+    // ═══ SIGNAUX FAIBLES (INDIVIDUEL) ═══
+    const sigCount=getSignalCount(c.id);
+    const sigPoids=getSignalPoids(c.id);
+    const counterEl=$('signalCounterIndiv');
+    if(counterEl){
+        if(sigCount>0){
+            counterEl.innerHTML='<span class="sig-counter alert">👁️ '+sigCount+'/15 signaux · '+sigPoids+'/'+SIGNAUX_MAX+' pts</span>';
+        } else {
+            counterEl.innerHTML='<span class="sig-counter ok">✅ 0 signal</span>';
+        }
+    }
+
+    let hs='<div class="signal-grid">';
+    SIGNAUX.forEach(s=>{
+        const checked=signaux[c.id]&&signaux[c.id][s.id];
+        hs+='<div class="signal-row'+(checked?' checked':'')+'" onclick="toggleSignal(\''+c.id+'\',\''+s.id+'\',this)">'+
+            '<input type="checkbox" class="signal-cb" '+(checked?'checked':'')+' onclick="event.stopPropagation();" onchange="toggleSignal(\''+c.id+'\',\''+s.id+'\',this.parentElement)">'+
+            '<span class="signal-lbl">'+s.label+'</span><span class="signal-pts">'+s.poids+' pts</span></div>';
+    });
+    hs+='</div>';
+    if(zoneS)zoneS.innerHTML=hs;
+}
+function updQ(cid,qid,val){const c=collabs.find(x=>x.id===cid);if(c)c[qid]=val;save();renderQuestionnaire();}
+function toggleSignal(cid,sid,row){
+    if(!signaux[cid])signaux[cid]={};
+    signaux[cid][sid]=!signaux[cid][sid];
+    if(!signaux[cid][sid])delete signaux[cid][sid];
+    const cb=row.querySelector('.signal-cb');if(cb)cb.checked=!!signaux[cid][sid];
+    row.classList.toggle('checked',!!signaux[cid][sid]);
+    save();
+    // Mise à jour du compteur en temps réel
+    const sigCount=getSignalCount(cid);
+    const sigPoids=getSignalPoids(cid);
+    const counterEl=$('signalCounterIndiv');
+    if(counterEl){
+        if(sigCount>0){
+            counterEl.innerHTML='<span class="sig-counter alert">👁️ '+sigCount+'/15 signaux · '+sigPoids+'/'+SIGNAUX_MAX+' pts</span>';
+        } else {
+            counterEl.innerHTML='<span class="sig-counter ok">✅ 0 signal</span>';
+        }
+    }
+}
+
+// ═══════════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════════
+function renderDashboard(){
+    let prom=0,pass=0,det=0,nbOk=0,totalS=0,critiques=0,totalSig=0;
+    collabs.forEach(c=>{
+        if(c.q1!==''&&c.q1!==undefined){const v=num(c.q1);if(v>=9)prom++;else if(v>=7)pass++;else det++;}
+        const ok=isComplete(c);if(ok){nbOk++;const sc=calcScore(c);totalS+=sc.score;if(sc.score>75)critiques++;}
+        totalSig+=getSignalCount(c.id);
+    });
+    const n=collabs.length,enps=n>0?Math.round(((prom-det)/n)*100):0,moy=nbOk>0?Math.round(totalS/nbOk):0;
+
+    $('statGrid').innerHTML=
+        '<div class="stat-card'+(enps<0?' danger':enps>30?' success':' warning')+'"><div class="stat-value">'+(enps>0?'+':'')+enps+'</div><div class="stat-label">eNPS global</div></div>'+
+        '<div class="stat-card'+(moy>50?' danger':moy>25?' warning':' success')+'"><div class="stat-value">'+moy+'</div><div class="stat-label">Score risque moyen</div></div>'+
+        '<div class="stat-card'+(critiques>0?' danger':'')+'"><div class="stat-value">'+critiques+'</div><div class="stat-label">Cas critique'+(critiques>1?'s':'')+'</div></div>'+
+        '<div class="stat-card'+(totalSig>5?' danger':totalSig>0?' warning':'')+'"><div class="stat-value">'+totalSig+'</div><div class="stat-label">Signaux faibles actifs</div></div>'+
+        '<div class="stat-card"><div class="stat-value">'+nbOk+'/'+n+'</div><div class="stat-label">Complétude</div></div>';
+
+    // ═══ INTERPRETATION DYNAMIQUE ═══
+    const interp=$('dashInterpretation');
+    if(n>0&&nbOk>0){
+        interp.style.display='block';
+        let ih='<div class="card-header"><div class="card-icon">💬</div><div><h3>Interprétation des indicateurs</h3><div class="subtitle">Lecture des KPIs et recommandations associées</div></div></div>';
+        ih+='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;">';
+        // eNPS
+        ih+='<div style="padding:14px;border-radius:8px;border-left:4px solid '+(enps<0?'var(--danger)':enps>30?'var(--success)':'var(--warning)')+';background:var(--gray-50);">';
+        ih+='<strong style="font-size:13px;">eNPS : '+(enps>0?'+':'')+enps+'</strong><br>';
+        if(enps<-20) ih+='<span style="font-size:12px;color:var(--gray-600);">Score négatif préoccupant : les détracteurs sont majoritaires. L\u2019attractivité employeur du cabinet est compromise. Action prioritaire : identifier les causes structurelles de mécontentement.</span>';
+        else if(enps<0) ih+='<span style="font-size:12px;color:var(--gray-600);">Score légèrement négatif : l\u2019équipe est fragile. Entretiens individuels recommandés pour inverser la tendance.</span>';
+        else if(enps<=30) ih+='<span style="font-size:12px;color:var(--gray-600);">Score neutre : la majorité de l\u2019équipe est passive. Actions de valorisation à envisager pour convertir les passifs en promoteurs.</span>';
+        else ih+='<span style="font-size:12px;color:var(--gray-600);">Score positif : l\u2019équipe est globalement engagée. Maintenir les bonnes pratiques et surveiller les détracteurs isolés.</span>';
+        ih+='</div>';
+        // Score moyen
+        ih+='<div style="padding:14px;border-radius:8px;border-left:4px solid '+(moy>50?'var(--danger)':moy>25?'var(--warning)':'var(--success)')+';background:var(--gray-50);">';
+        ih+='<strong style="font-size:13px;">Score de risque moyen : '+moy+'/100</strong><br>';
+        if(moy<=25) ih+='<span style="font-size:12px;color:var(--gray-600);">Risque faible à l\u2019échelle du cabinet. Pas de plan de rétention généralisé nécessaire. Suivi semestriel suffisant.</span>';
+        else if(moy<=50) ih+='<span style="font-size:12px;color:var(--gray-600);">Risque modéré. Des fragilités existent. Cibler les collaborateurs au-dessus de 26 pour des actions personnalisées.</span>';
+        else ih+='<span style="font-size:12px;color:var(--gray-600);">Risque élevé à critique. L\u2019équipe est en souffrance. Plan de rétention structurel à déployer immédiatement.</span>';
+        ih+='</div>';
+        // Cas critiques
+        ih+='<div style="padding:14px;border-radius:8px;border-left:4px solid '+(critiques>0?'var(--danger)':'var(--success)')+';background:var(--gray-50);">';
+        ih+='<strong style="font-size:13px;">Cas critique'+(critiques>1?'s':'')+' : '+critiques+'</strong><br>';
+        if(critiques===0) ih+='<span style="font-size:12px;color:var(--gray-600);">Aucun collaborateur en zone critique (score > 75). Situation stable. Maintenir la vigilance via les signaux faibles.</span>';
+        else ih+='<span style="font-size:12px;color:var(--gray-600);">'+critiques+' collaborateur'+(critiques>1?'s':'')+' en zone critique. Entretien de rétention sous 48h impératif. Sans intervention rapide, le départ est très probable. Voir onglet « Plan d\u2019action ».</span>';
+        ih+='</div>';
+        // Signaux faibles
+        ih+='<div style="padding:14px;border-radius:8px;border-left:4px solid '+(totalSig>5?'var(--danger)':totalSig>0?'var(--warning)':'var(--success)')+';background:var(--gray-50);">';
+        ih+='<strong style="font-size:13px;">Signaux faibles actifs : '+totalSig+'</strong><br>';
+        if(totalSig===0) ih+='<span style="font-size:12px;color:var(--gray-600);">Aucun signal managérial détecté. Les observations quotidiennes ne relèvent pas d\u2019alerte. Continuer la veille.</span>';
+        else if(totalSig<=3) ih+='<span style="font-size:12px;color:var(--gray-600);">Quelques signaux isolés. Rester vigilant et vérifier s\u2019ils se concentrent sur un même collaborateur.</span>';
+        else ih+='<span style="font-size:12px;color:var(--gray-600);">Nombre élevé de signaux. Les observations managériales confirment les risques identifiés par le questionnaire. La triangulation est cohérente.</span>';
+        ih+='</div>';
+        ih+='</div>';
+        interp.innerHTML=ih;
+    } else { interp.style.display='none'; }
+
+    let th='<table><thead><tr><th>Collaborateur</th><th>Q1</th><th>eNPS</th><th>Q11</th><th>Moy. Q2-Q10</th><th>Signaux</th><th>Score</th><th>Niveau</th><th>Suivi</th></tr></thead><tbody>';
+    collabs.forEach(c=>{
+        const ok=isComplete(c);const calc=ok?calcScore(c):null;const niv=calc?getNiveau(calc.score):null;
+        const enpsC=c.q1!==''&&c.q1!==undefined?getENPS(c.q1):null;
+        const sigCount=getSignalCount(c.id);
+        th+='<tr><td style="text-align:left;font-weight:600;">'+c.nom+'</td>'+
+            '<td>'+(c.q1||'-')+'</td><td>'+(enpsC?'<span style="color:'+enpsC.color+';font-weight:600;">'+enpsC.label+'</span>':'-')+'</td>'+
+            '<td>'+(c.q11||'-')+'</td><td>'+(ok?calc.moyQ+'/5':'-')+'</td>'+
+            '<td>'+(ok?'<span style="color:'+(sigCount>3?'var(--danger)':sigCount>0?'var(--warning)':'var(--success)')+';font-weight:700;">'+calc.sigR+'/'+SIGNAUX_MAX+'</span> <span style="font-size:11px;color:var(--gray-400);">('+sigCount+' sig.)</span>':'-')+'</td>'+
+            '<td style="font-weight:700;">'+(ok?calc.score:'-')+'</td>'+
+            '<td>'+(ok?'<span class="status '+niv.cls+'">'+niv.niv+'</span>':'-')+'</td>'+
+            '<td>'+(ok?niv.action:'-')+'</td></tr>';
+    });
+    th+='</tbody></table>';
+    $('dashTable').innerHTML=th;
+}
+
+// ═══════════════════════════════════════════
+// CHARTS
+// ═══════════════════════════════════════════
+let chartENPS=null,chartRisk=null;
+function renderCharts(){
+    let prom=0,pass=0,det=0;
+    collabs.forEach(c=>{if(c.q1!==''&&c.q1!==undefined){const v=num(c.q1);if(v>=9)prom++;else if(v>=7)pass++;else det++;}});
+
+    if(chartENPS)chartENPS.destroy();
+    chartENPS=new Chart($('chartENPS'),{type:'doughnut',data:{labels:['Promoteurs','Passifs','Détracteurs'],datasets:[{data:[prom,pass,det],backgroundColor:['#059669','#d97706','#dc2626'],borderWidth:2,borderColor:'white'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{padding:16,font:{size:13}}}}}});
+
+    const labels=[],scores=[],colors=[];
+    collabs.forEach(c=>{const ok=isComplete(c);if(ok){const calc=calcScore(c);labels.push(c.nom);scores.push(calc.score);const niv=getNiveau(calc.score);colors.push(niv.color.replace('var(--success)','#059669').replace('var(--warning)','#d97706').replace('var(--danger)','#dc2626').replace('#ea580c','#ea580c'));}});
+
+    if(chartRisk)chartRisk.destroy();
+    chartRisk=new Chart($('chartRisk'),{type:'bar',data:{labels,datasets:[{label:'Score de risque',data:scores,backgroundColor:colors,borderRadius:6,barThickness:36}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',scales:{x:{max:100,grid:{color:'#f3f4f6'},ticks:{font:{size:12}}},y:{ticks:{font:{size:13}}}},plugins:{legend:{display:false}}}});
+}
+
+// ═══════════════════════════════════════════
+// ANALYSE INDIVIDUELLE
+// ═══════════════════════════════════════════
+function renderAnalyse(){
+    const sel=$('selAnalyse');const zone=$('zoneAnalyse');
+    if(!sel||!zone||!sel.value){zone.innerHTML='';return;}
+    const c=collabs.find(x=>x.id===sel.value);
+    if(!c||!isComplete(c)){zone.innerHTML='<p style="color:var(--gray-400);padding:14px;font-size:14px;">Questionnaire incomplet pour ce collaborateur.</p>';return;}
+    const calc=calcScore(c);const niv=getNiveau(calc.score);
+
+    const axes=[
+        {label:'Intention de départ (Q11)',val:calc.idxI,poids:40,contrib:Math.round(calc.idxI*0.40),color:'var(--danger)'},
+        {label:'Signaux faibles observés',val:calc.idxS,poids:25,contrib:Math.round(calc.idxS*0.25),color:'var(--warning)'},
+        {label:'Satisfaction moy. (Q2-Q10)',val:calc.idxSat,poids:20,contrib:Math.round(calc.idxSat*0.20),color:'var(--info)'},
+        {label:'Phase d\'intégration',val:calc.idxInt,poids:10,contrib:Math.round(calc.idxInt*0.10),color:'var(--secondary)'},
+        {label:'Taux de formation',val:calc.idxF,poids:5,contrib:Math.round(calc.idxF*0.05),color:'var(--gray-500)'}
+    ];
+
+    let h='<div style="display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:start;">';
+    h+='<div style="text-align:center;padding:24px 28px;background:var(--gray-50);border-radius:var(--radius);border:2px solid '+niv.color+';"><div style="font-size:48px;font-weight:800;color:'+niv.color+';">'+calc.score+'</div><div style="font-size:14px;color:var(--gray-600);margin-top:4px;">/ 100</div><span class="status '+niv.cls+'" style="margin-top:8px;">'+niv.niv+'</span></div>';
+    h+='<div>';
+    axes.forEach(a=>{
+        const pct=Math.min(100,a.val);
+        h+='<div style="margin-bottom:12px;"><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;"><span>'+a.label+' <span style="color:var(--gray-400);">(×'+a.poids+'%)</span></span><strong>'+a.val+'/100 → +'+a.contrib+' pts</strong></div>';
+        h+='<div style="height:10px;background:var(--gray-200);border-radius:5px;overflow:hidden;"><div style="height:100%;width:'+pct+'%;background:'+a.color+';border-radius:5px;transition:width 0.5s;"></div></div></div>';
+    });
+    h+='</div></div>';
+
+    // Détail signaux faibles pour ce collaborateur
+    const sigCount=getSignalCount(c.id);
+    if(sigCount>0){
+        h+='<div style="margin-top:16px;background:#fef8f8;border:1px solid #fecaca;border-radius:8px;padding:14px;">';
+        h+='<strong style="font-size:13px;color:var(--danger);">👁️ Signaux faibles détectés ('+sigCount+'/15) :</strong><div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;">';
+        SIGNAUX.forEach(s=>{
+            if(signaux[c.id]&&signaux[c.id][s.id]){
+                h+='<span style="background:#fee2e2;color:var(--danger);padding:4px 10px;border-radius:6px;font-size:12px;font-weight:600;">'+s.label+' ('+s.poids+' pts)</span>';
+            }
+        });
+        h+='</div></div>';
+    }
+
+    h+='<div class="info-box'+(calc.score>75?' red':calc.score>50?' warn':calc.score>25?' warn':' ok')+'" style="margin-top:16px;">';
+    h+='<strong>'+niv.emoji+' Interprétation — '+c.nom+'</strong>';
+    if(calc.score<=25) h+='<p>Risque faible. Collaborateur engagé. Suivi semestriel recommandé. Pas de plan de rétention nécessaire à ce stade.</p>';
+    else if(calc.score<=50) h+='<p>Risque modéré. Des signaux de désengagement sont détectés. Un entretien de rétention est recommandé sous 30 jours pour identifier les causes et agir avant dégradation.</p>';
+    else if(calc.score<=75) h+='<p>Risque élevé. Plusieurs indicateurs convergent vers un risque de départ. Un entretien de rétention est à planifier sous 7 jours avec des actions correctives rapides.</p>';
+    else h+='<p>Risque critique. Entretien de rétention sous 48h impératif. Sans action immédiate, le départ est très probable.</p>';
+    h+='</div>';
+    zone.innerHTML=h;
+}
+
+// ═══════════════════════════════════════════
+// RECOMMENDED ACTIONS
+// ═══════════════════════════════════════════
+function getRecommendedActions(c,calc){
+    const actives=new Set();
+    if(calc.score>25) actives.add('entretien');
+    if(calc.score>50) actives.add('diagnostic');
+    SIGNAUX.forEach(s=>{if(signaux[c.id]&&signaux[c.id][s.id]) ACTIONS.forEach(a=>{if(a.drivers.includes(s.id))actives.add(a.id);});});
+    QUESTIONS.forEach(q=>{if(q.type==='sat'&&num(c[q.id])<=2) ACTIONS.forEach(a=>{if(a.drivers.includes(q.id))actives.add(a.id);});});
+    if(num(c.q11)<=2) actives.add('entretien');
+    if(num(c.q11)<=1){actives.add('diagnostic');actives.add('charge');}
+    const prioOrder={urgent:0,important:1,normal:2};
+    return ACTIONS.filter(a=>actives.has(a.id)).sort((a,b)=>prioOrder[a.priorite]-prioOrder[b.priorite]);
+}
+
+function calcActionBudget(a,c){
+    const ct=num($('coutHoraire').value,45);
+    const ci=a.heures*ct;
+    let cd=0;
+    if(a.coutDirect==='salaire_revalo'){
+        cd=Math.round(num(c.salaire)*getTauxRevalo());
+    } else if(a.coutDirect==='formation'){
+        cd=getBudgetFormation();
+    } else {
+        cd=num(a.coutDirect,0);
+    }
+    return ci+cd;
+}
+function calcPlanBudget(c){
+    const calc=calcScore(c);const acts=getRecommendedActions(c,calc);
+    const sel=actionsSel[c.id]||acts.map(a=>a.id);
+    return acts.filter(a=>sel.includes(a.id)).reduce((s,a)=>s+calcActionBudget(a,c),0);
+}
+
+// ═══════════════════════════════════════════
+// ACTIONS & BUDGET
+// ═══════════════════════════════════════════
+function renderActions(){
+    const sel=$('selActions');const zone=$('zoneActions');
+    if(!sel||!zone||!sel.value){zone.innerHTML='';return;}
+    const c=collabs.find(x=>x.id===sel.value);
+    if(!c||!isComplete(c)){zone.innerHTML='<p style="color:var(--gray-400);padding:14px;font-size:14px;">Questionnaire incomplet.</p>';return;}
+    const calc=calcScore(c);const niv=getNiveau(calc.score);
+    if(calc.score<26){zone.innerHTML='<div class="info-box ok"><strong>✅ Aucune action requise</strong><p>Score de '+calc.score+'/100 (seuil : 26). Ce collaborateur ne nécessite pas de plan de rétention. Suivi semestriel recommandé.</p></div>';return;}
+
+    const acts=getRecommendedActions(c,calc);
+    if(!actionsSel[c.id])actionsSel[c.id]=acts.map(a=>a.id);
+    const selA=actionsSel[c.id];
+    let totalBudget=0;
+
+    let h='<div style="margin:12px 0;"><strong style="font-size:16px;color:var(--primary);">Actions recommandées pour '+c.nom+' — Score '+calc.score+' ('+niv.niv+')</strong></div>';
+    h+='<p style="font-size:13px;color:var(--gray-500);margin-bottom:14px;">Cliquez sur une action pour la sélectionner/désélectionner.</p>';
+
+    acts.forEach(a=>{
+        const checked=selA.includes(a.id);
+        const budget=calcActionBudget(a,c);
+        if(checked)totalBudget+=budget;
+        const recurTag=a.recurrent?'<span style="background:#dbeafe;color:#1d4ed8;font-size:10px;padding:2px 8px;border-radius:10px;font-weight:700;margin-left:6px;">RÉCURRENT / AN</span>':'';
+        let costDetail=a.heures+'h × '+num($('coutHoraire').value,45)+' € <span style="color:var(--gray-400);font-size:10px;">(coût d\'opportunité)</span>';
+        if(a.coutDirect==='salaire_revalo'){
+            costDetail+=' + '+getTauxRevaloLabel()+' sal. <span style="color:var(--gray-400);font-size:10px;">(coût réel récurrent)</span>';
+        } else if(a.coutDirect==='formation'){
+            costDetail+=' + '+fmt(getBudgetFormation())+' € form. <span style="color:var(--gray-400);font-size:10px;">(coût réel)</span>';
+        } else if(a.coutDirect>0){
+            costDetail+=' + '+fmt(a.coutDirect)+' € <span style="color:var(--gray-400);font-size:10px;">(coût réel)</span>';
+        }
+        h+='<div class="action-card'+(checked?' selected':'')+'" onclick="toggleAction(\''+c.id+'\',\''+a.id+'\')">'+
+            '<div class="action-prio '+a.priorite+'">'+({urgent:'!',important:'‼',normal:'·'}[a.priorite])+'</div>'+
+            '<div class="action-content"><h4>'+a.label+recurTag+'</h4><p>'+a.desc+' — <em>'+a.delai+'</em></p></div>'+
+            '<div class="action-meta">'+fmt(budget)+' €<div class="action-budget">'+costDetail+'</div></div></div>';
+    });
+
+    // ═══ DISTINCTION PONCTUEL / RÉCURRENT ═══
+    let budgetPonctuel=0, budgetRecurrent=0;
+    acts.filter(a=>selA.includes(a.id)).forEach(a=>{
+        const b=calcActionBudget(a,c);
+        if(a.recurrent) budgetRecurrent+=b; else budgetPonctuel+=b;
+    });
+
+    // ═══ ANALYSE FINANCIÈRE TRANSPARENTE ═══
+    const coutDepart=getCoutDepart(c);
+    const scenarioLabel={bas:'basse (15 000 €)',median:'médiane (20 000 €)',haut:'haute (25 000 €)',custom:'personnalisée'};
+    const scLbl=scenarioLabel[$('scenarioDepart').value]||'médiane';
+
+    h+='<div class="financial-box">';
+    h+='<h4>📊 Mise en perspective financière — aide à l\'arbitrage</h4>';
+
+    // Distinction coût d'opportunité / coût réel
+    const coutOpportunite=acts.filter(a=>selA.includes(a.id)).reduce((s,a)=>s+a.heures*num($('coutHoraire').value,45),0);
+    const coutReel=totalBudget-coutOpportunite;
+
+    h+='<div class="financial-row"><span class="label">Coût d\'opportunité (temps manager mobilisé)<br><span class="formula">↳ Heures × coût horaire chargé — temps soustrait à la production, non décaissé</span></span><span class="value">'+fmt(coutOpportunite)+' €</span></div>';
+    h+='<div class="financial-row"><span class="label">Coût réel décaissé (formation, revalorisation…)<br><span class="formula">↳ Dépenses effectives entraînant un décaissement ou un engagement récurrent</span></span><span class="value">'+fmt(coutReel)+' €</span></div>';
+
+    if(budgetRecurrent>0){
+        h+='<div class="financial-row"><span class="label" style="color:var(--warning);"><em>dont coût récurrent annuel</em><br><span class="formula">↳ Revalorisation salariale '+getTauxRevaloLabel()+' : impact permanent sur la masse salariale</span></span><span class="value" style="color:var(--warning);">'+fmt(budgetRecurrent)+' € / an</span></div>';
+    }
+
+    h+='<div class="financial-row" style="border-top:2px solid var(--primary);padding-top:14px;"><span class="label"><strong>Budget total Année 1</strong></span><span class="value" style="font-weight:800;color:var(--primary);font-size:18px;">'+fmt(totalBudget)+' €</span></div>';
+
+    h+='<div style="margin:14px 0;padding:1px 0;border-top:1px dashed var(--gray-300);"></div>';
+
+    h+='<div class="financial-row"><span class="label">Coût estimé d\'un départ — hypothèse '+scLbl+'<br><span class="formula">Source : entretien n° 5, Annexe 25. Contexte : 49 % des cabinets déclarent des difficultés de recrutement (OMECA S2 2025).</span></span><span class="value">'+fmt(coutDepart)+' €</span></div>';
+
+    // Niveau de risque qualitatif (PAS de probabilité chiffrée)
+    const niveauRisqueLabel=calc.score<=25?'Faible — suivi semestriel suffisant':calc.score<=50?'Modéré — actions préventives recommandées':calc.score<=75?'Élevé — plan de rétention sous 30 jours':'Critique — intervention sous 48h impérative';
+    h+='<div class="financial-row"><span class="label">Niveau de risque du collaborateur (score '+calc.score+'/100)</span><span class="value" style="color:'+niv.color+';">'+niveauRisqueLabel+'</span></div>';
+
+    h+='<div class="ratio-box">';
+    const pctExpo=totalBudget>0?Math.round((totalBudget/coutDepart)*100):0;
+    h+='<div class="ratio-value">Plan : '+fmt(totalBudget)+' € — Exposition départ : '+fmt(coutDepart)+' €</div>';
+    h+='<div class="ratio-label">Le plan de rétention représente <strong>'+pctExpo+' %</strong> du coût estimé d\'un départ</div>';
+    h+='<div class="ratio-detail">'+(pctExpo<30?'L\'investissement est nettement inférieur au coût d\'un remplacement.':pctExpo<60?'L\'investissement reste inférieur au coût d\'un remplacement.':'L\'investissement se rapproche du coût de remplacement — vérifier la pertinence de chaque action.')+' '+(budgetRecurrent>0?'Dont '+fmt(budgetRecurrent)+' € récurrents (annuels). ':'')+'Simulation paramétrable.</div>';
+    h+='</div>';
+
+    h+='<div class="source-note">Sources : coût de remplacement 15 000-25 000 € (entretien n° 5, Annexe 25, consultant RH cabinets EC). Contexte sectoriel : 49 % de difficultés de recrutement (OMECA, Baromètre S2 2025, n = 301). Coût horaire = salaire brut × 1,45 ÷ 1 607 h (art. L.3121-41 C. trav., IDCC 0787). Formation : 1 500-3 000 €/an/pers. (entretien n° 5). Revalorisation : taux paramétré par l\'utilisateur (repères OMECA et INSEE). <strong>Tous les montants dépendent des hypothèses saisies — simulation indicative.</strong></div>';
+    h+='</div>';
+
+    zone.innerHTML=h;
+}
+
+function toggleAction(cid,aid){
+    if(!actionsSel[cid])actionsSel[cid]=[];
+    const idx=actionsSel[cid].indexOf(aid);
+    if(idx>=0)actionsSel[cid].splice(idx,1);else actionsSel[cid].push(aid);
+    save();renderActions();
+}
+
+// ═══════════════════════════════════════════
+// DECISION TABLE
+// ═══════════════════════════════════════════
+function renderDecisionTable(){
+    const tb=$('bodyDecision');if(!tb)return;tb.innerHTML='';
+    document.querySelectorAll('.decision-card').forEach(c=>{c.classList.remove('selected');if(c.classList.contains(decisionGlobale==='GO'?'go':decisionGlobale==='COND'?'cond':decisionGlobale==='NOGO'?'nogo':''))c.classList.add('selected');});
+    let totalBudget=0,totalDepart=0;
+    collabs.forEach(c=>{
+        const ok=isComplete(c);const calc=ok?calcScore(c):null;const niv=calc?getNiveau(calc.score):null;
+        const acts=ok&&calc.score>=26?getRecommendedActions(c,calc):[];
+        const selA=actionsSel[c.id]||acts.map(a=>a.id);
+        const nbA=acts.filter(a=>selA.includes(a.id)).length;
+        const bud=ok&&calc.score>=26?calcPlanBudget(c):0;
+        const statut=decisionsIndiv[c.id]||'NA';
+        const coutDep=ok&&calc.score>=26?getCoutDepart(c):0;
+        totalBudget+=bud;totalDepart+=coutDep;
+        tb.innerHTML+='<tr><td style="text-align:left;font-weight:600;">'+c.nom+'</td>'+
+            '<td style="font-weight:700;">'+(ok?calc.score+'/100':'-')+'</td>'+
+            '<td>'+(ok?'<span class="status '+niv.cls+'">'+niv.niv+'</span>':'-')+'</td>'+
+            '<td>'+(nbA||'-')+'</td><td>'+(bud>0?fmt(bud)+' \u20ac':'-')+'</td>'+
+            '<td><select style="font-size:13px;padding:6px 10px;border-radius:6px;border:1px solid var(--gray-300);" onchange="setDecIndiv(\''+c.id+'\',this.value)">'+
+                '<option value="NA"'+(statut==='NA'?' selected':'')+'>—</option>'+
+                '<option value="RETENU"'+(statut==='RETENU'?' selected':'')+'>Plan valid\u00e9</option>'+
+                '<option value="OBSERVATION"'+(statut==='OBSERVATION'?' selected':'')+'>En observation</option>'+
+                '<option value="DEPART"'+(statut==='DEPART'?' selected':'')+'>D\u00e9part organis\u00e9</option>'+
+            '</select></td></tr>';
+    });
+    if(totalBudget>0){
+        const ratioGlobal=totalDepart>0?(totalDepart/totalBudget).toFixed(1):'-';
+        tb.innerHTML+='<tr style="background:var(--gray-100);font-weight:700;border-top:2px solid var(--primary);">'+
+            '<td style="text-align:left;" colspan="4">TOTAL</td>'+
+            '<td>'+fmt(totalBudget)+' \u20ac</td>'+
+            '<td style="font-size:12px;color:var(--primary);">Co\u00fbt d\u00e9parts : '+fmt(totalDepart)+' \u20ac \u2014 Ratio 1:'+ratioGlobal+'</td></tr>';
+    }
+}
+function selectDecision(d){
+    decisionGlobale=d;save();
+    document.querySelectorAll('.decision-card').forEach(c=>c.classList.remove('selected'));
+    document.querySelector('.decision-card.'+(d==='GO'?'go':d==='COND'?'cond':'nogo')).classList.add('selected');
+}
+function setDecIndiv(cid,val){decisionsIndiv[cid]=val;save();}
+
+// ═══════════════════════════════════════════
+// SAVE / LOAD
+// ═══════════════════════════════════════════
+function save(){
+    try{localStorage.setItem('a23_v10',JSON.stringify({collabs,signaux,actionsSel,decisionsIndiv,decisionGlobale,isDemoActive,config:{nom:$('nomCabinet').value,camp:$('campagne').value,date:$('dateEval').value,salMgr:$('salaireManager').value,scenario:$('scenarioDepart').value,coutCustom:$('coutDepartCustom').value,cout:$('coutHoraire').value,tauxRevalo:$('tauxRevalo').value,tauxRevaloCustom:$('tauxRevaloCustom').value,budgetFormation:$('budgetFormation').value,budgetFormationCustom:$('budgetFormationCustom').value}}));}catch(e){}
+}
+function load(){
+    try{
+        const d=JSON.parse(localStorage.getItem('a23_v10'));if(!d)return;
+        collabs=d.collabs||[];signaux=d.signaux||{};actionsSel=d.actionsSel||{};decisionsIndiv=d.decisionsIndiv||{};decisionGlobale=d.decisionGlobale||'';isDemoActive=d.isDemoActive||false;
+        if(d.config){$('nomCabinet').value=d.config.nom||'';$('campagne').value=d.config.camp||'';$('dateEval').value=d.config.date||'';$('salaireManager').value=d.config.salMgr||'50000';$('scenarioDepart').value=d.config.scenario||'median';$('coutDepartCustom').value=d.config.coutCustom||'20000';if(d.config.tauxRevalo){$('tauxRevalo').value=d.config.tauxRevalo;}if(d.config.tauxRevaloCustom){$('tauxRevaloCustom').value=d.config.tauxRevaloCustom;}if(d.config.budgetFormation){$('budgetFormation').value=d.config.budgetFormation;}if(d.config.budgetFormationCustom){$('budgetFormationCustom').value=d.config.budgetFormationCustom;}updateScenario();updateRevalo();updateFormation();calcCoutHoraire();}
+    }catch(e){}
+}
+function exporterJSON(){
+    save();const d=localStorage.getItem('a23_v10');
+    const blob=new Blob([d],{type:'application/json'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='Annexe23_'+$('nomCabinet').value.replace(/\s/g,'_')+'.json';a.click();
+    toast('JSON exporté');
+}
+function handleImport(e){
+    const f=e.target.files[0];if(!f)return;
+    const r=new FileReader();
+    r.onload=function(ev){
+        try{
+            const d=JSON.parse(ev.target.result);
+            collabs=d.collabs||[];signaux=d.signaux||{};actionsSel=d.actionsSel||{};decisionsIndiv=d.decisionsIndiv||{};decisionGlobale=d.decisionGlobale||'';
+            if(d.config){$('nomCabinet').value=d.config.nom||'';$('campagne').value=d.config.camp||'';$('dateEval').value=d.config.date||'';$('salaireManager').value=d.config.salMgr||'50000';$('scenarioDepart').value=d.config.scenario||'median';$('coutDepartCustom').value=d.config.coutCustom||'20000';if(d.config.tauxRevalo){$('tauxRevalo').value=d.config.tauxRevalo;}if(d.config.budgetFormation){$('budgetFormation').value=d.config.budgetFormation;}updateScenario();updateRevalo();updateFormation();calcCoutHoraire();}
+            save();renderEquipe();showTab('config');toast('Données importées');
+        }catch(err){alert('Fichier JSON invalide.');}
+    };r.readAsText(f);e.target.value='';
+}
+
+// ═══════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════
+function toast(msg){const t=$('toast');t.textContent='✓ '+msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+
+// ═══════════════════════════════════════════
+// PDF QUESTIONNAIRE
+// ═══════════════════════════════════════════
+function genererPDFQuestionnaire(){
+    const {jsPDF}=window.jspdf;
+    const doc=new jsPDF('p','mm','a4');
+    const W=210,H=297,M=20,pw=W-2*M;
+    let y=20;
+    const navy=[30,58,95],gray=[75,85,99],lightGray=[229,231,235];
+
+    function checkY(need){if(y+need>H-25){doc.addPage();y=20;addPageHeader();}}
+    function addPageHeader(){
+        doc.setFontSize(7);doc.setTextColor(160,160,160);
+        doc.text('Annexe 23 \u2014 Questionnaire d\u2019engagement',M,12);
+        doc.text($('nomCabinet').value+' | '+$('campagne').value,W-M,12,{align:'right'});
+    }
+
+    doc.setFillColor(navy[0],navy[1],navy[2]);doc.rect(0,0,W,8,'F');
+    y=18;
+    doc.setFontSize(20);doc.setFont(undefined,'bold');doc.setTextColor(navy[0],navy[1],navy[2]);
+    doc.text('Questionnaire d\u2019Engagement',W/2,y,{align:'center'});y+=8;
+    doc.setFontSize(11);doc.setFont(undefined,'normal');doc.setTextColor(gray[0],gray[1],gray[2]);
+    doc.text('Confidentiel',W/2,y,{align:'center'});y+=10;
+    doc.setDrawColor(navy[0],navy[1],navy[2]);doc.setLineWidth(0.5);doc.line(M,y,W-M,y);y+=8;
+    doc.setFontSize(10);doc.setTextColor(gray[0],gray[1],gray[2]);doc.setFont(undefined,'normal');
+    doc.text('Cabinet : '+$('nomCabinet').value,M,y);doc.text('Campagne : '+$('campagne').value,W-M,y,{align:'right'});y+=5;
+    doc.text('Date : '+($('dateEval').value||'___/___/______'),M,y);doc.text('Dur\u00e9e : 5 minutes',W-M,y,{align:'right'});y+=10;
+
+    const consignesText='R\u00e9pondez sinc\u00e8rement \u00e0 chaque question. Ce questionnaire est confidentiel : vos r\u00e9ponses sont accessibles uniquement au dirigeant du cabinet aux fins d\u2019am\u00e9lioration des conditions de travail. Elles ne seront en aucun cas communiqu\u00e9es \u00e0 des tiers. Cochez la valeur qui correspond le mieux \u00e0 votre ressenti.';
+    const consLines=doc.splitTextToSize(consignesText,pw-14);
+    const rgpdLine='Conformit\u00e9 RGPD art. 5, 6 \u2014 Donn\u00e9es confidentielles. Acc\u00e8s r\u00e9serv\u00e9 au dirigeant. Droits : RGPD art. 15 \u00e0 17.';
+    const boxH=10+consLines.length*4.5+10;
+    doc.setFillColor(249,250,251);doc.roundedRect(M,y,pw,boxH,2,2,'F');doc.setDrawColor(lightGray[0],lightGray[1],lightGray[2]);doc.roundedRect(M,y,pw,boxH,2,2,'S');
+    doc.setFontSize(10);doc.setFont(undefined,'bold');doc.setTextColor(navy[0],navy[1],navy[2]);doc.text('Consignes',M+7,y+6);
+    doc.setFont(undefined,'normal');doc.setFontSize(9);doc.setTextColor(gray[0],gray[1],gray[2]);
+    consLines.forEach((l,i)=>{doc.text(l,M+7,y+12+i*4.5);});
+    doc.setFontSize(7);doc.setTextColor(160,160,160);doc.text(rgpdLine,M+7,y+boxH-4);y+=boxH+6;
+
+    function addSection(title){checkY(12);doc.setFontSize(12);doc.setFont(undefined,'bold');doc.setTextColor(navy[0],navy[1],navy[2]);
+    doc.setFillColor(navy[0],navy[1],navy[2]);doc.rect(M,y,pw,0.8,'F');y+=5;doc.text(title,M,y);y+=6;}
+    function addQuestion(code,text,min,max){
+        checkY(16);doc.setFontSize(10);doc.setFont(undefined,'bold');doc.setTextColor(navy[0],navy[1],navy[2]);doc.text(code,M+2,y);
+        doc.setFont(undefined,'normal');doc.setTextColor(gray[0],gray[1],gray[2]);
+        const lines=doc.splitTextToSize(text,pw-50);lines.forEach((l,i)=>{doc.text(l,M+16,y+i*4);});y+=lines.length*4+2;
+        const circleY=y;const circleStart=M+16;const r=3.5;const gap=9;
+        for(let v=min;v<=max;v++){const cx=circleStart+(v-min)*gap;doc.setDrawColor(gray[0],gray[1],gray[2]);doc.setLineWidth(0.4);doc.circle(cx,circleY,r);doc.setFontSize(7);doc.setTextColor(gray[0],gray[1],gray[2]);doc.text(String(v),cx,circleY+0.8,{align:'center'});}
+        y+=10;
+    }
+
+    addSection('Recommandation globale');
+    addQuestion('Q1','Sur une \u00e9chelle de 0 \u00e0 10, quelle est la probabilit\u00e9 que vous recommandiez ce cabinet comme employeur \u00e0 un confr\u00e8re ou un ami ?',0,10);
+    addSection('Satisfaction d\u00e9taill\u00e9e (1 = pas du tout \u2014 5 = tout \u00e0 fait)');
+    const qSat=[{c:'Q2',t:'Les conditions de travail (équipement, ergonomie, outils) sont satisfaisantes.'},{c:'Q3',t:'La communication avec la direction est fluide et transparente.'},{c:'Q4',t:'Je me sens reconnu(e) et valorisé(e) dans mon travail.'},{c:'Q5',t:'Mon rôle et mes responsabilités sont clairement définis.'},{c:'Q6',t:'L\'ambiance de travail au sein de l\'équipe est agréable.'},{c:'Q7',t:'L\'équilibre entre vie professionnelle et vie personnelle est respecté.'},{c:'Q8',t:'La charge de travail est raisonnable et bien répartie.'},{c:'Q9',t:'Ma rémunération est en adéquation avec mes compétences et mes responsabilités.'},{c:'Q10',t:'J\'ai des perspectives d\'évolution au sein du cabinet.'}];
+    qSat.forEach(q=>addQuestion(q.c,q.t,1,5));
+    addSection('Intention de départ (1 = départ certain \u2014 5 = fidélité totale)');
+    addQuestion('Q11','Je me vois encore travailler dans ce cabinet dans 12 mois.',1,5);
+
+    checkY(18);doc.setFillColor(249,250,251);doc.roundedRect(M,y,pw,14,2,2,'F');
+    doc.setFontSize(7);doc.setTextColor(160,160,160);
+    doc.text('Réf. : Art. L.4121-1, L.6315-1 C. trav. · NPMQ §22, §32-33 · Art. 148 Code de déontologie (Décret n° 2012-432 modifié) · RGPD art. 5, 6 · IDCC 0787',M+3,y+5);
+    doc.text('eNPS : méthodologie Bain & Company (2003). Scoring : méthodologie personnelle — Réalisé par le candidat (triangulation ISA 500).',M+3,y+10);
+
+    const tp=doc.internal.getNumberOfPages();
+    for(let p=1;p<=tp;p++){doc.setPage(p);doc.setFontSize(7);doc.setTextColor(180,180,180);doc.text('Annexe 23 \u2014 Source : réalisé par le candidat',M,H-8);doc.text('Page '+p+'/'+tp,W-M,H-8,{align:'right'});doc.setFillColor(navy[0],navy[1],navy[2]);doc.rect(0,H-3,W,3,'F');}
+
+    doc.save('Annexe23_Questionnaire_'+$('nomCabinet').value.replace(/\s/g,'_')+'.pdf');
+    toast('Questionnaire PDF généré');
+}
+
+// ═══════════════════════════════════════════
+// PDF RAPPORT
+// ═══════════════════════════════════════════
+function genererPDF(){
+    const {jsPDF}=window.jspdf;
+    const doc=new jsPDF('p','mm','a4');
+    const W=210,H=297,M=15,pw=W-2*M;let y=20;
+    const navy=[30,58,95],teal=[13,148,136],gray=[71,85,99];
+    function checkY(need){if(y+need>H-20){doc.addPage();y=20;}}
+    function fmtP(n){return String(Math.round(Number(n))).replace(/\B(?=(\d{3})+(?!\d))/g,' ');}
+
+    // HEADER
+    doc.setFillColor(navy[0],navy[1],navy[2]);doc.roundedRect(M,y-5,pw,28,3,3,'F');
+    doc.setTextColor(255,255,255);doc.setFontSize(15);doc.setFont(undefined,'bold');
+    doc.text('Annexe 23 \u2014 Barom\u00e8tre d\u2019engagement et plan de r\u00e9tention',M+8,y+4);
+    doc.setFontSize(10);doc.setFont(undefined,'normal');
+    doc.text($('nomCabinet').value+' | Campagne '+$('campagne').value+' | '+($('dateEval').value||'Non dat\u00e9'),M+8,y+12);
+    doc.text('Outil de diagnostic RH : eNPS, scoring multiaxes, plan d\u2019action chiffr\u00e9',M+8,y+18);
+    y+=32;
+
+    doc.setFontSize(8);doc.setTextColor(gray[0],gray[1],gray[2]);
+    doc.text('R\u00e9f. : NPMQ \u00a722, \u00a732-33 | Art. L.4121-1 C. trav. | RGPD art. 5, 6 | Art. 148 Code de d\u00e9ontologie (D\u00e9cret n\u00b0 2012-432 modifi\u00e9) | IDCC 0787',M,y);y+=8;
+
+    // 1. TABLEAU
+    doc.setFontSize(13);doc.setFont(undefined,'bold');doc.setTextColor(navy[0],navy[1],navy[2]);
+    doc.text('1. Tableau de bord synth\u00e9tique',M,y);y+=8;
+
+    let prom=0,pass=0,det=0,nbOk=0,totalS=0;
+    collabs.forEach(c=>{if(c.q1!==''&&c.q1!==undefined){const v=num(c.q1);if(v>=9)prom++;else if(v>=7)pass++;else det++;}const ok=isComplete(c);if(ok){nbOk++;totalS+=calcScore(c).score;}});
+    const enps=collabs.length>0?Math.round(((prom-det)/collabs.length)*100):0;
+    const moy=nbOk>0?Math.round(totalS/nbOk):0;
+
+    doc.setFontSize(10);doc.setFont(undefined,'normal');doc.setTextColor(gray[0],gray[1],gray[2]);
+    doc.text('eNPS global : '+(enps>0?'+':'')+enps+' ('+prom+'P / '+pass+'N / '+det+'D) | Risque moyen : '+moy+'/100 | Compl\u00e9tude : '+nbOk+'/'+collabs.length,M,y);y+=8;
+
+    const colW=[40,15,15,15,18,15,22];
+    doc.setFillColor(navy[0],navy[1],navy[2]);doc.roundedRect(M,y-4,pw,8,1,1,'F');
+    doc.setTextColor(255,255,255);doc.setFontSize(9);doc.setFont(undefined,'bold');
+    let xH=M+3;
+    ['Collaborateur','Q1','Q11','Moy.','Signaux','Score','Niveau'].forEach((h,i)=>{doc.text(h,xH,y+1);xH+=colW[i];});y+=8;
+
+    doc.setFont(undefined,'normal');doc.setTextColor(gray[0],gray[1],gray[2]);
+    collabs.forEach((c,idx)=>{
+        checkY(7);const ok=isComplete(c);const calc=ok?calcScore(c):null;const niv=calc?getNiveau(calc.score):null;
+        if(idx%2===0){doc.setFillColor(249,250,251);doc.rect(M,y-4,pw,7,'F');}
+        doc.setFontSize(9);let x=M+3;
+        doc.text(c.nom.substring(0,24),x,y);x+=colW[0];
+        doc.text(c.q1?c.q1+'/10':'-',x,y);x+=colW[1];
+        doc.text(c.q11?c.q11+'/5':'-',x,y);x+=colW[2];
+        doc.text(ok?calc.moyQ+'/5':'-',x,y);x+=colW[3];
+        doc.text(ok?Math.round(calc.idxS)+'%':'-',x,y);x+=colW[4];
+        doc.text(ok?String(calc.score):'-',x,y);x+=colW[5];
+        doc.text(ok?niv.niv:'-',x,y);y+=7;
+    });y+=6;
+
+    // 2. PLANS D'ACTION
+    checkY(14);
+    doc.setFontSize(13);doc.setFont(undefined,'bold');doc.setTextColor(navy[0],navy[1],navy[2]);
+    doc.text('2. Plans d\u2019action individuels',M,y);y+=6;
+
+    // Note explicative : collaborateurs exclus
+    const exclus=collabs.filter(c=>{const calc=calcScore(c);return calc.complete&&calc.score<26;});
+    if(exclus.length>0){
+        doc.setFontSize(8);doc.setFont(undefined,'italic');doc.setTextColor(gray[0],gray[1],gray[2]);
+        const exNoms=exclus.map(c=>c.nom+' (score '+calcScore(c).score+')').join(', ');
+        doc.text('Note : '+exNoms+' \u2014 score < 26/100 (risque faible). Aucun plan de r\u00e9tention requis. Suivi semestriel recommand\u00e9.',M,y);y+=8;
+    } else {y+=2;}
+
+    collabs.forEach(c=>{
+        const calc=calcScore(c);if(!calc.complete||calc.score<26)return;
+        const niv=getNiveau(calc.score);checkY(22);
+        doc.setFillColor(249,250,251);doc.roundedRect(M,y-4,pw,8,1,1,'F');
+        doc.setFontSize(10);doc.setFont(undefined,'bold');doc.setTextColor(navy[0],navy[1],navy[2]);
+        doc.text(niv.niv+' - '+c.nom+' - Score '+calc.score+'/100',M+4,y+1);y+=10;
+
+        const acts=getRecommendedActions(c,calc);
+        const sel=actionsSel[c.id]||acts.map(a=>a.id);
+        let budget=0;
+        doc.setFont(undefined,'normal');doc.setTextColor(gray[0],gray[1],gray[2]);doc.setFontSize(9);
+        acts.filter(a=>sel.includes(a.id)).forEach(a=>{
+            checkY(6);const b=calcActionBudget(a,c);budget+=b;
+            const detail=a.coutDirect==='salaire_revalo'?' ('+getTauxRevaloLabel()+')':a.coutDirect==='formation'?' (budget param.)':'';
+            doc.text('  \u2013 '+a.label+detail+' ('+a.delai+') : '+fmtP(b)+' \u20ac',M+4,y);y+=6;
+        });
+
+        checkY(14);
+        doc.setFont(undefined,'bold');doc.setFontSize(10);
+        doc.text('  Budget du plan : '+fmtP(budget)+' \u20ac',M+4,y);y+=6;
+
+        const coutDep=getCoutDepart(c);
+        const pctExpo=budget>0?Math.round((budget/coutDep)*100):0;
+
+        doc.setFont(undefined,'normal');doc.setFontSize(9);
+        doc.text('  Co\u00fbt estim\u00e9 d\u2019un d\u00e9part : '+fmtP(coutDep)+' \u20ac (hypoth\u00e8se '+($('scenarioDepart').value||'m\u00e9diane')+', entretien n\u00b0 5, Annexe 25)',M+4,y);y+=5;
+        const niveauRisq=calc.score<=25?'Faible':calc.score<=50?'Mod\u00e9r\u00e9':calc.score<=75?'\u00c9lev\u00e9':'Critique';
+        doc.text('  Niveau de risque : '+niveauRisq+' (score '+calc.score+'/100)',M+4,y);y+=5;
+        doc.setFont(undefined,'bold');
+        doc.text('  Exposition : le plan repr\u00e9sente '+pctExpo+' % du co\u00fbt estim\u00e9 d\u2019un d\u00e9part \u2014 simulation param\u00e9trable',M+4,y);y+=10;
+    });
+
+    // 3. DECISION
+    checkY(22);
+    doc.setFontSize(13);doc.setFont(undefined,'bold');doc.setTextColor(navy[0],navy[1],navy[2]);
+    doc.text('3. D\u00e9cision globale',M,y);y+=8;
+    doc.setFontSize(10);doc.setFont(undefined,'normal');doc.setTextColor(gray[0],gray[1],gray[2]);
+    const decLabels={GO:'GO \u2014 Plan valid\u00e9',COND:'GO Conditionnel \u2014 Actions prioritaires',NOGO:'NO GO \u2014 Plan report\u00e9'};
+    doc.text('D\u00e9cision : '+(decLabels[decisionGlobale]||'Non d\u00e9finie'),M,y);y+=6;
+    const com=($('commentDecision').value||'Aucun commentaire').substring(0,350);
+    doc.splitTextToSize('Commentaire : '+com,pw-6).forEach(l=>{checkY(5);doc.text(l,M+3,y);y+=5;});y+=8;
+
+    // 4. SIGNATURES
+    checkY(38);
+    doc.setFontSize(13);doc.setFont(undefined,'bold');doc.setTextColor(navy[0],navy[1],navy[2]);
+    doc.text('4. Signatures',M,y);y+=10;
+    doc.setFontSize(10);doc.setFont(undefined,'normal');doc.setTextColor(gray[0],gray[1],gray[2]);
+    doc.text('Le dirigeant :',M+3,y);doc.text('Date : ___/___/______',M+3,y+10);doc.text('Signature :',M+3,y+22);
+    doc.text('Le manager r\u00e9f\u00e9rent :',M+pw/2+3,y);doc.text('Date : ___/___/______',M+pw/2+3,y+10);doc.text('Signature :',M+pw/2+3,y+22);y+=32;
+
+    // SOURCES & RGPD
+    checkY(20);
+    doc.setFillColor(249,250,251);doc.roundedRect(M,y,pw,18,2,2,'F');
+    doc.setFontSize(7);doc.setTextColor(160,160,160);
+    doc.text('Sources : eNPS (Bain & Company, 2003). Co\u00fbt de remplacement : 15 000-25 000 \u20ac (entretien n\u00b0 5, Annexe 25). Difficult\u00e9s recrutement : 49 % (OMECA S2 2025, n=301).',M+3,y+5);
+    doc.text('Co\u00fbt horaire : salaire brut \u00d7 1,45 \u00f7 1 607 h (art. L.3121-41 C. trav., IDCC 0787). Formation : 1 500-3 000 \u20ac/an/pers. (entretien n\u00b0 5). Simulation param\u00e9trable.',M+3,y+9);
+    doc.text('RGPD art. 5, 6 | Finalit\u00e9 : pilotage r\u00e9tention, pr\u00e9vention RPS (art. L.4121-1 C. trav.) | Conservation : dur\u00e9es l\u00e9gales | Acc\u00e8s : dirigeant, manager r\u00e9f\u00e9rent.',M+3,y+13);
+
+    const tp=doc.internal.getNumberOfPages();
+    for(let p=1;p<=tp;p++){doc.setPage(p);doc.setFontSize(8);doc.setTextColor(180,180,180);doc.text('Annexe 23 \u2014 Barom\u00e8tre d\u2019engagement | Source : r\u00e9alis\u00e9 par le candidat',M,H-8);doc.text('Page '+p+'/'+tp,W-M,H-8,{align:'right'});}
+
+    doc.save('Annexe23_Barometre_'+$('nomCabinet').value.replace(/\s/g,'_')+'.pdf');
+    toast('PDF généré');
+}
+
+// ═══════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════
+function init(){
+    $('dateEval').value=new Date().toISOString().split('T')[0];
+    calcCoutHoraire();
+    load();renderEquipe();
+    ['nomCabinet','campagne','dateEval','salaireManager','scenarioDepart','coutDepartCustom','tauxRevalo','tauxRevaloCustom','budgetFormation','budgetFormationCustom'].forEach(id=>{
+        const el=$(id);if(el) el.addEventListener('change',function(){
+            if(id==='tauxRevalo') updateRevalo();
+            if(id==='budgetFormation') updateFormation();
+            save();
+        });
+    });
+}
+init();
+</script>
+</body>
+</html>

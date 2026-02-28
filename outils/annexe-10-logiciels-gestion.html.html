@@ -1,0 +1,2382 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Annexe 10 — Comparatif des logiciels de gestion de cabinet</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.1/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        :root {
+            --primary: #1e3a5f;
+            --primary-light: #2d5a8a;
+            --secondary: #0d9488;
+            --secondary-light: #14b8a6;
+            --accent: #f59e0b;
+            --danger: #dc2626;
+            --success: #059669;
+            --warning: #d97706;
+            --info: #2563eb;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --radius: 12px;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, var(--gray-100) 0%, #e0e7ef 100%);
+            color: var(--gray-700);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        .container { max-width: 1400px; margin: 0 auto; padding: 24px; }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            border-radius: var(--radius);
+            padding: 32px;
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+        .header::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 300px;
+            height: 300px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 50%;
+        }
+        .header h1 { font-size: 24px; font-weight: 700; margin-bottom: 8px; position: relative; }
+        .header p { opacity: 0.9; font-size: 14px; max-width: 900px; position: relative; }
+        .header-meta { display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
+        .badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: rgba(255,255,255,0.15);
+            padding: 6px 14px; border-radius: 20px;
+            font-size: 12px; font-weight: 600;
+        }
+        .badge-accent { background: var(--secondary); color: white; }
+        .badge-warning { background: var(--accent); color: var(--gray-800); }
+
+        .context-box {
+            background: rgba(255,255,255,0.1);
+            border-left: 4px solid var(--accent);
+            padding: 16px 20px;
+            border-radius: 0 8px 8px 0;
+            margin-top: 20px;
+        }
+        .context-box p { font-size: 13px; margin-bottom: 6px; opacity: 0.95; }
+        .context-box p:last-child { margin-bottom: 0; }
+
+        /* Action Bar */
+        .action-bar { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
+        .btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 12px 24px; border: none; border-radius: 8px;
+            font-size: 14px; font-weight: 600; cursor: pointer;
+            transition: all 0.2s; text-decoration: none;
+        }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-light); transform: translateY(-2px); box-shadow: var(--shadow); }
+        .btn-secondary { background: var(--gray-200); color: var(--gray-700); }
+        .btn-secondary:hover { background: var(--gray-300); transform: translateY(-2px); }
+        .btn-success { background: var(--success); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
+
+        /* Tabs */
+        .tabs {
+            display: flex; gap: 4px; background: white; padding: 8px;
+            border-radius: var(--radius); box-shadow: var(--shadow);
+            margin-bottom: 24px; flex-wrap: wrap;
+        }
+        .tab {
+            padding: 10px 16px; border: none; background: transparent;
+            font-size: 13px; font-weight: 600; color: var(--gray-600);
+            border-radius: 8px; cursor: pointer; transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .tab:hover { background: var(--gray-100); }
+        .tab.active { background: var(--primary); color: white; }
+
+        /* Panels */
+        .panel { display: none; animation: fadeIn 0.3s ease; }
+        .panel.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Cards */
+        .card {
+            background: white; border-radius: var(--radius);
+            padding: 24px; box-shadow: var(--shadow); margin-bottom: 20px;
+        }
+        .card-header {
+            display: flex; align-items: center; gap: 12px;
+            margin-bottom: 16px; padding-bottom: 16px;
+            border-bottom: 1px solid var(--gray-200);
+        }
+        .card-icon {
+            width: 48px; height: 48px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            border-radius: 10px; display: flex; align-items: center; justify-content: center;
+            font-size: 22px; color: white; flex-shrink: 0;
+        }
+        .card-icon.secondary { background: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-light) 100%); }
+        .card-icon.danger { background: linear-gradient(135deg, var(--danger) 0%, #ef4444 100%); }
+        .card-icon.success { background: linear-gradient(135deg, var(--success) 0%, #34d399 100%); }
+        .card-icon.warning { background: linear-gradient(135deg, var(--accent) 0%, #fbbf24 100%); }
+        .card h3 { font-size: 18px; font-weight: 700; color: var(--gray-800); }
+        .card .subtitle { color: var(--gray-500); font-size: 13px; margin-top: 2px; }
+
+        /* Grids */
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 20px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+
+        /* Stat Cards */
+        .stat-card {
+            background: white; border-radius: var(--radius); padding: 20px;
+            box-shadow: var(--shadow); text-align: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .stat-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+        .stat-value {
+            font-size: 32px; font-weight: 800;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .stat-label { font-size: 13px; color: var(--gray-600); margin-top: 4px; font-weight: 500; }
+        .stat-source { font-size: 10px; color: var(--gray-500); margin-top: 8px; font-style: italic; }
+
+        /* Score Cards */
+        .score-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+        .score-card {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white; border-radius: var(--radius); padding: 14px 16px;
+            box-shadow: var(--shadow);
+        }
+        .score-card.secondary { background: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-light) 100%); }
+        .score-card.accent { background: linear-gradient(135deg, var(--accent) 0%, #fbbf24 100%); color: var(--gray-800); }
+        .score-card.success { background: linear-gradient(135deg, var(--success) 0%, #34d399 100%); }
+        .score-card h4 { font-size: 10px; opacity: 0.9; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .score-card .score-value { font-size: 28px; font-weight: 800; margin: 4px 0; }
+        .score-card .score-label { font-size: 12px; font-weight: 600; }
+        .score-card .score-sub { font-size: 10px; opacity: 0.85; margin-top: 4px; }
+
+        /* Alerts */
+        .alert {
+            padding: 16px 20px; border-radius: var(--radius); margin-bottom: 16px;
+            display: flex; align-items: flex-start; gap: 12px;
+        }
+        .alert-icon { font-size: 20px; flex-shrink: 0; }
+        .alert-content { flex: 1; }
+        .alert-title { font-weight: 700; margin-bottom: 4px; }
+        .alert-info { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; }
+        .alert-warning { background: #fffbeb; border: 1px solid #fde68a; color: #92400e; }
+        .alert-success { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; }
+
+        /* Logiciel Cards */
+        .logiciel-card {
+            background: white; border-radius: var(--radius);
+            overflow: hidden; box-shadow: var(--shadow);
+            transition: all 0.3s; border: 1px solid var(--gray-100);
+            margin-bottom: 8px;
+        }
+        .logiciel-card:hover { box-shadow: var(--shadow-lg); }
+        .logiciel-header {
+            padding: 12px 16px; display: flex;
+            justify-content: space-between; align-items: center;
+            cursor: pointer; transition: background 0.2s;
+        }
+        .logiciel-header:hover { background: var(--gray-50); }
+        .logiciel-info { display: flex; align-items: center; gap: 12px; }
+        .logiciel-logo {
+            width: 36px; height: 36px;
+            border-radius: 8px; display: flex;
+            align-items: center; justify-content: center;
+            font-size: 13px; font-weight: 800; color: white;
+            flex-shrink: 0;
+        }
+        .logiciel-logo.pennylane { background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); }
+        .logiciel-logo.myunisoft { background: linear-gradient(135deg, #0891b2 0%, #22d3ee 100%); }
+        .logiciel-logo.fulll { background: linear-gradient(135deg, #059669 0%, #34d399 100%); }
+        .logiciel-logo.dext { background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%); }
+        .logiciel-logo.acd { background: linear-gradient(135deg, #dc2626 0%, #f87171 100%); }
+        .logiciel-logo.silae { background: linear-gradient(135deg, #ec4899 0%, #f472b6 100%); }
+        .logiciel-logo.quadra { background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%); }
+        .logiciel-logo.finthesis { background: linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%); }
+        .logiciel-logo.kanta { background: linear-gradient(135deg, #0d9488 0%, #5eead4 100%); }
+        .logiciel-logo.chaintrust { background: linear-gradient(135deg, #2563eb 0%, #60a5fa 100%); }
+        .logiciel-logo.ipaidthat { background: linear-gradient(135deg, #4f46e5 0%, #818cf8 100%); }
+        .logiciel-logo.fygr { background: linear-gradient(135deg, #0284c7 0%, #38bdf8 100%); }
+        .logiciel-logo.default { background: linear-gradient(135deg, var(--gray-600) 0%, var(--gray-400) 100%); }
+        .logiciel-name { font-size: 14px; font-weight: 700; color: var(--gray-800); }
+        .logiciel-cat { font-size: 11px; color: var(--gray-500); margin-top: 1px; }
+        .logiciel-badges { display: flex; gap: 4px; flex-wrap: wrap; }
+        .tag {
+            padding: 2px 7px; border-radius: 4px;
+            font-size: 9px; font-weight: 600;
+        }
+        .tag-pa { background: #d1fae5; color: #065f46; }
+        .tag-cloud { background: #dbeafe; color: #1e40af; }
+        .tag-api { background: #e9d5ff; color: #6b21a8; }
+        .tag-fr { background: #fef3c7; color: #92400e; }
+        .tag-ia { background: #fce7f3; color: #9d174d; }
+        .logiciel-metrics { display: flex; gap: 10px; align-items: center; }
+        .logiciel-metric { text-align: center; }
+        .logiciel-metric-value { font-size: 15px; font-weight: 700; color: var(--primary); }
+        .logiciel-metric-label { font-size: 9px; color: var(--gray-500); text-transform: uppercase; }
+        .logiciel-price {
+            background: var(--success); color: white;
+            padding: 4px 10px; border-radius: 6px;
+            font-size: 11px; font-weight: 700;
+        }
+        .expand-btn {
+            width: 26px; height: 26px; border: none;
+            background: var(--gray-100); border-radius: 50%;
+            cursor: pointer; font-size: 10px; color: var(--gray-600);
+            transition: all 0.2s; margin-left: 8px;
+        }
+        .expand-btn:hover { background: var(--gray-200); }
+        .logiciel-card.expanded .expand-btn { transform: rotate(180deg); background: var(--primary); color: white; }
+        .logiciel-body {
+            display: none; padding: 20px;
+            background: var(--gray-50); border-top: 1px solid var(--gray-200);
+        }
+        .logiciel-card.expanded .logiciel-body { display: block; }
+        .detail-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; }
+        .detail-section {
+            background: white; border-radius: 8px;
+            padding: 16px; box-shadow: var(--shadow);
+        }
+        .detail-title {
+            font-size: 11px; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.5px;
+            color: var(--gray-500); margin-bottom: 12px;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .points-list { list-style: none; }
+        .points-list li {
+            padding: 8px 0; font-size: 13px; color: var(--gray-700);
+            border-bottom: 1px solid var(--gray-100);
+            display: flex; align-items: flex-start; gap: 8px;
+        }
+        .points-list li:last-child { border-bottom: none; }
+        .point-icon {
+            flex-shrink: 0; width: 18px; height: 18px;
+            border-radius: 50%; display: flex;
+            align-items: center; justify-content: center;
+            font-size: 10px; font-weight: 700;
+        }
+        .point-icon.pos { background: #d1fae5; color: var(--success); }
+        .point-icon.neg { background: #fee2e2; color: var(--danger); }
+
+        /* TCO Cards */
+        .tco-card {
+            background: white; border-radius: var(--radius);
+            padding: 24px; box-shadow: var(--shadow);
+            border-left: 4px solid var(--primary);
+        }
+        .tco-card.startup { border-left-color: var(--secondary); }
+        .tco-card.polyvalent { border-left-color: var(--accent); }
+        .tco-card.premium { border-left-color: var(--danger); }
+        .tco-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .tco-title { font-size: 16px; font-weight: 700; color: var(--gray-800); }
+        .tco-total {
+            font-size: 24px; font-weight: 800;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .tco-details { font-size: 13px; color: var(--gray-600); }
+        .tco-line { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--gray-100); }
+        .tco-line:last-child { border-bottom: none; }
+
+        /* Scoring */
+        .scoring-row {
+            display: grid; grid-template-columns: 1.8fr 1fr 1fr 1fr 0.5fr;
+            gap: 4px; padding: 5px 0; border-bottom: 1px solid var(--gray-100);
+            align-items: center;
+        }
+        .scoring-row.header { font-weight: 700; color: var(--gray-800); background: var(--gray-50); padding: 6px 8px; border-radius: 6px; font-size: 11px; }
+        .scoring-cell { font-size: 11px; }
+        .scoring-score { font-weight: 700; text-align: center; font-size: 12px; }
+        .scoring-score.high { color: var(--success); }
+        .scoring-score.medium { color: var(--warning); }
+        .scoring-score.low { color: var(--danger); }
+
+        /* Source Citation */
+        .source-citation {
+            background: var(--gray-50);
+            border-left: 3px solid var(--secondary);
+            padding: 12px 16px; margin: 12px 0;
+            font-size: 12px; color: var(--gray-600);
+        }
+        .source-citation strong { color: var(--gray-800); }
+
+        /* Tables */
+        .data-table {
+            width: 100%; border-collapse: collapse;
+            font-size: 13px; margin-top: 16px;
+        }
+        .data-table th, .data-table td {
+            padding: 12px; text-align: left;
+            border-bottom: 1px solid var(--gray-200);
+        }
+        .data-table th {
+            background: var(--gray-50);
+            font-weight: 600; color: var(--gray-700);
+            font-size: 11px; text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .data-table tr:hover { background: var(--gray-50); }
+
+        /* Filters */
+        .filters {
+            background: white; border-radius: var(--radius);
+            padding: 16px 20px; margin-bottom: 20px;
+            display: flex; flex-wrap: wrap; gap: 16px;
+            align-items: flex-end; box-shadow: var(--shadow);
+        }
+        .filter-group { display: flex; flex-direction: column; gap: 4px; }
+        .filter-label {
+            font-size: 10px; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.5px;
+            color: var(--gray-500);
+        }
+        select, input[type="text"] {
+            padding: 8px 14px; border: 2px solid var(--gray-200);
+            border-radius: 8px; font-size: 13px;
+            min-width: 160px; background: white;
+            transition: all 0.2s;
+        }
+        select:focus, input:focus { outline: none; border-color: var(--primary); }
+
+        /* Footer */
+        .footer {
+            text-align: center; padding: 24px;
+            color: var(--gray-500); font-size: 12px;
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: none; justify-content: center; align-items: center;
+            z-index: 10000;
+        }
+        .loading-overlay.show { display: flex; }
+        .loading-content {
+            background: white; padding: 40px;
+            border-radius: var(--radius); text-align: center;
+        }
+        .spinner {
+            width: 50px; height: 50px;
+            border: 4px solid var(--gray-200);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        @media (max-width: 768px) {
+            .score-grid { grid-template-columns: repeat(2, 1fr); }
+            .logiciel-header { flex-direction: column; gap: 16px; }
+            .logiciel-metrics { justify-content: flex-start; }
+            .scoring-row { grid-template-columns: 1fr; gap: 4px; }
+        }
+
+        @media print {
+            .action-bar, .tabs, .filters { display: none; }
+            .panel { display: block !important; page-break-inside: avoid; }
+            .card { box-shadow: none; border: 1px solid var(--gray-200); }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <p style="font-weight: 600; color: var(--gray-700);">Generation du PDF en cours...</p>
+            <p style="font-size: 12px; color: var(--gray-500);">Rapport complet multi-pages</p>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <div class="header">
+        <div class="header-badge">📊 ANNEXE 10</div>
+        <h1>Annexe 10 — Comparatif des logiciels de gestion de cabinet</h1>
+        <p>Outil d'aide a la selection adapte aux besoins specifiques d'un cabinet 100% numerique. Donnees actualisees janvier 2026 avec simulations TCO et grille de scoring appliquee.</p>
+        <div class="header-meta">
+            <span class="badge">📅 Fevrier 2026</span>
+            <span class="badge badge-accent">🔧 11 solutions analysees</span>
+            <span class="badge badge-warning">⚡ 108 PA immatriculees</span>
+            <span class="badge">📋 Sources verifiees</span>
+        </div>
+        <div class="context-box">
+            <p><strong>Cadre reglementaire :</strong> Reception factures electroniques : 1er sept. 2026 | Emission TPE-PME : 1er sept. 2027</p>
+            <p><strong>References normatives :</strong> RGPD, Directive NIS 2, Recommandations ANSSI 2024, Code de deontologie EC (art. 147)</p>
+            <p><strong>Source PA :</strong> Liste officielle DGFiP - 101 PA au 16 janvier 2026, 108 PA au 13 fevrier 2026 (liste evolutive)</p>
+        </div>
+    </div>
+
+    <!-- Action Bar -->
+    <div class="action-bar">
+        <button class="btn btn-primary" onclick="exportPDFComplet()">📄 Export PDF</button>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+        <button class="tab active" onclick="showPanel('dashboard')">📊 Tableau de bord</button>
+        <button class="tab" onclick="showPanel('comparatif')">📋 Comparatif</button>
+        <button class="tab" onclick="showPanel('tco')">💰 Simulations TCO</button>
+        <button class="tab" onclick="showPanel('scoring')">⭐ Scoring</button>
+        <button class="tab" onclick="showPanel('terrain')">📈 Études & Enquête </button>
+        <button class="tab" onclick="showPanel('sources')">📚 Sources</button>
+    </div>
+
+    <!-- Panel 1: Dashboard -->
+    <div id="dashboard" class="panel active">
+        <!-- KPIs sourcés -->
+        <div class="score-grid">
+            <div class="score-card">
+                <h4>📊 Contexte economique</h4>
+                <div class="score-value">67%</div>
+                <div class="score-label">Activite stable S1 2025</div>
+                <div class="score-sub">OMECA Barometre S2 2025 - Janvier 2026</div>
+            </div>
+            <div class="score-card secondary">
+                <h4>✅ Plateformes Agreees</h4>
+                <div class="score-value">108</div>
+                <div class="score-label">PA immatriculees DGFiP</div>
+                <div class="score-sub">101 au 16/01/2026, 108 au 13/02/2026 - Liste evolutive</div>
+            </div>
+            <div class="score-card accent">
+                <h4>📈 Demande conseil</h4>
+                <div class="score-value">+45%</div>
+                <div class="score-label">Hausse liee difficultes clients</div>
+                <div class="score-sub">OMECA S2 2025 - Tendance structurante</div>
+            </div>
+            <div class="score-card success">
+                <h4>💬 Negociation tarifaire</h4>
+                <div class="score-value">34%</div>
+                <div class="score-label">Intensification pression prix</div>
+                <div class="score-sub">OMECA S2 2025 - Contexte contraint</div>
+            </div>
+        </div>
+
+        <!-- Contexte OMECA S2 2025 -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon">📊</div>
+                <div>
+                    <h3>Contexte sectoriel - Barometre OMECA S2 2025</h3>
+                    <div class="subtitle">Publie janvier 2026 - Panel BVA 301 cabinets</div>
+                </div>
+            </div>
+
+            <div class="source-citation">
+                <strong>Source officielle :</strong> OMECA - Barometre des metiers de l'expertise comptable, 2e semestre 2025<br>
+                <strong>Publication :</strong> Janvier 2026 | <strong>Methodologie :</strong> Enquete telephonique BVA, panel representatif 301 dirigeants
+            </div>
+
+            <div class="grid" style="margin-top: 16px;">
+                <div style="background: var(--gray-50); padding: 20px; border-radius: 8px;">
+                    <h4 style="color: var(--primary); margin-bottom: 12px;">Activite S1 2025</h4>
+                    <div style="font-size: 13px; color: var(--gray-700);">
+                        <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--gray-200);">
+                            <span>Activite stable</span><strong>67%</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--gray-200);">
+                            <span>Hausse CA</span><strong style="color: var(--success);">14%</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--gray-200);">
+                            <span>Baisse CA</span><strong style="color: var(--danger);">9%</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 8px 0;">
+                            <span>NSP</span><strong style="color: var(--gray-500);">10%</strong>
+                        </div>
+                    </div>
+                </div>
+                <div style="background: var(--gray-50); padding: 20px; border-radius: 8px;">
+                    <h4 style="color: var(--primary); margin-bottom: 12px;">Situation clients</h4>
+                    <div style="font-size: 13px; color: var(--gray-700);">
+                        <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--gray-200);">
+                            <span>Degradation constatee</span><strong style="color: var(--danger);">36%</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--gray-200);">
+                            <span>Stabilite</span><strong>58%</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 8px 0;">
+                            <span>Amelioration</span><strong style="color: var(--success);">6%</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="alert alert-warning" style="margin-top: 20px;">
+                <div class="alert-icon">⚠️</div>
+                <div class="alert-content">
+                    <div class="alert-title">Implications pour un cabinet en creation 2026</div>
+                    <div>Contexte economique contraint avec pression tarifaire accrue. L'automatisation des taches a faible valeur ajoutee n'est plus un luxe technologique mais une <strong>condition de viabilite economique</strong>. La differenciation par le conseil et l'efficacite operationnelle devient determinante.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Indicateurs de performance sourcés -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon secondary">⚡</div>
+                <div>
+                    <h3>Indicateurs de performance mesures</h3>
+                    <div class="subtitle">Donnees editeurs et etudes professionnelles - Benchmarks juin 2025</div>
+                </div>
+            </div>
+            
+            <div class="alert alert-info" style="margin-bottom: 20px;">
+                <div class="alert-icon">ℹ️</div>
+                <div class="alert-content">
+                    <div class="alert-title">Transparence methodologique</div>
+                    <div>Ces indicateurs proviennent de benchmarks editeurs (non audites). Ils constituent des ordres de grandeur pour structurer des simulations financieres, non des garanties de resultats.</div>
+                </div>
+            </div>
+
+            <div class="grid-4">
+                <div class="stat-card">
+                    <div style="font-size: 24px; margin-bottom: 8px;">📈</div>
+                    <div class="stat-value">+27%</div>
+                    <div class="stat-label">Productivite</div>
+                    <div class="stat-source">Pennylane - Benchmarks juin 2025</div>
+                </div>
+                <div class="stat-card">
+                    <div style="font-size: 24px; margin-bottom: 8px;">⏱️</div>
+                    <div class="stat-value">1h12</div>
+                    <div class="stat-label">Gagne / dossier / mois</div>
+                    <div class="stat-source">Pennylane - Moyenne base utilisateurs</div>
+                </div>
+                <div class="stat-card">
+                    <div style="font-size: 24px; margin-bottom: 8px;">🔄</div>
+                    <div class="stat-value">84%</div>
+                    <div class="stat-label">Reconciliations auto</div>
+                    <div class="stat-source">Pennylane - IA suggestions reussies</div>
+                </div>
+                <div class="stat-card">
+                    <div style="font-size: 24px; margin-bottom: 8px;">📉</div>
+                    <div class="stat-value">>99%</div>
+                    <div class="stat-label">Precision OCR</div>
+                    <div class="stat-source">Dext - Taux reconnaissance revendique</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Panel 2: Comparatif -->
+    <div id="comparatif" class="panel">
+        <div class="filters">
+            <div class="filter-group">
+                <label class="filter-label">Categorie</label>
+                <select id="filterCat" onchange="filterLogiciels()">
+                    <option value="all">Toutes categories</option>
+                    <option value="production">Production comptable</option>
+                    <option value="collecte">Collecte / OCR</option>
+                    <option value="bi">BI / Reporting</option>
+                    <option value="social">Social / Paie</option>
+                    <option value="crm">CRM / Conformite</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label class="filter-label">Statut PA</label>
+                <select id="filterPA" onchange="filterLogiciels()">
+                    <option value="all">Tous statuts</option>
+                    <option value="pa">Plateforme Agreee ✓</option>
+                    <option value="od">Operateur Dematerialisation</option>
+                    <option value="na">Non applicable</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label class="filter-label">Recherche</label>
+                <input type="text" id="searchInput" placeholder="Nom du logiciel..." oninput="filterLogiciels()">
+            </div>
+        </div>
+
+        <div id="logicielsContainer"></div>
+    </div>
+
+    <!-- Panel 3: Simulations TCO -->
+    <div id="tco" class="panel">
+        <div class="alert alert-info">
+            <div class="alert-icon">💰</div>
+            <div class="alert-content">
+                <div class="alert-title">Simulateur TCO interactif</div>
+                <div>Cout Total de Possession : abonnements logiciels + formation initiale. Les montants pre-remplis correspondent aux tarifs publics verifies (sources indiquees). <strong>Chaque montant est modifiable</strong> pour refleter un devis negocie ou une evolution tarifaire.</div>
+            </div>
+        </div>
+
+        <!-- Profile selector -->
+        <div style="display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap;">
+            <button class="tab active" id="btn-startup" onclick="loadProfile('startup')" style="flex:1; min-width: 200px;">🚀 Startup Urbain</button>
+            <button class="tab" id="btn-polyvalent" onclick="loadProfile('polyvalent')" style="flex:1; min-width: 200px;">🏢 Polyvalent TPE</button>
+            <button class="tab" id="btn-premium" onclick="loadProfile('premium')" style="flex:1; min-width: 200px;">💎 Premium PME</button>
+        </div>
+
+        <div id="tco-profile-desc" class="source-citation" style="margin-bottom: 16px;"></div>
+
+        <!-- Parameters bar -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 20px; background: var(--gray-50); padding: 16px; border-radius: 8px;">
+            <div>
+                <label style="font-size: 11px; font-weight: 600; color: var(--gray-500); text-transform: uppercase;">Nb dossiers</label>
+                <input type="number" id="tco-dossiers" value="50" min="1" max="500" onchange="recalcTCO()" style="width: 100%; padding: 6px 10px; border: 1px solid var(--gray-200); border-radius: 6px; font-size: 14px; font-weight: 700;">
+            </div>
+            <div>
+                <label style="font-size: 11px; font-weight: 600; color: var(--gray-500); text-transform: uppercase;">Nb collaborateurs</label>
+                <input type="number" id="tco-collabs" value="2" min="1" max="50" onchange="recalcTCO()" style="width: 100%; padding: 6px 10px; border: 1px solid var(--gray-200); border-radius: 6px; font-size: 14px; font-weight: 700;">
+            </div>
+            <div>
+                <label style="font-size: 11px; font-weight: 600; color: var(--gray-500); text-transform: uppercase;">CA moyen/dossier (€)</label>
+                <input type="number" id="tco-ca-dossier" value="1500" min="100" max="50000" step="100" onchange="recalcTCO()" style="width: 100%; padding: 6px 10px; border: 1px solid var(--gray-200); border-radius: 6px; font-size: 14px; font-weight: 700;">
+            </div>
+            <div>
+                <label style="font-size: 11px; font-weight: 600; color: var(--gray-500); text-transform: uppercase;">Formation initiale (€)</label>
+                <input type="number" id="tco-formation" value="2000" min="0" max="20000" step="100" onchange="recalcTCO()" style="width: 100%; padding: 6px 10px; border: 1px solid var(--gray-200); border-radius: 6px; font-size: 14px; font-weight: 700;">
+            </div>
+        </div>
+
+        <!-- TCO lines -->
+        <div class="card" style="padding: 0; overflow: hidden;">
+            <table class="data-table" style="margin: 0; font-size: 12px;" id="tco-table">
+                <thead>
+                    <tr style="background: var(--primary); color: white;">
+                        <th style="width: 30%; text-align: left; padding: 10px 12px;">Outil</th>
+                        <th style="width: 15%; text-align: left; padding: 10px 8px;">Fonction</th>
+                        <th style="width: 12%; text-align: center; padding: 10px 8px;">Mode tarif</th>
+                        <th style="width: 13%; text-align: center; padding: 10px 8px;">€ HT/mois</th>
+                        <th style="width: 10%; text-align: right; padding: 10px 8px;">Total/an</th>
+                        <th style="width: 20%; text-align: left; padding: 10px 8px;">Source</th>
+                    </tr>
+                </thead>
+                <tbody id="tco-body"></tbody>
+                <tfoot>
+                    <tr style="background: var(--gray-50); font-weight: 700;">
+                        <td colspan="4" style="padding: 10px 12px; text-align: right;">Total abonnements/an</td>
+                        <td style="padding: 10px 8px; text-align: right; color: var(--primary); font-size: 14px;" id="tco-total-abo">0 €</td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <!-- Summary cards -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-top: 16px;">
+            <div style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); color: white; padding: 14px 16px; border-radius: 8px;">
+                <div style="font-size: 10px; opacity: 0.85; text-transform: uppercase;">Total recurrent/an</div>
+                <div style="font-size: 24px; font-weight: 800; margin: 4px 0;" id="tco-sum-recurrent">0 €</div>
+            </div>
+            <div style="background: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-light) 100%); color: white; padding: 14px 16px; border-radius: 8px;">
+                <div style="font-size: 10px; opacity: 0.85; text-transform: uppercase;">Total annee 1 (+ formation)</div>
+                <div style="font-size: 24px; font-weight: 800; margin: 4px 0;" id="tco-sum-y1">0 €</div>
+            </div>
+            <div style="background: linear-gradient(135deg, var(--accent) 0%, #fbbf24 100%); color: var(--gray-800); padding: 14px 16px; border-radius: 8px;">
+                <div style="font-size: 10px; text-transform: uppercase; font-weight: 600;">Cout SI/dossier/an</div>
+                <div style="font-size: 24px; font-weight: 800; margin: 4px 0;" id="tco-sum-dossier">0 €</div>
+            </div>
+            <div style="background: linear-gradient(135deg, var(--success) 0%, #34d399 100%); color: white; padding: 14px 16px; border-radius: 8px;">
+                <div style="font-size: 10px; opacity: 0.85; text-transform: uppercase;">Ratio SI/CA</div>
+                <div style="font-size: 24px; font-weight: 800; margin: 4px 0;" id="tco-sum-ratio">0 %</div>
+                <div style="font-size: 10px; opacity: 0.85;" id="tco-ratio-comment"></div>
+            </div>
+        </div>
+
+        <!-- Grille Pennylane + sources -->
+        <div class="card" style="margin-top: 20px;">
+            <div class="card-header">
+                <div class="card-icon warning">📋</div>
+                <div>
+                    <h3>References tarifaires utilisees</h3>
+                    <div class="subtitle">Sources publiques verifiees - Tarifs susceptibles d'evolution</div>
+                </div>
+            </div>
+            <div style="font-size: 12px; color: var(--gray-600); line-height: 1.8;">
+                <div><strong>Pennylane</strong> : ~20 €/dossier/mois ecosysteme complet (Keynote ComptaTech juin 2025) | Plans clients : Basique 14 €, Essentiel 24 €, Premium 79-298 € (pennylane.com/fr/tarifs) | Offre cabinet createur : gratuit 6 mois sur 50 premiers dossiers</div>
+                <div><strong>Dext</strong> : Pack 50 dossiers 604 €/mois tarif standard, 302 €/mois 1ere annee CJEC -50% (cjec.anecs-cjec.org, juin 2025) | SCI/LMNP : 3 €/dossier/mois</div>
+                <div><strong>Chaintrust</strong> : a partir de 20 € HT/dossier engagement, 5 € tresorerie (chaintrust.io/contact, novembre 2025)</div>
+                <div><strong>MyUnisoft</strong> : 150-250 €/mois licence cabinet (myunisoft.fr, estimation positionnement marche)</div>
+                <div><strong>Fulll</strong> : 200-350 €/mois suite complete (fulll.fr, estimation positionnement marche)</div>
+                <div><strong>iPaidThat</strong> : a partir de 0,09 € HT/facture traitee (degressif), tarifs cabinets sur devis (ipaidthat.io)</div>
+                <div><strong>Silae / MySilae</strong> : 3-12 €/bulletin selon volume (6 € moyen 2026 apres revision tarifaire). Source : compta-online.com oct. 2024, apogea.fr</div>
+                <div><strong>Finthesis</strong> : sur devis selon nombre de projets (finthesis.io/tarifs). Estimation : 120-180 €/mois pour 30-50 dossiers</div>
+                <div><strong>Fygr</strong> : 80-120 €/mois (fygr.io)</div>
+                <div><strong>Kanta</strong> : ~100 €/mois conformite LCB-FT (kanta.fr)</div>
+                <div><strong>Yousign</strong> : ~25-49 €/mois offre Pro (yousign.com)</div>
+                <div><strong>Acronis Cyber Protect</strong> : ~30-50 €/mois PME (acronis.com)</div>
+                <div style="margin-top: 8px; font-style: italic; color: var(--gray-500);">⚠️ Les tarifs editeurs evoluent regulierement. Les montants ci-dessus sont des reperes publics a date. Privilegiez toujours un devis personnalise aupres de l'editeur.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Panel 4: Scoring -->
+    <div id="scoring" class="panel">
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon">⭐</div>
+                <div>
+                    <h3>Grille de scoring appliquee</h3>
+                    <div class="subtitle">Notation sur 100 points - Methodologie transparente</div>
+                </div>
+            </div>
+
+            <div class="alert alert-info">
+                <div class="alert-icon">📐</div>
+                <div class="alert-content">
+                    <div class="alert-title">Formule de calcul</div>
+                    <div>Score = (Conformite x 25%) + (Fonctionnalites x 25%) + (Interoperabilite x 20%) + (UX x 15%) + (TCO x 15%)</div>
+                </div>
+            </div>
+
+            <!-- Détail pondération -->
+            <table class="data-table" style="margin-bottom: 24px;">
+                <thead>
+                    <tr>
+                        <th>Critere</th>
+                        <th>Pond.</th>
+                        <th>Sous-criteres</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Conformite reglementaire</strong></td>
+                        <td>25%</td>
+                        <td>PA (10pts) | Hebergement FR/UE (5pts) | SecNumCloud (5pts) | RGPD (5pts)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Fonctionnalites metier</strong></td>
+                        <td>25%</td>
+                        <td>Couverture (10pts) | Automatisation IA (8pts) | Module revision (7pts)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Interoperabilite</strong></td>
+                        <td>20%</td>
+                        <td>API ouverte (8pts) | Connecteurs natifs (7pts) | Export FEC (5pts)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Experience utilisateur</strong></td>
+                        <td>15%</td>
+                        <td>Ergonomie (6pts) | Courbe apprentissage (5pts) | Support (4pts)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Cout total possession</strong></td>
+                        <td>15%</td>
+                        <td>Prix/dossier (8pts) | Scalabilite (4pts) | Couts caches (3pts)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Scoring comparatif -->
+            <h4 style="color: var(--primary); margin-bottom: 10px; font-size: 14px;">Application comparative - Top 3 Production</h4>
+            
+            <div class="scoring-row header">
+                <div class="scoring-cell">Critere (poids)</div>
+                <div class="scoring-cell">MyUnisoft</div>
+                <div class="scoring-cell">Pennylane</div>
+                <div class="scoring-cell">ACD</div>
+                <div class="scoring-cell">Max</div>
+            </div>
+            <div class="scoring-row">
+                <div class="scoring-cell">Conformite (25%)</div>
+                <div class="scoring-score high">25/25</div>
+                <div class="scoring-score medium">18/25</div>
+                <div class="scoring-score high">23/25</div>
+                <div class="scoring-cell">25</div>
+            </div>
+            <div class="scoring-row">
+                <div class="scoring-cell">Fonctionnalites (25%)</div>
+                <div class="scoring-score high">21/25</div>
+                <div class="scoring-score high">24/25</div>
+                <div class="scoring-score medium">19/25</div>
+                <div class="scoring-cell">25</div>
+            </div>
+            <div class="scoring-row">
+                <div class="scoring-cell">Interoperabilite (20%)</div>
+                <div class="scoring-score high">20/20</div>
+                <div class="scoring-score high">20/20</div>
+                <div class="scoring-score medium">16/20</div>
+                <div class="scoring-cell">20</div>
+            </div>
+            <div class="scoring-row">
+                <div class="scoring-cell">Experience UX (15%)</div>
+                <div class="scoring-score medium">12/15</div>
+                <div class="scoring-score high">15/15</div>
+                <div class="scoring-score medium">11/15</div>
+                <div class="scoring-cell">15</div>
+            </div>
+            <div class="scoring-row">
+                <div class="scoring-cell">TCO (15%)</div>
+                <div class="scoring-score high">13/15</div>
+                <div class="scoring-score high">13/15</div>
+                <div class="scoring-score medium">11/15</div>
+                <div class="scoring-cell">15</div>
+            </div>
+            <div class="scoring-row" style="background: var(--gray-100); font-weight: 700;">
+                <div class="scoring-cell">TOTAL</div>
+                <div class="scoring-score high" style="font-size: 14px;">91/100</div>
+                <div class="scoring-score high" style="font-size: 14px;">90/100</div>
+                <div class="scoring-score medium" style="font-size: 14px;">80/100</div>
+                <div class="scoring-cell">100</div>
+            </div>
+
+            <!-- Interprétation -->
+            <div class="grid" style="margin-top: 12px;">
+                <div style="background: #d1fae5; padding: 10px 12px; border-radius: 6px;">
+                    <strong style="color: var(--success); font-size: 12px;">🥇 MyUnisoft (91/100)</strong>
+                    <p style="font-size: 11px; color: var(--gray-700); margin-top: 4px; line-height: 1.4;">
+                        Choix rationnel pour cabinet sensible a la <strong>souverainete des donnees</strong> et clientele TPE traditionnelle. Hebergement France, SecNumCloud, Data Lake souverain.
+                    </p>
+                </div>
+                <div style="background: #dbeafe; padding: 10px 12px; border-radius: 6px;">
+                    <strong style="color: var(--info); font-size: 12px;">🥈 Pennylane (90/100)</strong>
+                    <p style="font-size: 11px; color: var(--gray-700); margin-top: 4px; line-height: 1.4;">
+                        S'impose pour cabinet ciblant <strong>clients digitaux natifs</strong> valorisant l'experience utilisateur et l'automatisation. Interface moderne plebiscitee.
+                    </p>
+                </div>
+                <div style="background: #fef3c7; padding: 10px 12px; border-radius: 6px;">
+                    <strong style="color: var(--warning); font-size: 12px;">🥉 ACD (80/100)</strong>
+                    <p style="font-size: 11px; color: var(--gray-700); margin-top: 4px; line-height: 1.4;">
+                        Pertinent pour cabinet recherchant <strong>solution robuste eprouvee</strong> avec GED integree, acceptant interface moins moderne.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Grille cybersécurité -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon danger">🔒</div>
+                <div>
+                    <h3>Sous-grille Cybersecurite</h3>
+                    <div class="subtitle">NIS 2, ANSSI 2024, Art. 147 Code deontologie</div>
+                </div>
+            </div>
+
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Critere</th>
+                        <th>Points</th>
+                        <th>Fulll</th>
+                        <th>MyUnisoft</th>
+                        <th>Pennylane</th>
+                        <th>ACD</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Souverainete (localisation, Cloud Act)</td>
+                        <td>5</td>
+                        <td style="color: var(--success);">5</td>
+                        <td style="color: var(--success);">5</td>
+                        <td style="color: var(--warning);">3</td>
+                        <td style="color: var(--success);">5</td>
+                    </tr>
+                    <tr>
+                        <td>SecNumCloud</td>
+                        <td>5</td>
+                        <td style="color: var(--success);">5</td>
+                        <td style="color: var(--success);">5</td>
+                        <td style="color: var(--danger);">0</td>
+                        <td style="color: var(--warning);">3</td>
+                    </tr>
+                    <tr>
+                        <td>Authentification (MFA, SSO, logs)</td>
+                        <td>5</td>
+                        <td style="color: var(--success);">5</td>
+                        <td style="color: var(--success);">5</td>
+                        <td style="color: var(--success);">5</td>
+                        <td style="color: var(--success);">4</td>
+                    </tr>
+                    <tr>
+                        <td>Reversibilite (FEC + PJ)</td>
+                        <td>3</td>
+                        <td style="color: var(--success);">3</td>
+                        <td style="color: var(--success);">3</td>
+                        <td style="color: var(--success);">3</td>
+                        <td style="color: var(--success);">3</td>
+                    </tr>
+                    <tr>
+                        <td>Certifications (ISO 27001, tests)</td>
+                        <td>2</td>
+                        <td style="color: var(--success);">2</td>
+                        <td style="color: var(--warning);">1</td>
+                        <td style="color: var(--success);">2</td>
+                        <td style="color: var(--danger);">0</td>
+                    </tr>
+                    <tr style="font-weight: 700; background: var(--gray-50);">
+                        <td>TOTAL</td>
+                        <td>20</td>
+                        <td style="color: var(--success);">20/20</td>
+                        <td style="color: var(--success);">19/20</td>
+                        <td style="color: var(--warning);">13/20</td>
+                        <td style="color: var(--warning);">15/20</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+ <!-- Panel 5: Retours terrain -->
+<div id="terrain" class="panel">
+    <!-- OMECA S2 2025 IA -->
+    <div class="card">
+        <div class="card-header">
+            <div class="card-icon">📈</div>
+            <div>
+                <h3>Usages de l'IA - OMECA S2 2025</h3>
+                <div class="subtitle">Panel representatif 301 cabinets - Janvier 2026</div>
+            </div>
+        </div>
+
+        <div class="source-citation">
+            <strong>Source :</strong> OMECA - Barometre des metiers, 2e semestre 2025 (publication janvier 2026)<br>
+            <strong>Methodologie :</strong> Enquete telephonique BVA, panel representatif 301 dirigeants
+        </div>
+
+        <div class="grid-4" style="margin-top: 10px;">
+            <div class="stat-card" style="padding: 8px 10px;">
+                <div class="stat-value" style="font-size: 20px;">62%</div>
+                <div class="stat-label" style="font-size: 9px;">Utilisent logiciels avec IA</div>
+            </div>
+            <div class="stat-card" style="padding: 8px 10px;">
+                <div class="stat-value" style="font-size: 20px;">32%</div>
+                <div class="stat-label" style="font-size: 9px;">Automatisation taches</div>
+            </div>
+            <div class="stat-card" style="padding: 8px 10px;">
+                <div class="stat-value" style="font-size: 20px;">29%</div>
+                <div class="stat-label" style="font-size: 9px;">Gain productivite</div>
+            </div>
+            <div class="stat-card" style="padding: 8px 10px;">
+                <div class="stat-value" style="font-size: 20px;">24%</div>
+                <div class="stat-label" style="font-size: 9px;">Temps libere conseil</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enquête - -->
+    <div class="card">
+        <div class="card-header">
+            <div class="card-icon warning">📝</div>
+            <div>
+                <h3>Enquête - Cabinets d'expertise comptable</h3>
+                <div class="subtitle">26 repondants - Novembre 2025</div>
+            </div>
+        </div>
+
+        <div class="source-citation">
+            <strong>Source :</strong> Enquête realisee aupres de cabinets ayant engage une demarche de numerisation<br>
+            <strong>Periode :</strong> 03/11/2025 au 07/11/2025 | <strong>Echantillon :</strong> n = 26 repondants
+        </div>
+
+        <h4 style="margin-top: 12px; color: var(--primary); font-size: 13px;">Profil des repondants</h4>
+        <div class="grid" style="margin-top: 8px;">
+            <div style="background: var(--gray-50); padding: 10px 12px; border-radius: 6px;">
+                <h5 style="color: var(--gray-700); margin-bottom: 6px; font-size: 11px;">Taille des cabinets</h5>
+                <div style="font-size: 11px;">
+                    <div style="display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px solid var(--gray-200);">
+                        <span>1 a 5 personnes</span><strong>73%</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px solid var(--gray-200);">
+                        <span>Seul (0 salarie)</span><strong>8%</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 3px 0;">
+                        <span>6 personnes et +</span><strong>19%</strong>
+                    </div>
+                </div>
+            </div>
+            <div style="background: var(--gray-50); padding: 10px 12px; border-radius: 6px;">
+                <h5 style="color: var(--gray-700); margin-bottom: 6px; font-size: 11px;">Anciennete</h5>
+                <div style="font-size: 11px;">
+                    <div style="display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px solid var(--gray-200);">
+                        <span>Moins de 2 ans (dont en creation)</span><strong>69.2%</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px solid var(--gray-200);">
+                        <span>3 a 5 ans</span><strong>19.2%</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 3px 0;">
+                        <span>Plus de 5 ans</span><strong>7.7%</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h4 style="margin-top: 14px; color: var(--primary); font-size: 13px;">Outils les plus utilises (mentions)</h4>
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Outil</th>
+            <th>Mentions</th>
+            <th>% repondants</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>Dext</strong></td>
+            <td>15</td>
+            <td>57.7%</td>
+        </tr>
+        <tr>
+            <td><strong>Pennylane</strong></td>
+            <td>13</td>
+            <td>50.0%</td>
+        </tr>
+        <tr>
+            <td><strong>ChatGPT</strong></td>
+            <td>8</td>
+            <td>30.8%</td>
+        </tr>
+        <tr>
+            <td><strong>ACD</strong></td>
+            <td>5</td>
+            <td>19.2%</td>
+        </tr>
+        <tr>
+            <td><strong>QuickBooks</strong></td>
+            <td>5</td>
+            <td>19.2%</td>
+        </tr>
+        <tr>
+            <td><strong>MyUnisoft</strong></td>
+            <td>4</td>
+            <td>15.4%</td>
+        </tr>
+        <tr>
+            <td><strong>Tiime</strong></td>
+            <td>4</td>
+            <td>15.4%</td>
+        </tr>
+    </tbody>
+</table>
+
+
+
+        <h4 style="margin-top: 10px; color: var(--primary); font-size: 12px;">Integration IA / Automatisation</h4>
+<div class="grid-3" style="margin-top: 6px; gap: 6px;">
+    <div style="background: #d1fae5; padding: 6px 8px; border-radius: 5px; text-align: center;">
+        <div style="font-size: 16px; font-weight: 800; color: var(--success);">69.2%</div>
+        <div style="font-size: 9px; color: var(--gray-700);">Utilisation active</div>
+    </div>
+    <div style="background: #fef3c7; padding: 6px 8px; border-radius: 5px; text-align: center;">
+        <div style="font-size: 16px; font-weight: 800; color: var(--warning);">19.2%</div>
+        <div style="font-size: 9px; color: var(--gray-700);">En cours / Tests</div>
+    </div>
+    <div style="background: #fee2e2; padding: 6px 8px; border-radius: 5px; text-align: center;">
+        <div style="font-size: 16px; font-weight: 800; color: var(--danger);">11.5%</div>
+        <div style="font-size: 9px; color: var(--gray-700);">Pas encore</div>
+    </div>
+</div>
+
+
+        <h4 style="margin-top: 10px; color: var(--primary); font-size: 12px;">Taches automatisees via IA</h4>
+<div style="display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px;">
+    <span style="background: var(--gray-100); padding: 3px 8px; border-radius: 10px; font-size: 9px;">Saisie / OCR <strong>23.1%</strong></span>
+    <span style="background: var(--gray-100); padding: 3px 8px; border-radius: 10px; font-size: 9px;">Categorisation auto <strong>23.1%</strong></span>
+    <span style="background: var(--gray-100); padding: 3px 8px; border-radius: 10px; font-size: 9px;">Recuperation bancaire <strong>23.1%</strong></span>
+    <span style="background: var(--gray-100); padding: 3px 8px; border-radius: 10px; font-size: 9px;">Recherches quotidiennes <strong>15.4%</strong></span>
+    <span style="background: var(--gray-100); padding: 3px 8px; border-radius: 10px; font-size: 9px;">Aide redaction <strong>11.5%</strong></span>
+</div>
+
+
+        <h4 style="margin-top: 10px; color: var(--primary); font-size: 12px;">Principaux defis vers le 100% numerique</h4>
+<div class="grid-3" style="margin-top: 6px; gap: 6px;">
+    <div style="background: #fee2e2; padding: 6px 8px; border-radius: 5px; text-align: center;">
+        <div style="font-size: 16px; font-weight: 800; color: var(--danger);">34.6%</div>
+        <div style="font-size: 9px; color: var(--gray-700);">Cout des outils</div>
+    </div>
+    <div style="background: #fef3c7; padding: 6px 8px; border-radius: 5px; text-align: center;">
+        <div style="font-size: 16px; font-weight: 800; color: var(--warning);">30.8%</div>
+        <div style="font-size: 9px; color: var(--gray-700);">Formation / Competences</div>
+    </div>
+    <div style="background: #dbeafe; padding: 6px 8px; border-radius: 5px; text-align: center;">
+        <div style="font-size: 16px; font-weight: 800; color: var(--info);">19.2%</div>
+        <div style="font-size: 9px; color: var(--gray-700);">Securite donnees</div>
+    </div>
+</div>
+
+
+        <h4 style="margin-top: 10px; color: var(--primary); font-size: 12px;">Indicateurs economiques (medianes)</h4>
+        <div class="grid-4" style="margin-top: 6px; gap: 6px;">
+            <div class="stat-card" style="padding: 5px 8px;">
+                <div class="stat-value" style="font-size: 16px;">125k€</div>
+                <div class="stat-label" style="font-size: 8px;">CA Annee 1</div>
+            </div>
+            <div class="stat-card" style="padding: 5px 8px;">
+                <div class="stat-value" style="font-size: 16px;">200k€</div>
+                <div class="stat-label" style="font-size: 8px;">CA Annee 2</div>
+            </div>
+            <div class="stat-card" style="padding: 5px 8px;">
+                <div class="stat-value" style="font-size: 16px;">3 500€</div>
+                <div class="stat-label" style="font-size: 8px;">Honoraires/dossier</div>
+            </div>
+            <div class="stat-card" style="padding: 5px 8px;">
+                <div class="stat-value" style="font-size: 16px;">25</div>
+                <div class="stat-label" style="font-size: 8px;">Objectif clients 12 mois</div>
+            </div>
+        </div>
+
+        <div class="alert alert-success" style="margin-top: 8px; padding: 8px 10px;">
+    <div class="alert-icon" style="font-size: 12px;">✅</div>
+    <div class="alert-content">
+        <div class="alert-title" style="font-size: 11px;">Efficacite des outils numeriques</div>
+        <div style="font-size: 10px;"><strong>73.1%</strong> des repondants evaluent favorablement l'efficacite des outils adoptes (Bon / Tres satisfaisant / Excellent). <strong>76.9%</strong> ont mis en place une formation continue sur les nouvelles technologies.</div>
+    </div>
+</div>
+    </div>
+</div>
+
+    <!-- Panel 6: Sources -->
+    <div id="sources" class="panel">
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon">📚</div>
+                <div>
+                    <h3>References bibliographiques</h3>
+                    <div class="subtitle">Sources verifiees et consultees - Format DEC</div>
+                </div>
+            </div>
+
+            <h4 style="color: var(--primary); margin-bottom: 12px;">Sources institutionnelles</h4>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Source</th>
+                        <th>Type</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>OMECA - Barometre S2 2025</td>
+                        <td>Etude (n=301)</td>
+                        <td>Janvier 2026</td>
+                    </tr>
+                    <tr>
+                        <td>DGFiP - Liste des plateformes agreees</td>
+                        <td>Officiel</td>
+                        <td>13 fevrier 2026</td>
+                    </tr>
+                    <tr>
+                        <td>ANSSI - Guide hygiene informatique</td>
+                        <td>Recommandation</td>
+                        <td>2024</td>
+                    </tr>
+                    <tr>
+                        <td>Fed Finance - Etude digitalisation</td>
+                        <td>Etude</td>
+                        <td>Avril 2024</td>
+                    </tr>
+                    <tr>
+                        <td>Guide Agiris - Budget IT TPE/PME</td>
+                        <td>Benchmark</td>
+                        <td>Juin 2025</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h4 style="color: var(--primary); margin: 24px 0 12px;">Sources editeurs</h4>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Editeur</th>
+                        <th>Donnees utilisees</th>
+                        <th>Consultation</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Pennylane</td>
+                        <td>Benchmarks productivite, grille tarifaire 2026</td>
+                        <td>Janvier 2026</td>
+                    </tr>
+                    <tr>
+                        <td>Dext</td>
+                        <td>Precision OCR, base utilisateurs</td>
+                        <td>Janvier 2026</td>
+                    </tr>
+                    <tr>
+                        <td>MyUnisoft</td>
+                        <td>API documentation, hebergement</td>
+                        <td>Janvier 2026</td>
+                    </tr>
+                    <tr>
+                        <td>Fulll</td>
+                        <td>Certifications, fonctionnalites</td>
+                        <td>Janvier 2026</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h4 style="color: var(--primary); margin: 24px 0 12px;">Plateformes d'avis</h4>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Plateforme</th>
+                        <th>Logiciel</th>
+                        <th>Avis</th>
+                        <th>Note</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Appvizer</td>
+                        <td>Pennylane</td>
+                        <td>200+</td>
+                        <td>4.2/5</td>
+                    </tr>
+                    <tr>
+                        <td>Capterra</td>
+                        <td>Dext</td>
+                        <td>160+</td>
+                        <td>4.2/5</td>
+                    </tr>
+                    <tr>
+                        <td>Trustpilot</td>
+                        <td>iPaidThat</td>
+                        <td>72</td>
+                        <td>4.5/5</td>
+                    </tr>
+                             </tbody>
+            </table>
+
+            <h4 style="color: var(--primary); margin: 24px 0 12px;">Enquête </h4>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Parametre</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Population</td>
+                        <td>Cabinets ou structures assimilees, pratique significative d'outils numeriques</td>
+                    </tr>
+                    <tr>
+                        <td>Periode de collecte</td>
+                        <td>03/11/2025 au 07/11/2025</td>
+                    </tr>
+                    <tr>
+                        <td>Echantillon</td>
+                        <td>n = 26 repondants</td>
+                    </tr>
+                    <tr>
+                        <td>Mode</td>
+                        <td>Questionnaire en ligne (reponses consolidees)</td>
+                    </tr>
+                    <tr>
+                        <td>Anonymisation</td>
+                        <td>Identifiants non exploites dans l'analyse</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+    <!-- Footer -->
+    <div class="footer">
+        <p>Annexe 10 — Mémoire DEC « Entreprendre en tant qu'expert-comptable dans un univers numérisé »</p>
+        <p>Donnees actualisees fevrier 2026 | Sources verifiees et documentees | OMECA S2 2025</p>
+    </div>
+</div>
+
+<script>
+// Base de données des logiciels
+const LOGICIELS_DB = {
+    pennylane: {
+        id: 'pennylane', nom: 'Pennylane', cat: 'Production comptable', catKey: 'production',
+        description: 'Plateforme de pilotage unifiee fusionnant vision EC et dirigeant',
+        logoClass: 'pennylane', statutPA: 'pa', cloud: true, api: true, ia: 3, fr: false,
+        prix: '14-298€/mois', note: 4.2, avis: 200, sourceAvis: 'Appvizer',
+        score: 90, scoreDetail: { conformite: 18, fonctionnalites: 24, interop: 20, ux: 15, tco: 13 },
+        forts: ['Interface moderne, collaboration temps reel', 'PA immatriculee (emission, reception, e-reporting)', '+27% productivite mesuree (benchmark juin 2025)', '4 500 cabinets partenaires (janvier 2026)'],
+        vigilance: ['Hebergement AWS Europe (Cloud Act)', 'Pas de SecNumCloud', 'Tarifs en evolution'],
+        sources: 'pennylane.com, Appvizer (200+ avis)'
+    },
+    myunisoft: {
+        id: 'myunisoft', nom: 'MyUnisoft', cat: 'Production + Portail', catKey: 'production',
+        description: 'Solution souveraine "par la profession, pour la profession"',
+        logoClass: 'myunisoft', statutPA: 'pa', cloud: true, api: true, ia: 3, fr: true,
+        prix: '150-250€/mois', note: 4.0, avis: 30, sourceAvis: 'Estime',
+        score: 91, scoreDetail: { conformite: 25, fonctionnalites: 21, interop: 20, ux: 12, tco: 13 },
+        forts: ['Data Lake souverain 100% francais', 'SecNumCloud', 'PA immatriculee janvier 2026', 'Ecosysteme API tres riche'],
+        vigilance: ['Interface moins "grand public"', 'Communaute avis a developper'],
+        sources: 'myunisoft.fr, Documentation API'
+    },
+    fulll: {
+        id: 'fulll', nom: 'Fulll', cat: 'Production complete', catKey: 'production',
+        description: 'Suite 100% SaaS avec marque blanche native',
+        logoClass: 'fulll', statutPA: 'pa', cloud: true, api: true, ia: 2, fr: true,
+        prix: '200-350€/mois', note: 4.8, avis: 50, sourceAvis: 'Estime',
+        score: 88, scoreDetail: { conformite: 25, fonctionnalites: 22, interop: 18, ux: 11, tco: 12 },
+        forts: ['Suite complete native (Compta + Paie + RH)', 'SecNumCloud + ISO 27001', 'Marque blanche native', 'Score cybersecurite 20/20'],
+        vigilance: ['Courbe apprentissage initiale', 'Investissement demarrage consequent'],
+        sources: 'fulll.fr'
+    },
+    dext: {
+        id: 'dext', nom: 'Dext', cat: 'Collecte / OCR', catKey: 'collecte',
+        description: 'Leader OCR avec pivot vers plateforme complete',
+        logoClass: 'dext', statutPA: 'pa', cloud: true, api: true, ia: 3, fr: false,
+        prix: '20-50€/mois/dossier', note: 4.2, avis: 160, sourceAvis: 'Capterra',
+        score: 82, scoreDetail: { conformite: 15, fonctionnalites: 22, interop: 20, ux: 14, tco: 11 },
+        forts: ['OCR >99% precision (revendique)', 'PA immatriculee + paiements fournisseurs', 'App mobile excellente (4.7/5)', '3 000 cabinets FR'],
+        vigilance: ['UK-based (Cloud Act)', 'Solution complementaire uniquement', 'Cout par dossier a integrer'],
+        sources: 'dext.com, Capterra (160+ avis)'
+    },
+    acd: {
+        id: 'acd', nom: 'ACD', cat: 'Production comptable', catKey: 'production',
+        description: 'Suite de production historique avec GED integree',
+        logoClass: 'acd', statutPA: 'pa', cloud: true, api: true, ia: 2, fr: true,
+        prix: '~8€/dossier/mois', note: 4.0, avis: 50, sourceAvis: 'Estime',
+        score: 80, scoreDetail: { conformite: 23, fonctionnalites: 19, interop: 16, ux: 11, tco: 11 },
+        forts: ['Solution eprouvee sur le marche', 'GED integree (Zeendoc)', 'PA immatriculee', 'Hebergement France'],
+        vigilance: ['Interface moins moderne', 'ISO 27001 en cours'],
+        sources: 'acd-groupe.fr, Enquête'
+    },
+    silae: {
+        id: 'silae', nom: 'Silae', cat: 'Social / Paie', catKey: 'social',
+        description: 'Standard de la paie francaise',
+        logoClass: 'silae', statutPA: 'na', cloud: true, api: true, ia: 1, fr: true,
+        prix: '~15€/bulletin', note: 4.0, avis: 100, sourceAvis: 'Estime',
+        score: 78, scoreDetail: { conformite: 20, fonctionnalites: 20, interop: 16, ux: 10, tco: 12 },
+        forts: ['Robustesse eprouvee droit social FR', 'Mises a jour legales garanties', 'Standard de fait profession'],
+        vigilance: ['Interface vieillissante', 'Formation initiale necessaire'],
+        sources: 'silae.fr'
+    },
+    finthesis: {
+        id: 'finthesis', nom: 'Finthesis', cat: 'BI / Reporting', catKey: 'bi',
+        description: 'Business Intelligence specialisee finance',
+        logoClass: 'finthesis', statutPA: 'na', cloud: true, api: true, ia: 2, fr: true,
+        prix: '120-180€/mois', note: 4.3, avis: 40, sourceAvis: 'Estime',
+        score: 75, scoreDetail: { conformite: 15, fonctionnalites: 20, interop: 18, ux: 12, tco: 10 },
+        forts: ['Connexion FEC directe', '50+ graphes financiers', 'Reporting ESG (CSRD)', 'Integration Pennylane, ACD, MyUnisoft'],
+        vigilance: ['Perimetre finance uniquement', 'Moins flexible que Power BI'],
+        sources: 'finthesis.io'
+    },
+    kanta: {
+        id: 'kanta', nom: 'Kanta', cat: 'CRM / Conformite', catKey: 'crm',
+        description: 'Outil LCB-FT, KYC automatise et onboarding',
+        logoClass: 'kanta', statutPA: 'na', cloud: true, api: true, ia: 2, fr: true,
+        prix: '~100€/mois', note: 4.0, avis: 20, sourceAvis: 'Estime',
+        score: 72, scoreDetail: { conformite: 20, fonctionnalites: 18, interop: 14, ux: 10, tco: 10 },
+        forts: ['Conformite LCB-FT automatisee', 'KYC et scoring risque', 'Indispensable cabinet 100% numerique'],
+        vigilance: ['Niche conformite uniquement'],
+        sources: 'kanta.fr'
+    },
+    chaintrust: {
+        id: 'chaintrust', nom: 'Chaintrust', cat: 'Collecte / IA', catKey: 'collecte',
+        description: 'Automatisation comptable par IA avancee',
+        logoClass: 'chaintrust', statutPA: 'pa', cloud: true, api: true, ia: 4, fr: true,
+        prix: 'Sur devis', note: 4.0, avis: 15, sourceAvis: 'Estime',
+        score: 80, scoreDetail: { conformite: 22, fonctionnalites: 23, interop: 16, ux: 10, tco: 9 },
+        forts: ['PA immatriculee', 'IA niveau "Autonomie"', 'Ecritures generees sans validation ligne a ligne'],
+        vigilance: ['Necessite confiance dans IA', 'Prix sur devis'],
+        sources: 'chaintrust.io'
+    },
+    ipaidthat: {
+        id: 'ipaidthat', nom: 'iPaidThat', cat: 'Pre-compta / OCR', catKey: 'collecte',
+        description: 'Alternative economique Dext',
+        logoClass: 'ipaidthat', statutPA: 'od', cloud: true, api: true, ia: 2, fr: true,
+        prix: '20-40€/mois/dossier', note: 4.5, avis: 72, sourceAvis: 'Trustpilot',
+        score: 76, scoreDetail: { conformite: 18, fonctionnalites: 18, interop: 16, ux: 12, tco: 12 },
+        forts: ['Pre-compta + facturation + tresorerie', 'Prix tres competitif', '4.5/5 Trustpilot (72 avis)'],
+        vigilance: ['Moins connu que Dext', 'OCR legerement moins precis'],
+        sources: 'ipaidthat.com, Trustpilot (72 avis)'
+    },
+    fygr: {
+        id: 'fygr', nom: 'Fygr', cat: 'Tresorerie', catKey: 'bi',
+        description: 'Pilotage tresorerie temps reel',
+        logoClass: 'fygr', statutPA: 'na', cloud: true, api: true, ia: 2, fr: true,
+        prix: '80-120€/mois', note: 4.1, avis: 30, sourceAvis: 'Estime',
+        score: 74, scoreDetail: { conformite: 15, fonctionnalites: 19, interop: 18, ux: 12, tco: 10 },
+        forts: ['Prevision tresorerie automatique', 'Flux bancaires temps reel (PSD2)', 'Liaison native RCA'],
+        vigilance: ['Evenements exceptionnels manuels'],
+        sources: 'fygr.io'
+    }
+};
+
+// === SIMULATEUR TCO INTERACTIF ===
+const TCO_PROFILES = {
+    startup: {
+        nom: 'Cabinet Startup Urbain',
+        desc: '50 dossiers | 2 collaborateurs | Clients digitaux natifs | Stack Pennylane + collecte automatisee',
+        dossiers: 50, collabs: 2, caDossier: 1500, formation: 2000,
+        lines: [
+            { outil: 'Pennylane Premium', fonction: 'Production comptable', mode: 'forfait', montant: 79, source: 'pennylane.com - Module comptable cabinet 79 €/mois min.' },
+            { outil: 'Dext (pack 50 standard)', fonction: 'Collecte / OCR', mode: 'forfait', montant: 604, source: 'CJEC juin 2025 - Pack 50 : 604 €/mois plein tarif (302 € an1 CJEC -50%)' },
+            { outil: 'Kanta', fonction: 'LCB-FT obligatoire', mode: 'forfait', montant: 100, source: 'kanta.fr - ~100 €/mois' },
+            { outil: 'Finthesis', fonction: 'BI / Reporting', mode: 'forfait', montant: 140, source: 'finthesis.io/tarifs - Sur devis selon nb projets. Estimation profession.' },
+            { outil: 'Yousign Pro', fonction: 'Signature electronique', mode: 'forfait', montant: 25, source: 'yousign.com - Offre Pro ~25-49 €/mois' },
+            { outil: 'Acronis Cyber Protect', fonction: 'Cybersecu / Backup', mode: 'forfait', montant: 40, source: 'acronis.com - ~30-50 €/mois PME' },
+        ]
+    },
+    polyvalent: {
+        nom: 'Cabinet Polyvalent TPE',
+        desc: '100 dossiers | 5 collaborateurs | Souverainete donnees (SecNumCloud) | Stack MyUnisoft + Silae',
+        dossiers: 100, collabs: 5, caDossier: 1800, formation: 3500,
+        lines: [
+            { outil: 'MyUnisoft', fonction: 'Production souveraine', mode: 'forfait', montant: 200, source: 'myunisoft.fr - 150-250 €/mois licence cabinet' },
+            { outil: 'iPaidThat (collecte)', fonction: 'Pre-compta / OCR', mode: 'forfait', montant: 450, source: 'ipaidthat.io - 0,09 € HT/facture degressif. ~5 000 fact./mois pour 100 dos.' },
+            { outil: 'Kanta', fonction: 'LCB-FT obligatoire', mode: 'forfait', montant: 100, source: 'kanta.fr - ~100 €/mois' },
+            { outil: 'Silae (paie ~125 bulletins)', fonction: 'Social / Paie', mode: 'forfait', montant: 750, source: 'silae.fr - 3-12 €/bulletin (6 € moyen). ~25 dossiers social × 5 sal.' },
+            { outil: 'Power BI Pro', fonction: 'Reporting / BI', mode: 'forfait', montant: 47, source: 'microsoft.com - 9,40 €/utilisateur/mois x 5 collabs' },
+            { outil: 'Yousign + Acronis', fonction: 'Signature + Backup', mode: 'forfait', montant: 70, source: 'yousign.com + acronis.com - ~25+45 €/mois' },
+        ]
+    },
+    premium: {
+        nom: 'Cabinet Premium PME',
+        desc: '30 dossiers complexes | 3 collaborateurs | Automatisation IA avancee | Stack Fulll + Chaintrust',
+        dossiers: 30, collabs: 3, caDossier: 5000, formation: 4000,
+        lines: [
+            { outil: 'Fulll (suite complete)', fonction: 'Production + GED', mode: 'forfait', montant: 300, source: 'fulll.fr - 200-350 €/mois suite native' },
+            { outil: 'Chaintrust', fonction: 'IA saisie automatisee', mode: 'dossier', montant: 20, source: 'chaintrust.io - a partir de 20 € HT/dossier engagement' },
+            { outil: 'Finthesis', fonction: 'BI / Reporting', mode: 'forfait', montant: 150, source: 'finthesis.io/tarifs - Sur devis selon nb projets. Estimation profession.' },
+            { outil: 'Fygr', fonction: 'Tresorerie temps reel', mode: 'forfait', montant: 100, source: 'fygr.io - 80-120 €/mois' },
+            { outil: 'Silae (paie ~150 bulletins)', fonction: 'Social / Paie', mode: 'forfait', montant: 750, source: 'silae.fr - 3-12 €/bulletin (~5 € vol.). 12 dossiers PME × 12 sal.' },
+            { outil: 'Kanta', fonction: 'LCB-FT obligatoire', mode: 'forfait', montant: 100, source: 'kanta.fr - ~100 €/mois' },
+            { outil: 'Yousign + Acronis', fonction: 'Signature + Backup', mode: 'forfait', montant: 70, source: 'yousign.com + acronis.com' },
+        ]
+    }
+};
+
+let currentProfile = 'startup';
+
+function loadProfile(profileKey) {
+    currentProfile = profileKey;
+    const p = TCO_PROFILES[profileKey];
+    
+    // Update buttons
+    document.querySelectorAll('#tco .tab').forEach(b => b.classList.remove('active'));
+    document.getElementById('btn-' + profileKey).classList.add('active');
+    
+    // Update params
+    document.getElementById('tco-dossiers').value = p.dossiers;
+    document.getElementById('tco-collabs').value = p.collabs;
+    document.getElementById('tco-ca-dossier').value = p.caDossier;
+    document.getElementById('tco-formation').value = p.formation;
+    document.getElementById('tco-profile-desc').innerHTML = '<strong>' + p.nom + '</strong> — ' + p.desc;
+    
+    renderTCOLines();
+    recalcTCO();
+}
+
+function renderTCOLines() {
+    const p = TCO_PROFILES[currentProfile];
+    const tbody = document.getElementById('tco-body');
+    const dossiers = parseInt(document.getElementById('tco-dossiers').value) || 1;
+    
+    let html = '';
+    p.lines.forEach((line, i) => {
+        const modeLabel = line.mode === 'dossier' ? '€/dossier' : 'Forfait';
+        const modeColor = line.mode === 'dossier' ? 'var(--accent)' : 'var(--secondary)';
+        html += `<tr>
+            <td style="padding: 8px 12px; font-weight: 600; font-size: 12px;">${line.outil}</td>
+            <td style="padding: 8px; font-size: 11px; color: var(--gray-500);">${line.fonction}</td>
+            <td style="padding: 8px; text-align: center;">
+                <span style="background: ${modeColor}; color: white; padding: 2px 8px; border-radius: 4px; font-size: 9px; font-weight: 600;">${modeLabel}</span>
+            </td>
+            <td style="padding: 4px 8px; text-align: center;">
+                <input type="number" class="tco-input" data-idx="${i}" value="${line.montant}" min="0" max="99999" step="1" onchange="recalcTCO()" 
+                    style="width: 80px; padding: 4px 6px; border: 1px solid var(--gray-200); border-radius: 4px; font-size: 13px; font-weight: 700; text-align: right;">
+            </td>
+            <td style="padding: 8px; text-align: right; font-weight: 700; font-size: 12px;" class="tco-annual" data-idx="${i}">0 €</td>
+            <td style="padding: 8px; font-size: 10px; color: var(--gray-500); line-height: 1.3;">${line.source}</td>
+        </tr>`;
+    });
+    tbody.innerHTML = html;
+}
+
+function recalcTCO() {
+    const p = TCO_PROFILES[currentProfile];
+    const dossiers = parseInt(document.getElementById('tco-dossiers').value) || 1;
+    const formation = parseInt(document.getElementById('tco-formation').value) || 0;
+    const caDossier = parseInt(document.getElementById('tco-ca-dossier').value) || 1;
+    
+    let totalAnnuel = 0;
+    const inputs = document.querySelectorAll('.tco-input');
+    
+    inputs.forEach((input) => {
+        const idx = parseInt(input.dataset.idx);
+        const line = p.lines[idx];
+        const val = parseFloat(input.value) || 0;
+        
+        let annuel;
+        if (line.mode === 'dossier') {
+            annuel = val * dossiers * 12;
+        } else {
+            annuel = val * 12;
+        }
+        
+        totalAnnuel += annuel;
+        const cell = document.querySelector(`.tco-annual[data-idx="${idx}"]`);
+        if (cell) cell.textContent = formatEur(annuel);
+    });
+    
+    const totalY1 = totalAnnuel + formation;
+    const coutDossier = Math.round(totalAnnuel / dossiers);
+    const caTotal = dossiers * caDossier;
+    const ratio = caTotal > 0 ? ((totalAnnuel / caTotal) * 100).toFixed(1) : 0;
+    
+    document.getElementById('tco-total-abo').textContent = formatEur(totalAnnuel);
+    document.getElementById('tco-sum-recurrent').textContent = formatEur(totalAnnuel);
+    document.getElementById('tco-sum-y1').textContent = formatEur(totalY1);
+    document.getElementById('tco-sum-dossier').textContent = formatEur(coutDossier);
+    document.getElementById('tco-sum-ratio').textContent = ratio + ' %';
+    
+    const comment = document.getElementById('tco-ratio-comment');
+    if (ratio < 5) comment.textContent = 'Optimise - marge de manoeuvre';
+    else if (ratio < 10) comment.textContent = 'Equilibre - phase creation acceptable';
+    else if (ratio < 15) comment.textContent = 'Eleve - justifie si forte VA conseil';
+    else comment.textContent = 'Tres eleve - surveiller rentabilite';
+}
+
+function formatEur(n) {
+    return n.toLocaleString('fr-FR', { maximumFractionDigits: 0 }) + ' €';
+}
+
+// Old TCO_DATA kept for PDF export compatibility
+const TCO_DATA = {
+    startup: { nom: 'Cabinet Startup Urbain', dossiers: 50, collab: 2, total: 0, parDossier: 0, formation: 2000 },
+    polyvalent: { nom: 'Cabinet Polyvalent TPE', dossiers: 100, collab: 5, total: 0, parDossier: 0, formation: 3500 },
+    premium: { nom: 'Cabinet Premium PME', dossiers: 30, collab: 3, total: 0, parDossier: 0, formation: 4000 }
+};
+
+// Données OMECA S2 2025
+const OMECA_DATA = {
+    activiteStable: 67, hausseCA: 14, baisseCA: 9,
+    degradationClients: 36, stabiliteClients: 58,
+    demandeConseil: 45, negociationTarifaire: 34,
+    utilisationIA: 62, automatisation: 32, gainProductivite: 29, tempsConseil: 24,
+    dimensionHumaine: 58, formationIA: 44, reglesSecurite: 40
+};
+
+// Données enquête
+const ENQUETE_DATA = {
+    n: 26,
+    periode: '03/11/2025 - 07/11/2025',
+    taille: {
+        '1-5': { effectif: 19, pct: 73.1 },
+        'solo': { effectif: 2, pct: 7.7 },
+        '6-10': { effectif: 2, pct: 7.7 },
+        '11-20': { effectif: 1, pct: 3.8 },
+        '21+': { effectif: 2, pct: 7.7 }
+    },
+    outils: {
+        'Dext': { mentions: 15, pct: 57.7 },
+        'Pennylane': { mentions: 13, pct: 50.0 },
+        'ChatGPT': { mentions: 8, pct: 30.8 },
+        'ACD': { mentions: 5, pct: 19.2 },
+        'QuickBooks': { mentions: 5, pct: 19.2 },
+        'MyUnisoft': { mentions: 4, pct: 15.4 },
+        'Tiime': { mentions: 4, pct: 15.4 }
+    },
+    ia: {
+        'active': { effectif: 18, pct: 69.2 },
+        'enCours': { effectif: 5, pct: 19.2 },
+        'non': { effectif: 3, pct: 11.5 }
+    },
+    defis: {
+        'cout': { pct: 34.6 },
+        'formation': { pct: 30.8 },
+        'securite': { pct: 19.2 }
+    },
+    indicateurs: {
+        caAn1Mediane: 125000,
+        caAn2Mediane: 200000,
+        caAn3Mediane: 425000,
+        honorairesDossierMediane: 3500,
+        objectifClients12mMediane: 25
+    },
+    efficaciteOutils: 73.1,
+    formationContinue: 76.9
+};
+
+// Fonctions
+function showPanel(panelId) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById(panelId).classList.add('active');
+    // Marquer l'onglet cliqué comme actif
+    const tabs = document.querySelectorAll('.tab');
+    tabs.forEach(t => { if (t.getAttribute('onclick') && t.getAttribute('onclick').includes(panelId)) t.classList.add('active'); });
+}
+
+function renderLogiciels() {
+    const container = document.getElementById('logicielsContainer');
+    const filterCat = document.getElementById('filterCat').value;
+    const filterPA = document.getElementById('filterPA').value;
+    const search = document.getElementById('searchInput').value.toLowerCase();
+    
+    let html = '';
+    Object.values(LOGICIELS_DB).forEach(l => {
+        if (filterCat !== 'all' && l.catKey !== filterCat) return;
+        if (filterPA !== 'all' && l.statutPA !== filterPA) return;
+        if (search && !l.nom.toLowerCase().includes(search)) return;
+        
+        const scoreClass = l.score >= 85 ? 'high' : l.score >= 70 ? 'medium' : 'low';
+        
+        html += `
+        <div class="logiciel-card" id="card-${l.id}">
+            <div class="logiciel-header" onclick="toggleCard('${l.id}')">
+                <div class="logiciel-info">
+                    <div class="logiciel-logo ${l.logoClass}">${l.nom.substring(0,2).toUpperCase()}</div>
+                    <div>
+                        <div class="logiciel-name">${l.nom}</div>
+                        <div class="logiciel-cat">${l.cat}</div>
+                    </div>
+                </div>
+                <div class="logiciel-metrics">
+                    <div class="logiciel-badges">
+                        ${l.statutPA === 'pa' ? '<span class="tag tag-pa">PA ✓</span>' : ''}
+                        ${l.cloud ? '<span class="tag tag-cloud">Cloud</span>' : ''}
+                        ${l.api ? '<span class="tag tag-api">API</span>' : ''}
+                        ${l.fr ? '<span class="tag tag-fr">FR</span>' : ''}
+                        ${l.ia >= 3 ? '<span class="tag tag-ia">IA</span>' : ''}
+                    </div>
+                    <div class="logiciel-metric">
+                        <div class="logiciel-metric-value scoring-score ${scoreClass}">${l.score}/100</div>
+                        <div class="logiciel-metric-label">Score</div>
+                    </div>
+                    <div class="logiciel-metric">
+                        <div class="logiciel-metric-value">${l.note}/5</div>
+                        <div class="logiciel-metric-label">Note</div>
+                    </div>
+                    <div class="logiciel-price">${l.prix}</div>
+                    <button class="expand-btn">▼</button>
+                </div>
+            </div>
+            <div class="logiciel-body">
+                <div class="detail-grid">
+                    <div class="detail-section">
+                        <div class="detail-title">✅ Points forts</div>
+                        <ul class="points-list">
+                            ${l.forts.map(f => `<li><span class="point-icon pos">+</span>${f}</li>`).join('')}
+                        </ul>
+                    </div>
+                    <div class="detail-section">
+                        <div class="detail-title">⚠️ Points de vigilance</div>
+                        <ul class="points-list">
+                            ${l.vigilance.map(v => `<li><span class="point-icon neg">!</span>${v}</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+                <div class="source-citation" style="margin-top: 16px;">
+                    <strong>Sources :</strong> ${l.sources} | <strong>Score detail :</strong> Conf. ${l.scoreDetail.conformite}/25, Fonc. ${l.scoreDetail.fonctionnalites}/25, API ${l.scoreDetail.interop}/20, UX ${l.scoreDetail.ux}/15, TCO ${l.scoreDetail.tco}/15
+                </div>
+            </div>
+        </div>
+        `;
+    });
+    container.innerHTML = html;
+}
+
+function toggleCard(id) {
+    document.getElementById('card-' + id).classList.toggle('expanded');
+}
+
+function filterLogiciels() {
+    renderLogiciels();
+}
+
+// ============================================================
+// EXPORT PDF COMPLET - STYLE RAPPORT PROFESSIONNEL
+// ============================================================
+function exportPDFComplet() {
+    // PDF-safe number formatting (no Unicode spaces/commas)
+    function fmtNum(n) {
+        return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+    }
+    document.getElementById('loadingOverlay').classList.add('show');
+    
+    setTimeout(() => {
+        try {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'mm', 'a4');
+            const pageWidth = 210;
+            const pageHeight = 297;
+            const margin = 15;
+            const contentWidth = pageWidth - (margin * 2);
+            let currentPage = 1;
+            let y = 0;
+            
+            // Couleurs
+            const colorPrimary = [30, 58, 95];
+            const colorSecondary = [13, 148, 136];
+            const colorAccent = [245, 158, 11];
+            const colorSuccess = [5, 150, 105];
+            const colorDanger = [220, 38, 38];
+            const colorText = [55, 65, 81];
+            const colorMuted = [107, 114, 128];
+            
+            // Fonction utilitaire pour nettoyer le texte
+            function cleanText(str) {
+                if (!str) return '';
+                return String(str)
+                    .replace(/é/g, 'e').replace(/è/g, 'e').replace(/ê/g, 'e').replace(/ë/g, 'e')
+                    .replace(/à/g, 'a').replace(/â/g, 'a').replace(/ä/g, 'a')
+                    .replace(/ù/g, 'u').replace(/û/g, 'u').replace(/ü/g, 'u')
+                    .replace(/ô/g, 'o').replace(/ö/g, 'o')
+                    .replace(/î/g, 'i').replace(/ï/g, 'i')
+                    .replace(/ç/g, 'c')
+                    .replace(/œ/g, 'oe').replace(/æ/g, 'ae')
+                    .replace(/É/g, 'E').replace(/È/g, 'E').replace(/Ê/g, 'E')
+                    .replace(/À/g, 'A').replace(/Â/g, 'A')
+                    .replace(/Ù/g, 'U').replace(/Û/g, 'U')
+                    .replace(/Ô/g, 'O').replace(/Î/g, 'I')
+                    .replace(/Ç/g, 'C')
+                    .replace(/€/g, 'EUR')
+                    .replace(/—/g, '-').replace(/–/g, '-')
+                    .replace(/'/g, "'");
+            }
+            
+            // Footer de page
+            function addFooter() {
+                doc.setFontSize(8);
+                doc.setTextColor(...colorMuted);
+                doc.text(cleanText('Annexe 10 — Comparatif Logiciels Cabinet | Source : réalisé par le candidat'), margin, pageHeight - 10);
+                doc.text('Page ' + currentPage, pageWidth - margin - 15, pageHeight - 10);
+                doc.setDrawColor(200, 200, 200);
+                doc.line(margin, pageHeight - 15, pageWidth - margin, pageHeight - 15);
+            }
+            
+            // Nouvelle page
+            function newPage() {
+                addFooter();
+                doc.addPage();
+                currentPage++;
+                y = 20;
+            }
+            
+            // Vérifier espace disponible
+            function checkSpace(needed) {
+                if (y + needed > pageHeight - 25) {
+                    newPage();
+                    return true;
+                }
+                return false;
+            }
+            
+            // ============================================================
+            // PAGE 1 : COUVERTURE
+            // ============================================================
+            
+            // Bandeau header
+            doc.setFillColor(...colorPrimary);
+            doc.rect(0, 0, pageWidth, 50, 'F');
+            
+            // Titre
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(22);
+            doc.setFont('helvetica', 'bold');
+            doc.text('ANNEXE 10', margin, 25);
+            doc.setFontSize(14);
+            doc.setFont('helvetica', 'normal');
+            doc.text('Comparatif des Logiciels de Gestion de Cabinet', margin, 35);
+            doc.setFontSize(10);
+            doc.text('Guide pratique a la creation d\'un cabinet 100% numerique', margin, 43);
+            
+            // Badge date
+            doc.setFillColor(...colorSecondary);
+            doc.roundedRect(pageWidth - margin - 45, 15, 40, 12, 2, 2, 'F');
+            doc.setFontSize(9);
+            doc.text('Fevrier 2026', pageWidth - margin - 40, 23);
+            
+            y = 60;
+            
+            // Cadre réglementaire
+            doc.setFillColor(240, 249, 255);
+            doc.roundedRect(margin, y, contentWidth, 35, 3, 3, 'F');
+            doc.setDrawColor(...colorPrimary);
+            doc.setLineWidth(0.5);
+            doc.roundedRect(margin, y, contentWidth, 35, 3, 3, 'S');
+            
+            doc.setTextColor(...colorPrimary);
+            doc.setFontSize(11);
+            doc.setFont('helvetica', 'bold');
+            doc.text('CADRE REGLEMENTAIRE', margin + 5, y + 10);
+            
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(9);
+            doc.setTextColor(...colorText);
+            doc.text('- Reception factures electroniques : 1er septembre 2026', margin + 5, y + 18);
+            doc.text('- Emission TPE-PME : 1er septembre 2027', margin + 5, y + 24);
+            doc.text('- 108 plateformes agreees (DGFiP 13 fevrier 2026) : liste evolutive, 101 PA au 16 janvier 2026', margin + 5, y + 30);
+            
+            y += 45;
+            
+            // KPIs principaux
+            doc.setTextColor(...colorPrimary);
+            doc.setFontSize(12);
+            doc.setFont('helvetica', 'bold');
+            doc.text('INDICATEURS CLES - OMECA S2 2025', margin, y);
+            y += 8;
+            
+            const kpis = [
+                { label: 'Activite stable S1 2025', value: '67%', color: colorPrimary },
+                { label: 'Hausse demande conseil', value: '+45%', color: colorSuccess },
+                { label: 'Negociation tarifaire', value: '34%', color: colorAccent },
+                { label: 'Cabinets utilisant IA', value: '62%', color: colorSecondary }
+            ];
+            
+            const kpiWidth = (contentWidth - 15) / 4;
+            kpis.forEach((kpi, i) => {
+                const kpiX = margin + (i * (kpiWidth + 5));
+                doc.setFillColor(...kpi.color);
+                doc.roundedRect(kpiX, y, kpiWidth, 25, 2, 2, 'F');
+                doc.setTextColor(255, 255, 255);
+                doc.setFontSize(16);
+                doc.setFont('helvetica', 'bold');
+                doc.text(kpi.value, kpiX + kpiWidth/2, y + 12, { align: 'center' });
+                doc.setFontSize(7);
+                doc.setFont('helvetica', 'normal');
+                const labelLines = doc.splitTextToSize(kpi.label, kpiWidth - 4);
+                doc.text(labelLines, kpiX + kpiWidth/2, y + 19, { align: 'center' });
+            });
+            
+            y += 35;
+            
+            // Source
+            doc.setFontSize(8);
+            doc.setTextColor(...colorMuted);
+            doc.text('Source : OMECA - Barometre des metiers S2 2025 (panel BVA, n=301 cabinets) - Publication janvier 2026', margin, y);
+            
+            y += 15;
+            
+            // Contexte économique
+            doc.setTextColor(...colorPrimary);
+            doc.setFontSize(11);
+            doc.setFont('helvetica', 'bold');
+            doc.text('CONTEXTE ECONOMIQUE', margin, y);
+            y += 8;
+            
+            doc.setFillColor(255, 251, 235);
+            doc.setDrawColor(...colorAccent);
+            doc.setLineWidth(0.5);
+            doc.roundedRect(margin, y, contentWidth, 28, 2, 2, 'FD');
+            
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(...colorText);
+            const contexteText = 'Contexte contraint avec pression tarifaire accrue. 36% des cabinets constatent une degradation de la situation financiere de leurs clients. L\'automatisation des taches a faible valeur ajoutee n\'est plus un luxe technologique mais une condition de viabilite economique. La differenciation par le conseil et l\'efficacite operationnelle devient determinante.';
+            const contexteLines = doc.splitTextToSize(contexteText, contentWidth - 10);
+            doc.text(contexteLines, margin + 5, y + 8);
+            
+            y += 38;
+            
+            // Sommaire
+            doc.setTextColor(...colorPrimary);
+            doc.setFontSize(11);
+            doc.setFont('helvetica', 'bold');
+            doc.text('SOMMAIRE DU RAPPORT', margin, y);
+            y += 8;
+            
+            const sommaire = [
+                '1. Synthese et indicateurs cles',
+                '2. Comparatif des 11 solutions analysees',
+                '3. Simulations TCO par profil de cabinet',
+                '4. Grille de scoring appliquee',
+                '5. Retours terrain (OMECA, Fed Finance, entretiens)',
+                '6. Sources et references bibliographiques'
+            ];
+            
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(...colorText);
+            sommaire.forEach((item, i) => {
+                doc.text(item, margin + 5, y + (i * 6));
+            });
+            
+            addFooter();
+            
+            // ============================================================
+            // PAGE 2 : COMPARATIF LOGICIELS
+            // ============================================================
+            doc.addPage();
+            currentPage++;
+            y = 20;
+            
+            // Header page
+            doc.setFillColor(...colorPrimary);
+            doc.rect(0, 0, pageWidth, 20, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(12);
+            doc.setFont('helvetica', 'bold');
+            doc.text('2. COMPARATIF DES SOLUTIONS', margin, 13);
+            
+            y = 30;
+            
+            // Tableau comparatif
+            const logicielsArray = Object.values(LOGICIELS_DB);
+            
+            // En-tête tableau
+            doc.setFillColor(240, 240, 240);
+            doc.rect(margin, y, contentWidth, 8, 'F');
+            doc.setFontSize(7);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(...colorPrimary);
+            doc.text('Logiciel', margin + 2, y + 5);
+            doc.text('Categorie', margin + 35, y + 5);
+            doc.text('PA', margin + 75, y + 5);
+            doc.text('FR', margin + 85, y + 5);
+            doc.text('Score', margin + 95, y + 5);
+            doc.text('Prix', margin + 115, y + 5);
+            doc.text('Note', margin + 145, y + 5);
+            doc.text('Avis', margin + 160, y + 5);
+            y += 10;
+            
+            // Lignes
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(7);
+            logicielsArray.forEach((l, i) => {
+                checkSpace(7);
+                
+                if (i % 2 === 0) {
+                    doc.setFillColor(250, 250, 250);
+                    doc.rect(margin, y - 2, contentWidth, 7, 'F');
+                }
+                
+                doc.setTextColor(...colorText);
+                doc.setFont('helvetica', 'bold');
+                doc.text(cleanText(l.nom), margin + 2, y + 3);
+                doc.setFont('helvetica', 'normal');
+                doc.text(cleanText(l.cat).substring(0, 18), margin + 35, y + 3);
+                
+                // PA
+                if (l.statutPA === 'pa') {
+                    doc.setTextColor(...colorSuccess);
+                    doc.text('Oui', margin + 75, y + 3);
+                } else {
+                    doc.setTextColor(...colorMuted);
+                    doc.text('-', margin + 75, y + 3);
+                }
+                
+                // FR
+                if (l.fr) {
+                    doc.setTextColor(...colorSuccess);
+                    doc.text('Oui', margin + 85, y + 3);
+                } else {
+                    doc.setTextColor(...colorMuted);
+                    doc.text('Non', margin + 85, y + 3);
+                }
+                
+                // Score
+                const scoreColor = l.score >= 85 ? colorSuccess : l.score >= 70 ? colorAccent : colorDanger;
+                doc.setTextColor(...scoreColor);
+                doc.setFont('helvetica', 'bold');
+                doc.text(l.score + '/100', margin + 95, y + 3);
+                
+                doc.setFont('helvetica', 'normal');
+                doc.setTextColor(...colorText);
+                doc.text(cleanText(l.prix).substring(0, 18), margin + 115, y + 3);
+                doc.text(l.note + '/5', margin + 145, y + 3);
+                doc.text(String(l.avis), margin + 160, y + 3);
+                
+                y += 7;
+            });
+            
+            y += 10;
+            
+            // Légende
+            doc.setFontSize(8);
+            doc.setTextColor(...colorMuted);
+            doc.text('PA = Plateforme Agreee DGFiP | FR = Hebergement France | Score = Grille multicritere sur 100', margin, y);
+            
+            addFooter();
+            
+            // ============================================================
+            // PAGE 3 : TCO
+            // ============================================================
+            doc.addPage();
+            currentPage++;
+            y = 20;
+            
+            // Header page
+            doc.setFillColor(...colorPrimary);
+            doc.rect(0, 0, pageWidth, 20, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(12);
+            doc.setFont('helvetica', 'bold');
+            doc.text('3. SIMULATIONS TCO PAR PROFIL (donnees interactives)', margin, 13);
+            
+            y = 30;
+            
+            // Introduction TCO
+            doc.setFillColor(240, 249, 255);
+            doc.roundedRect(margin, y, contentWidth, 18, 2, 2, 'F');
+            doc.setFontSize(8);
+            doc.setTextColor(...colorText);
+            doc.text('Le Cout Total de Possession (TCO) integre : abonnements logiciels annuels, formation initiale.', margin + 5, y + 7);
+            doc.text('Tarifs sources publiques verifiees (jan. 2026). Montants ajustables dans le simulateur interactif.', margin + 5, y + 13);
+            
+            y += 28;
+            
+            const profileKeys = ['startup', 'polyvalent', 'premium'];
+            const profileColors = [colorSecondary, colorAccent, colorDanger];
+            const profileIcons = ['PROFIL 1', 'PROFIL 2', 'PROFIL 3'];
+            
+            profileKeys.forEach((pk, pi) => {
+                const prof = TCO_PROFILES[pk];
+                
+                // Header bar
+                doc.setFillColor(...profileColors[pi]);
+                doc.roundedRect(margin, y, contentWidth, 8, 2, 2, 'F');
+                doc.setTextColor(255, 255, 255);
+                doc.setFontSize(10);
+                doc.setFont('helvetica', 'bold');
+                doc.text(profileIcons[pi] + ' : ' + prof.nom, margin + 5, y + 6);
+                y += 12;
+                
+                doc.setTextColor(...colorText);
+                doc.setFontSize(8);
+                doc.setFont('helvetica', 'normal');
+                doc.text(prof.desc, margin + 5, y);
+                y += 8;
+                
+                let profTotal = 0;
+                prof.lines.forEach(line => {
+                    const annuel = line.mode === 'dossier' ? line.montant * prof.dossiers * 12 : line.montant * 12;
+                    profTotal += annuel;
+                    doc.text(line.outil + ' (' + line.fonction + ')', margin + 10, y);
+                    doc.text(fmtNum(annuel) + ' EUR/an', margin + 130, y);
+                    y += 5;
+                });
+                
+                const coutDossier = Math.round(profTotal / prof.dossiers);
+                const caTotal = prof.dossiers * prof.caDossier;
+                const ratio = ((profTotal / caTotal) * 100).toFixed(1);
+                
+                doc.setFont('helvetica', 'bold');
+                doc.text('Total : ' + fmtNum(profTotal) + ' EUR/an | Cout/dossier : ' + fmtNum(coutDossier) + ' EUR | Ratio SI/CA : ' + ratio + '%', margin + 5, y + 3);
+                doc.setFont('helvetica', 'normal');
+                
+                y += 15;
+                
+                if (y > 250 && pi < profileKeys.length - 1) {
+                    addFooter();
+                    doc.addPage();
+                    currentPage++;
+                    y = 20;
+                }
+            });
+            
+            addFooter();
+            
+            // ============================================================
+            // PAGE 4 : SCORING
+            // ============================================================
+            doc.addPage();
+            currentPage++;
+            y = 20;
+            
+            // Header page
+            doc.setFillColor(...colorPrimary);
+            doc.rect(0, 0, pageWidth, 20, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(12);
+            doc.setFont('helvetica', 'bold');
+            doc.text('4. GRILLE DE SCORING APPLIQUEE', margin, 13);
+            
+            y = 30;
+            
+            // Formule
+            doc.setFillColor(240, 249, 255);
+            doc.roundedRect(margin, y, contentWidth, 12, 2, 2, 'F');
+            doc.setTextColor(...colorPrimary);
+            doc.setFontSize(8);
+            doc.setFont('helvetica', 'bold');
+            doc.text('FORMULE : Score = (Conformite x 25%) + (Fonctionnalites x 25%) + (Interoperabilite x 20%) + (UX x 15%) + (TCO x 15%)', margin + 5, y + 8);
+            
+            y += 20;
+            
+            // Tableau pondération
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(...colorPrimary);
+            doc.text('DETAIL DES CRITERES', margin, y);
+            y += 8;
+            
+            const criteres = [
+                ['Conformite reglementaire', '25%', 'PA (10pts), Hebergement FR/UE (5pts), SecNumCloud (5pts), RGPD (5pts)'],
+                ['Fonctionnalites metier', '25%', 'Couverture (10pts), Automatisation IA (8pts), Module revision (7pts)'],
+                ['Interoperabilite', '20%', 'API ouverte (8pts), Connecteurs natifs (7pts), Export FEC (5pts)'],
+                ['Experience utilisateur', '15%', 'Ergonomie (6pts), Courbe apprentissage (5pts), Support (4pts)'],
+                ['Cout total possession', '15%', 'Prix/dossier (8pts), Scalabilite (4pts), Couts caches (3pts)']
+            ];
+            
+            // Header tableau
+            doc.setFillColor(240, 240, 240);
+            doc.rect(margin, y, contentWidth, 7, 'F');
+            doc.setFontSize(7);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Critere', margin + 2, y + 5);
+            doc.text('Pond.', margin + 55, y + 5);
+            doc.text('Sous-criteres', margin + 70, y + 5);
+            y += 9;
+            
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(...colorText);
+            criteres.forEach((c, i) => {
+                if (i % 2 === 0) {
+                    doc.setFillColor(250, 250, 250);
+                    doc.rect(margin, y - 2, contentWidth, 7, 'F');
+                }
+                doc.text(c[0], margin + 2, y + 3);
+                doc.setFont('helvetica', 'bold');
+                doc.text(c[1], margin + 55, y + 3);
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(6);
+                doc.text(c[2], margin + 70, y + 3);
+                doc.setFontSize(7);
+                y += 7;
+            });
+            
+            y += 10;
+            
+            // Comparatif Top 3
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(...colorPrimary);
+            doc.text('COMPARATIF TOP 3 - PRODUCTION COMPTABLE', margin, y);
+            y += 8;
+            
+            // Tableau comparatif
+            doc.setFillColor(...colorPrimary);
+            doc.rect(margin, y, contentWidth, 7, 'F');
+            doc.setFontSize(7);
+            doc.setTextColor(255, 255, 255);
+            doc.text('Critere', margin + 2, y + 5);
+            doc.text('MyUnisoft', margin + 60, y + 5);
+            doc.text('Pennylane', margin + 95, y + 5);
+            doc.text('ACD', margin + 130, y + 5);
+            doc.text('Max', margin + 160, y + 5);
+            y += 9;
+            
+            const comparatif = [
+                ['Conformite (25%)', '25/25', '18/25', '23/25', '25'],
+                ['Fonctionnalites (25%)', '21/25', '24/25', '19/25', '25'],
+                ['Interoperabilite (20%)', '20/20', '20/20', '16/20', '20'],
+                ['Experience UX (15%)', '12/15', '15/15', '11/15', '15'],
+                ['TCO (15%)', '13/15', '13/15', '11/15', '15'],
+                ['TOTAL', '91/100', '90/100', '80/100', '100']
+            ];
+            
+            doc.setTextColor(...colorText);
+            comparatif.forEach((row, i) => {
+                if (i % 2 === 0) {
+                    doc.setFillColor(250, 250, 250);
+                    doc.rect(margin, y - 2, contentWidth, 7, 'F');
+                }
+                if (i === comparatif.length - 1) {
+                    doc.setFillColor(240, 249, 255);
+                    doc.rect(margin, y - 2, contentWidth, 7, 'F');
+                    doc.setFont('helvetica', 'bold');
+                }
+                doc.text(row[0], margin + 2, y + 3);
+                
+                // Couleur selon score
+                const score1 = parseInt(row[1]);
+                const score2 = parseInt(row[2]);
+                const score3 = parseInt(row[3]);
+                
+                doc.setTextColor(...(score1 >= 20 ? colorSuccess : score1 >= 15 ? colorAccent : colorDanger));
+                doc.text(row[1], margin + 60, y + 3);
+                doc.setTextColor(...(score2 >= 20 ? colorSuccess : score2 >= 15 ? colorAccent : colorDanger));
+                doc.text(row[2], margin + 95, y + 3);
+                doc.setTextColor(...(score3 >= 20 ? colorSuccess : score3 >= 15 ? colorAccent : colorDanger));
+                doc.text(row[3], margin + 130, y + 3);
+                doc.setTextColor(...colorMuted);
+                doc.text(row[4], margin + 160, y + 3);
+                doc.setTextColor(...colorText);
+                doc.setFont('helvetica', 'normal');
+                
+                y += 7;
+            });
+            
+            y += 10;
+            
+            // Interprétation
+            doc.setFontSize(8);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(...colorPrimary);
+            doc.text('INTERPRETATION', margin, y);
+            y += 6;
+            
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(...colorText);
+            doc.setFontSize(7);
+            
+            doc.setFillColor(209, 250, 229);
+            doc.roundedRect(margin, y, contentWidth, 12, 2, 2, 'F');
+            doc.text('MyUnisoft (91/100) : Choix rationnel pour cabinet sensible a la souverainete des donnees.', margin + 5, y + 5);
+            doc.text('Hebergement France, SecNumCloud, Data Lake souverain.', margin + 5, y + 10);
+            y += 15;
+            
+            doc.setFillColor(219, 234, 254);
+            doc.roundedRect(margin, y, contentWidth, 12, 2, 2, 'F');
+            doc.text('Pennylane (90/100) : S\'impose pour cabinet ciblant clients digitaux natifs.', margin + 5, y + 5);
+            doc.text('Interface moderne plebiscitee, automatisation avancee.', margin + 5, y + 10);
+            y += 15;
+            
+            doc.setFillColor(254, 243, 199);
+            doc.roundedRect(margin, y, contentWidth, 12, 2, 2, 'F');
+            doc.text('ACD (80/100) : Pertinent pour cabinet recherchant solution robuste eprouvee.', margin + 5, y + 5);
+            doc.text('GED integree, interface moins moderne.', margin + 5, y + 10);
+            
+            addFooter();
+            
+            // ============================================================
+            // PAGE 5 : SOURCES
+            // ============================================================
+            doc.addPage();
+            currentPage++;
+            y = 20;
+            
+            // Header page
+            doc.setFillColor(...colorPrimary);
+            doc.rect(0, 0, pageWidth, 20, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(12);
+            doc.setFont('helvetica', 'bold');
+            doc.text('6. SOURCES ET REFERENCES', margin, 13);
+            
+            y = 30;
+            
+            doc.setTextColor(...colorPrimary);
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'bold');
+            doc.text('SOURCES INSTITUTIONNELLES', margin, y);
+            y += 8;
+            
+            const sourcesInst = [
+                'OMECA - Barometre des metiers de l\'expertise comptable, S2 2025 (panel BVA n=301) - Janvier 2026',
+                'DGFiP - Liste officielle des plateformes agreees - 16 janvier 2026 (101 PA), maj 13 fevrier 2026 (108 PA)',
+                'ANSSI - Guide d\'hygiene informatique TPE/PME - 2024',
+                'Fed Finance - Etude digitalisation cabinets expertise comptable - Avril 2024',
+                'Guide Agiris - Budget informatique TPE/PME - Juin 2025'
+            ];
+            
+            doc.setFontSize(8);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(...colorText);
+            sourcesInst.forEach(src => {
+                doc.text('- ' + src, margin + 5, y);
+                y += 6;
+            });
+            
+            y += 10;
+            
+            doc.setTextColor(...colorPrimary);
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'bold');
+            doc.text('SOURCES EDITEURS', margin, y);
+            y += 8;
+            
+            const sourcesEdit = [
+                'Pennylane - Site officiel, benchmarks productivite juin 2025, grille tarifaire 2026',
+                'Dext - Site officiel, documentation API, precision OCR - Janvier 2026',
+                'MyUnisoft - Documentation API, certifications SecNumCloud - Janvier 2026',
+                'Fulll - Certifications ISO 27001, fonctionnalites - Janvier 2026'
+            ];
+            
+            doc.setFontSize(8);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(...colorText);
+            sourcesEdit.forEach(src => {
+                doc.text('- ' + src, margin + 5, y);
+                y += 6;
+            });
+            
+            y += 10;
+            
+            doc.setTextColor(...colorPrimary);
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'bold');
+            doc.text('PLATEFORMES D\'AVIS', margin, y);
+            y += 8;
+            
+            const sourcesAvis = [
+                'Appvizer : Pennylane (200+ avis, 4.2/5)',
+                'Capterra : Dext (160+ avis, 4.2/5)',
+                'Trustpilot : iPaidThat (72 avis, 4.5/5)'
+            ];
+            
+            doc.setFontSize(8);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(...colorText);
+            sourcesAvis.forEach(src => {
+                doc.text('- ' + src, margin + 5, y);
+                y += 6;
+            });
+            
+            y += 10;
+            
+            doc.setTextColor(...colorPrimary);
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'bold');
+            doc.text('SOURCE PRIMAIRE', margin, y);
+            y += 8;
+            
+            doc.setFontSize(8);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(...colorText);
+            doc.text('- Entretiens cibles : 5 professionnels (banquier, cybersecurite, editeur SaaS, marketing digital, RH)', margin + 5, y);
+            doc.text('  (Annexe 25 - Eclairages complementaires sur les choix strategiques et operationnels)', margin + 5, y + 5);
+            
+            y += 20;
+            
+            // Cadre méthodologique
+            doc.setFillColor(240, 249, 255);
+            doc.roundedRect(margin, y, contentWidth, 30, 2, 2, 'F');
+            doc.setTextColor(...colorPrimary);
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'bold');
+            doc.text('NOTE METHODOLOGIQUE', margin + 5, y + 8);
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(7);
+            doc.setTextColor(...colorText);
+            const noteMethod = 'Les indicateurs de performance editeurs (productivite, precision OCR) proviennent de benchmarks internes non audites. Ils constituent des ordres de grandeur pour structurer des simulations financieres, non des garanties de resultats. Les verbatims presentes proviennent de temoignages publies par les editeurs ou d\'avis verifies sur plateformes tierces. Ils ne constituent pas un echantillon representatif mais illustrent des retours utilisateurs authentiques.';
+            const noteLines = doc.splitTextToSize(noteMethod, contentWidth - 10);
+            doc.text(noteLines, margin + 5, y + 14);
+            
+            addFooter();
+            
+            // Sauvegarde
+            doc.save('Annexe_10_Comparatif_Logiciels_Cabinet.pdf');
+            
+        } catch (error) {
+            console.error('Erreur export PDF:', error);
+            alert('Erreur lors de la generation du PDF: ' + error.message);
+        } finally {
+            document.getElementById('loadingOverlay').classList.remove('show');
+        }
+    }, 100);
+}
+
+// Init
+document.addEventListener('DOMContentLoaded', function() {
+    renderLogiciels();
+    loadProfile('startup');
+});
+</script>
+</body>
+</html>

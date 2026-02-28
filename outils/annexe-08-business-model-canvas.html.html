@@ -1,0 +1,1414 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Annexe 8 - Business Model Canvas | Cabinet Expert-Comptable 100% Numérique</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --primary:#4a6cf7;--primary-dark:#3b5de7;--secondary:#6b21a8;
+  --success:#16a34a;--warning:#d97706;--danger:#dc2626;
+  --dark:#0f172a;--dark-light:#1e293b;--gray:#64748b;
+  --light:#f8fafc;--white:#fff;
+  --radius:10px;
+}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:linear-gradient(135deg,#1e293b 0%,#0f172a 100%);min-height:100vh;color:#334155}
+
+.app-container{display:flex;height:100vh;overflow:hidden}
+
+/* SIDEBAR */
+.sidebar{width:300px;background:var(--dark);color:white;display:flex;flex-direction:column;flex-shrink:0;border-right:1px solid rgba(255,255,255,0.06)}
+.sidebar-header{padding:18px 16px;background:var(--dark-light);border-bottom:1px solid rgba(255,255,255,0.08)}
+.sidebar-header h2{font-size:1.1em;margin-bottom:4px;display:flex;align-items:center;gap:8px;font-weight:700;letter-spacing:-0.02em}
+.sidebar-header p{font-size:0.78em;opacity:0.5;letter-spacing:0.02em}
+.badge-dec{display:none}
+
+.sidebar-nav{flex:1;overflow-y:auto;padding:8px}
+.nav-section{margin-bottom:6px}
+.nav-section-title{font-size:0.7em;text-transform:uppercase;color:rgba(255,255,255,0.35);padding:10px 14px 4px;letter-spacing:1.2px;font-weight:600}
+.nav-item{display:flex;align-items:center;gap:9px;padding:10px 14px;border-radius:8px;cursor:pointer;transition:all 0.15s;margin:1px 0;font-size:0.92em;font-weight:500}
+.nav-item:hover{background:rgba(255,255,255,0.07)}
+.nav-item.active{background:linear-gradient(135deg,var(--primary),var(--secondary));box-shadow:0 2px 12px rgba(74,108,247,0.3)}
+.nav-item .icon{font-size:1em;width:20px;text-align:center;flex-shrink:0}
+.nav-item .badge{margin-left:auto;font-size:0.62em;padding:2px 6px;border-radius:8px;font-weight:700}
+.nav-item .badge.success{background:var(--success);color:white}
+.nav-item .badge.warning{background:var(--warning);color:white}
+.nav-item .badge.danger{background:rgba(220,38,38,0.2);color:#fca5a5}
+.nav-item .edit-indicator{margin-left:auto;font-size:0.65em;opacity:0.4}
+
+/* MAIN CONTENT */
+.main-content{flex:1;display:flex;flex-direction:column;overflow:hidden;background:#f1f5f9}
+
+.main-header{background:white;padding:11px 20px;box-shadow:0 1px 3px rgba(0,0,0,0.06);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;gap:12px;border-bottom:1px solid #e2e8f0}
+.main-header h1{font-size:1.1em;color:var(--dark);display:flex;align-items:center;gap:8px;font-weight:700;letter-spacing:-0.02em}
+.header-actions{display:flex;gap:7px}
+.btn{padding:9px 16px;border:none;border-radius:8px;cursor:pointer;font-weight:600;font-size:0.85em;transition:all 0.15s;display:flex;align-items:center;gap:5px;letter-spacing:-0.01em}
+.btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,0.12)}
+.btn-primary{background:linear-gradient(135deg,var(--primary),var(--secondary));color:white}
+.btn-secondary{background:#e2e8f0;color:#475569}
+.btn-outline{background:transparent;border:1.5px solid var(--primary);color:var(--primary)}
+.btn:disabled{opacity:0.5;cursor:not-allowed;transform:none}
+
+.content-area{flex:1;overflow-y:auto;padding:10px 14px}
+
+.panel{display:none;animation:fadeIn 0.25s ease}
+.panel.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* CONTEXT BANNER */
+.context-banner{background:linear-gradient(135deg,#0f172a,#1e293b);color:white;padding:14px;border-radius:var(--radius);margin-bottom:10px;display:grid;grid-template-columns:1fr 1fr;gap:14px;border:1px solid rgba(255,255,255,0.06)}
+.context-item h4{font-size:0.7em;text-transform:uppercase;opacity:0.5;margin-bottom:4px;letter-spacing:0.8px;font-weight:600}
+.context-item p{font-size:0.88em;line-height:1.5;font-weight:400}
+.context-item .highlight{color:#fbbf24;font-weight:700}
+
+/* KPI DASHBOARD */
+.kpi-dashboard{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}
+.kpi-card{background:white;border-radius:var(--radius);padding:12px 10px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,0.04);border-left:3px solid var(--primary);transition:all 0.2s}
+.kpi-card:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,0.08)}
+.kpi-card.warning{border-left-color:var(--warning)}
+.kpi-card.success{border-left-color:var(--success)}
+.kpi-card.danger{border-left-color:var(--danger)}
+.kpi-value{font-size:1.4em;font-weight:800;color:var(--dark);letter-spacing:-0.03em}
+.kpi-label{font-size:0.7em;color:var(--gray);margin-top:2px;font-weight:500}
+.kpi-sub{font-size:0.6em;color:var(--gray);margin-top:3px;font-style:italic}
+
+/* BMC CANVAS */
+.bmc-canvas-container{background:white;border-radius:var(--radius);padding:10px;box-shadow:0 1px 3px rgba(0,0,0,0.04)}
+.bmc-canvas{display:grid;grid-template-columns:1fr 1fr 1.3fr 1fr 1fr;grid-template-rows:1fr 1fr 0.65fr;gap:6px;min-height:600px;height:calc(100vh - 310px)}
+
+.bmc-block{background:var(--light);border-radius:8px;padding:9px;border:2px solid #e2e8f0;transition:all 0.2s;display:flex;flex-direction:column;position:relative;overflow:hidden;cursor:pointer}
+.bmc-block:hover{border-color:var(--primary);box-shadow:0 4px 16px rgba(74,108,247,0.12)}
+.bmc-block h3{font-size:0.78em;color:var(--primary);margin-bottom:5px;display:flex;align-items:center;gap:5px;text-transform:uppercase;letter-spacing:0.4px;font-weight:700}
+.bmc-block .num{width:18px;height:18px;background:linear-gradient(135deg,var(--primary),var(--secondary));border-radius:50%;color:white;display:flex;align-items:center;justify-content:center;font-size:0.6em;font-weight:700;flex-shrink:0}
+.bmc-block .differentiator{position:absolute;top:5px;right:5px;font-size:0.52em;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#78350f;padding:2px 5px;border-radius:5px;font-weight:700}
+.bmc-block .badge-pa{position:absolute;top:5px;right:5px;font-size:0.52em;background:linear-gradient(135deg,#06b6d4,#0891b2);color:white;padding:2px 6px;border-radius:5px;font-weight:700;letter-spacing:0.02em}
+.bmc-block .badges-top{position:absolute;top:5px;right:5px;display:flex;gap:3px}
+.bmc-block .badges-top .differentiator,.bmc-block .badges-top .badge-pa{position:static}
+.bmc-block ul{list-style:none;font-size:0.76em;line-height:1.4;flex:1;overflow-y:auto}
+.bmc-block li{padding:3px 0;border-bottom:1px solid rgba(0,0,0,0.04)}
+.bmc-block li:last-child{border-bottom:none}
+.bmc-block li .item-detail{font-size:0.88em;color:var(--gray);display:block;margin-top:1px;font-style:italic;line-height:1.3}
+.bmc-block .summary{font-size:0.64em;color:var(--gray);margin-top:4px;padding-top:4px;border-top:1px dashed #cbd5e1;font-weight:500}
+
+/* Highlight chiffres */
+.pct{color:var(--primary);font-weight:700;background:rgba(74,108,247,0.1);padding:1px 5px;border-radius:3px;white-space:nowrap;font-size:1.02em}
+.pct-rev{color:var(--success);font-weight:700;background:rgba(22,163,74,0.1);padding:1px 5px;border-radius:3px;white-space:nowrap;font-size:1.02em}
+.pct-cost{color:var(--danger);font-weight:700;background:rgba(220,38,38,0.1);padding:1px 5px;border-radius:3px;white-space:nowrap;font-size:1.02em}
+
+.block-partners{grid-column:1;grid-row:1/3}
+.block-activities{grid-column:2;grid-row:1}
+.block-resources{grid-column:2;grid-row:2}
+.block-value{grid-column:3;grid-row:1/3;border-color:var(--primary);background:linear-gradient(135deg,#eff6ff,#e0e7ff)}
+.block-relations{grid-column:4;grid-row:1}
+.block-channels{grid-column:4;grid-row:2}
+.block-segments{grid-column:5;grid-row:1/3}
+.block-costs{grid-column:1/3;grid-row:3;border-color:var(--danger);background:linear-gradient(135deg,#fef2f2,#fee2e2)}
+.block-revenue{grid-column:4/6;grid-row:3;border-color:var(--success);background:linear-gradient(135deg,#f0fdf4,#dcfce7)}
+
+.block-value .value-section{margin-bottom:6px}
+.block-value .value-section h4{font-size:0.68em;color:var(--secondary);margin-bottom:3px;display:flex;align-items:center;gap:4px;font-weight:700}
+.block-value .value-section ul{font-size:0.7em}
+
+
+
+/* PROFESSION INSIGHT */
+.profession-insight{background:linear-gradient(135deg,#f8fafc,#f1f5f9);border:1px solid rgba(74,108,247,0.2);border-radius:var(--radius);padding:12px;margin-top:14px}
+.profession-insight h4{font-size:0.78em;color:var(--primary);margin-bottom:8px;display:flex;align-items:center;gap:6px;font-weight:700}
+.profession-insight ul{font-size:0.76em;color:#475569;list-style:none}
+.profession-insight li{padding:3px 0;display:flex;align-items:flex-start;gap:6px}
+.profession-insight li::before{content:"→";color:var(--primary);font-weight:700}
+
+/* COMPLIANCE */
+.compliance-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));gap:10px}
+.compliance-card{background:white;border-radius:var(--radius);padding:12px;border-left:3px solid #cbd5e1;box-shadow:0 1px 3px rgba(0,0,0,0.04);transition:all 0.2s}
+.compliance-card.checked{border-left-color:var(--success);background:#f0fdf4}
+.compliance-card h4{font-size:0.85em;margin-bottom:5px;display:flex;align-items:center;gap:8px;font-weight:600}
+.compliance-card h4 input[type="checkbox"]{width:17px;height:17px;cursor:pointer;accent-color:var(--success)}
+.compliance-card .ref{font-size:0.7em;color:var(--gray);margin-bottom:5px}
+.compliance-card .cost{font-size:0.7em;color:var(--warning);margin-bottom:5px;font-weight:600}
+.compliance-card .arbitrage{font-size:0.76em;background:#f8fafc;padding:8px;border-radius:6px}
+.compliance-card .arbitrage h5{font-size:0.82em;color:var(--primary);margin-bottom:3px;font-weight:600}
+.compliance-card .arbitrage p{color:#475569;line-height:1.4}
+
+.score-section{background:white;border-radius:var(--radius);padding:14px;margin-top:14px}
+.score-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.score-header strong{font-size:0.85em}
+.score-header span{font-size:0.85em;font-weight:700}
+.score-bar{height:10px;background:#e2e8f0;border-radius:5px;overflow:hidden}
+.score-fill{height:100%;border-radius:5px;transition:all 0.4s ease}
+
+/* GUIDE PANEL */
+.guide-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:10px}
+.guide-card{background:white;border-radius:var(--radius);padding:14px;border-left:3px solid var(--primary);box-shadow:0 1px 3px rgba(0,0,0,0.04)}
+.guide-card h4{font-size:0.88em;color:var(--dark);margin-bottom:6px;display:flex;align-items:center;gap:6px;font-weight:700}
+.guide-card .guide-questions{font-size:0.78em;color:#475569;line-height:1.6}
+.guide-card .guide-questions li{margin-bottom:3px}
+.guide-card .guide-alert{font-size:0.72em;background:#fef2f2;color:#991b1b;padding:6px 8px;border-radius:5px;margin-top:6px;display:flex;align-items:flex-start;gap:4px}
+.guide-card .guide-tip{font-size:0.72em;background:#f0fdf4;color:#166534;padding:6px 8px;border-radius:5px;margin-top:6px;display:flex;align-items:flex-start;gap:4px}
+
+/* ALERT */
+.alert{padding:9px 12px;border-radius:8px;margin-bottom:10px;font-size:0.82em;display:flex;align-items:flex-start;gap:8px;line-height:1.4}
+.alert-info{background:#eff6ff;border-left:3px solid var(--primary);color:#1e40af}
+.alert-warning{background:#fffbeb;border-left:3px solid var(--warning);color:#92400e}
+
+/* EDIT PANEL (Sidebar) */
+.edit-panel{position:fixed;top:0;right:-440px;width:440px;height:100vh;background:white;box-shadow:-4px 0 24px rgba(0,0,0,0.15);z-index:1000;transition:right 0.25s ease;display:flex;flex-direction:column}
+.edit-panel.open{right:0}
+.edit-panel-header{padding:14px 18px;background:linear-gradient(135deg,var(--primary),var(--secondary));color:white;display:flex;align-items:center;justify-content:space-between}
+.edit-panel-header h2{font-size:0.95em;display:flex;align-items:center;gap:8px;font-weight:700}
+.edit-panel-close{background:rgba(255,255,255,0.15);border:none;color:white;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:1em;transition:background 0.15s}
+.edit-panel-close:hover{background:rgba(255,255,255,0.3)}
+.edit-panel-body{flex:1;overflow-y:auto;padding:18px}
+
+/* Edit Items */
+.edit-item{background:var(--light);border-radius:8px;padding:10px;margin-bottom:8px;display:flex;align-items:flex-start;gap:8px;border:1px solid #e2e8f0;transition:border-color 0.15s}
+.edit-item:hover{border-color:var(--primary)}
+.edit-item-content{flex:1}
+.edit-item-text{font-size:0.85em;margin-bottom:3px;font-weight:500}
+.edit-item-detail{font-size:0.72em;color:var(--gray)}
+.edit-item-actions{display:flex;gap:4px}
+.edit-item-btn{background:none;border:none;cursor:pointer;font-size:0.95em;padding:4px;border-radius:4px;transition:all 0.15s}
+.edit-item-btn:hover{background:rgba(0,0,0,0.06)}
+.edit-item-btn.delete:hover{background:#fee2e2;color:var(--danger)}
+
+/* Add Form */
+.add-form{background:#eff6ff;border-radius:8px;padding:14px;margin-top:12px;border:2px dashed var(--primary)}
+.add-form h4{font-size:0.82em;color:var(--primary);margin-bottom:8px;display:flex;align-items:center;gap:6px;font-weight:700}
+.add-form input,.add-form textarea{width:100%;padding:9px;border:1px solid #cbd5e1;border-radius:6px;font-size:0.82em;margin-bottom:6px;font-family:inherit}
+.add-form textarea{min-height:50px;resize:vertical}
+.add-form .form-actions{display:flex;gap:6px;justify-content:flex-end}
+
+/* Edit Modal */
+.edit-modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.4);z-index:2000;align-items:center;justify-content:center}
+.edit-modal.open{display:flex}
+.edit-modal-content{background:white;border-radius:12px;width:90%;max-width:480px;padding:20px;box-shadow:0 10px 40px rgba(0,0,0,0.2)}
+.edit-modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.edit-modal-header h3{font-size:0.95em;color:var(--dark);font-weight:700}
+.edit-modal-close{background:none;border:none;font-size:1.3em;cursor:pointer;color:var(--gray)}
+.edit-modal-body input,.edit-modal-body textarea{width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:8px;font-size:0.85em;margin-bottom:10px;font-family:inherit}
+.edit-modal-body textarea{min-height:70px}
+.edit-modal-footer{display:flex;gap:8px;justify-content:flex-end}
+
+/* PDF STYLES */
+#pdf-export-container{position:fixed;left:-9999px;top:0;background:white}
+.pdf-page{width:1683px;min-height:1190px;background:white;font-family:'Segoe UI',system-ui,sans-serif}
+.pdf-header{background:linear-gradient(135deg,#4a6cf7,#6b21a8);padding:28px 36px;color:white;display:flex;justify-content:space-between;align-items:center}
+.pdf-header h1{font-size:30px;font-weight:700;margin:0;letter-spacing:-0.5px}
+.pdf-header .subtitle{font-size:15px;opacity:0.9;margin-top:4px}
+.pdf-header .meta{text-align:right}
+.pdf-header .meta .annexe{font-size:17px;font-weight:600}
+.pdf-header .meta .date{font-size:13px;opacity:0.9;margin-top:3px}
+.pdf-grid{display:grid;grid-template-columns:1fr 1fr 1.4fr 1fr 1fr;grid-template-rows:1fr 1fr 0.55fr;gap:14px;padding:22px 28px;background:linear-gradient(180deg,#f8fafc 0%,#e2e8f0 100%);min-height:1000px}
+.pdf-block{background:white;border-radius:10px;padding:14px;border:2px solid #e2e8f0;display:flex;flex-direction:column;overflow:hidden}
+.pdf-block h3{font-size:12.5px;color:#4a6cf7;margin-bottom:10px;display:flex;align-items:center;gap:7px;text-transform:uppercase;letter-spacing:0.3px;font-weight:700;border-bottom:2px solid #f1f5f9;padding-bottom:8px}
+.pdf-block .num{width:20px;height:20px;background:linear-gradient(135deg,#4a6cf7,#6b21a8);border-radius:50%;color:white;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0}
+.pdf-block ul{list-style:none;margin:0;padding:0;font-size:10.5px;line-height:1.65;flex:1}
+.pdf-block li{padding:3px 0;border-bottom:1px solid #f8fafc;color:#334155}
+.pdf-block li:last-child{border-bottom:none}
+.pdf-block li.section-title{font-weight:700;color:#4a6cf7;margin-top:7px;border-bottom:none;font-size:10.5px}
+.pdf-block li.empty{height:8px;border-bottom:none}
+.pdf-block.partners{grid-column:1;grid-row:1/3}
+.pdf-block.activities{grid-column:2;grid-row:1}
+.pdf-block.resources{grid-column:2;grid-row:2}
+.pdf-block.value{grid-column:3;grid-row:1/3;border-color:#4a6cf7;background:linear-gradient(180deg,#eff6ff 0%,#e0e7ff 100%)}
+.pdf-block.relations{grid-column:4;grid-row:1}
+.pdf-block.channels{grid-column:4;grid-row:2}
+.pdf-block.segments{grid-column:5;grid-row:1/3}
+.pdf-block.costs{grid-column:1/3;grid-row:3;border-color:#dc2626;background:linear-gradient(180deg,#fef2f2 0%,#fee2e2 100%)}
+.pdf-block.revenue{grid-column:4/6;grid-row:3;border-color:#16a34a;background:linear-gradient(180deg,#f0fdf4 0%,#dcfce7 100%)}
+.pdf-footer{background:white;padding:16px 36px;font-size:11px;color:#64748b;display:flex;justify-content:space-between;border-top:1px solid #e2e8f0}
+
+/* Responsive */
+@media(max-width:1400px){
+  .kpi-dashboard{grid-template-columns:repeat(2,1fr)}
+  .context-banner{grid-template-columns:1fr}
+}
+@media(max-width:1200px){
+  .sidebar{width:68px}
+  .sidebar .nav-item span:not(.icon),.sidebar-header h2 span,.sidebar-header p,.nav-section-title,.badge-dec,.edit-indicator{display:none}
+  .sidebar-header h2{font-size:1.1em;justify-content:center}
+}
+</style>
+</head>
+<body>
+
+<div class="app-container">
+  
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h2>📊 BMC <span>Stratégique</span></h2>
+      <p>Cabinet 100% Numérique — Annexe 8</p>
+    </div>
+    
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-title">Vues</div>
+        <div class="nav-item active" onclick="showPanel('dashboard')">
+          <span class="icon">📊</span>
+          <span>Canvas BMC</span>
+        </div>
+        <div class="nav-item" onclick="showPanel('guide')">
+          <span class="icon">📘</span>
+          <span>Guide EC</span>
+        </div>
+      </div>
+      
+      <div class="nav-section">
+        <div class="nav-section-title">9 Blocs (cliquer = éditer)</div>
+        <div class="nav-item" onclick="openEditPanel('segments')">
+          <span class="icon">👥</span>
+          <span>1. Segments clients</span>
+          <span class="edit-indicator">✏️</span>
+        </div>
+        <div class="nav-item" onclick="openEditPanel('value')">
+          <span class="icon">💎</span>
+          <span>2. Proposition valeur</span>
+          <span class="edit-indicator">✏️</span>
+        </div>
+        <div class="nav-item" onclick="openEditPanel('channels')">
+          <span class="icon">📢</span>
+          <span>3. Canaux</span>
+          <span class="edit-indicator">✏️</span>
+        </div>
+        <div class="nav-item" onclick="openEditPanel('relations')">
+          <span class="icon">💬</span>
+          <span>4. Relations clients</span>
+          <span class="edit-indicator">✏️</span>
+        </div>
+        <div class="nav-item" onclick="openEditPanel('revenue')">
+          <span class="icon">💵</span>
+          <span>5. Sources revenus</span>
+          <span class="edit-indicator">✏️</span>
+        </div>
+        <div class="nav-item" onclick="openEditPanel('resources')">
+          <span class="icon">🔧</span>
+          <span>6. Ressources clés</span>
+          <span class="edit-indicator">✏️</span>
+        </div>
+        <div class="nav-item" onclick="openEditPanel('activities')">
+          <span class="icon">⚙️</span>
+          <span>7. Activités clés</span>
+          <span class="edit-indicator">✏️</span>
+        </div>
+        <div class="nav-item" onclick="openEditPanel('partners')">
+          <span class="icon">🤝</span>
+          <span>8. Partenaires clés</span>
+          <span class="edit-indicator">✏️</span>
+        </div>
+        <div class="nav-item" onclick="openEditPanel('costs')">
+          <span class="icon">💰</span>
+          <span>9. Structure coûts</span>
+          <span class="edit-indicator">✏️</span>
+        </div>
+      </div>
+      
+      <div class="nav-section">
+        <div class="nav-section-title">Conformité</div>
+        <div class="nav-item" onclick="showPanel('compliance')">
+          <span class="icon">⚖️</span>
+          <span>Arbitrages Pro.</span>
+          <span class="badge danger" id="compliance-badge">0/19</span>
+        </div>
+      </div>
+    </nav>
+  </aside>
+  
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+    
+    <header class="main-header">
+      <h1 id="panel-title">📊 Business Model Canvas — Cabinet 100 % Numérique</h1>
+      <div class="header-actions">
+        <button class="btn btn-secondary" onclick="resetToDefaults()">🔄 Réinit.</button>
+        <button class="btn" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:white" onclick="loadCabinetX()">📂 Cas pratique Cabinet X</button>
+        <button class="btn btn-outline" onclick="exportJSON()" title="Sauvegarder votre configuration actuelle en fichier JSON">💾 Sauver config</button>
+        <button class="btn btn-outline" onclick="document.getElementById('import-json').click()" title="Restaurer une configuration sauvegardée">📂 Charger config</button>
+        <input type="file" id="import-json" accept=".json" style="display:none" onchange="importJSON(event)">
+        <button class="btn btn-primary" id="export-btn" onclick="exportPDF()">📄 Exporter PDF</button>
+      </div>
+    </header>
+    
+    <div class="content-area">
+      
+      <!-- ============================================ -->
+      <!-- PANEL: Dashboard / Canvas BMC                -->
+      <!-- ============================================ -->
+      <div id="panel-dashboard" class="panel active">
+        
+        <div class="context-banner">
+          <div class="context-item">
+            <h4>🎯 Positionnement stratégique</h4>
+            <p>Cabinet <span class="highlight">100 % dématérialisé</span>, différenciation par <span class="highlight">automatisation (jusqu'à 70 % de la saisie — objectif cible)</span> et conseil DAF à haute valeur ajoutée. Cible : TPE digitales, startups et professions libérales tech-natives.</p>
+          </div>
+          <div class="context-item">
+            <h4>💡 Logique du modèle économique</h4>
+            <p>Un cabinet sans locaux fixes, fondé sur une <span class="highlight">stack SaaS intégrée</span>, des processus industrialisés et un <span class="highlight">rituel client formalisé</span> (onboarding, visio mensuelle, revue trimestrielle).</p>
+          </div>
+        </div>
+        
+        <!-- KPI Dashboard -->
+        <div class="kpi-dashboard" id="kpi-dashboard">
+          <div class="kpi-card">
+            <div class="kpi-value" id="kpi-segments">4</div>
+            <div class="kpi-label">Segments ciblés</div>
+            <div class="kpi-sub">dont 3 prioritaires + 1 secondaire</div>
+          </div>
+          <div class="kpi-card success">
+            <div class="kpi-value" id="kpi-recurring">71 %</div>
+            <div class="kpi-label">Revenus récurrents (EC)</div>
+            <div class="kpi-sub">abonnement mensuel — cible stratégique du modèle</div>
+          </div>
+          <div class="kpi-card warning">
+            <div class="kpi-value" id="kpi-channels">6</div>
+            <div class="kpi-label">Canaux d'acquisition</div>
+            <div class="kpi-sub">tunnel Calendly : 20-30 % conversion</div>
+          </div>
+          <div class="kpi-card" id="kpi-compliance-card">
+            <div class="kpi-value" id="kpi-compliance">0/19</div>
+            <div class="kpi-label">Conformité réglementaire</div>
+            <div class="kpi-sub">NPMQ · Déontologie · RGPD · LCB-FT</div>
+          </div>
+        </div>
+        
+        <div class="alert alert-info">
+          <span>💡</span>
+          <div><strong>Mode interactif</strong> — Cliquez sur un bloc du Canvas ou utilisez le menu latéral (✏️) pour modifier son contenu. Les données sont sauvegardées dans le navigateur.</div>
+        </div>
+        
+        <div class="bmc-canvas-container">
+          <div class="bmc-canvas" id="bmc-canvas">
+            
+            <div class="bmc-block block-partners" onclick="openEditPanel('partners')">
+              <h3><span class="num">8</span> Partenaires clés</h3>
+              <div class="badges-top"><span class="differentiator">🔗 API</span><span class="badge-pa">📑 PA</span></div>
+              <ul id="block-partners-list"></ul>
+              <div class="summary" id="block-partners-summary"></div>
+            </div>
+            
+            <div class="bmc-block block-activities" onclick="openEditPanel('activities')">
+              <h3><span class="num">7</span> Activités clés</h3>
+              <span class="differentiator">🤖 Auto.</span>
+              <ul id="block-activities-list"></ul>
+              <div class="summary" id="block-activities-summary"></div>
+            </div>
+            
+            <div class="bmc-block block-resources" onclick="openEditPanel('resources')">
+              <h3><span class="num">6</span> Ressources clés</h3>
+              <span class="badge-pa">📑 PA</span>
+              <ul id="block-resources-list"></ul>
+              <div class="summary" id="block-resources-summary"></div>
+            </div>
+            
+            <div class="bmc-block block-value" onclick="openEditPanel('value')">
+              <h3><span class="num">💎</span> Proposition de valeur</h3>
+              <div class="badges-top"><span class="differentiator">⭐ Cœur</span><span class="badge-pa">📑 PA</span></div>
+              <div id="block-value-content"></div>
+              <div class="summary" id="block-value-summary"></div>
+            </div>
+            
+            <div class="bmc-block block-relations" onclick="openEditPanel('relations')">
+              <h3><span class="num">4</span> Relations clients</h3>
+              <ul id="block-relations-list"></ul>
+              <div class="summary" id="block-relations-summary"></div>
+            </div>
+            
+            <div class="bmc-block block-channels" onclick="openEditPanel('channels')">
+              <h3><span class="num">3</span> Canaux</h3>
+              <ul id="block-channels-list"></ul>
+              <div class="summary" id="block-channels-summary"></div>
+            </div>
+            
+            <div class="bmc-block block-segments" onclick="openEditPanel('segments')">
+              <h3><span class="num">1</span> Segments clients</h3>
+              <span class="differentiator">🎯 Cible</span>
+              <ul id="block-segments-list"></ul>
+              <div class="summary" id="block-segments-summary"></div>
+            </div>
+            
+            <div class="bmc-block block-costs" onclick="openEditPanel('costs')">
+              <h3><span class="num">9</span> Structure des coûts</h3>
+              <ul id="block-costs-list"></ul>
+              <div class="summary" id="block-costs-summary"></div>
+            </div>
+            
+            <div class="bmc-block block-revenue" onclick="openEditPanel('revenue')">
+              <h3><span class="num">5</span> Sources de revenus</h3>
+              <ul id="block-revenue-list"></ul>
+              <div class="summary" id="block-revenue-summary"></div>
+            </div>
+            
+          </div>
+        </div>
+        
+        <!-- Cross-references -->
+
+              
+      </div>
+      
+      <!-- ============================================ -->
+      <!-- PANEL: Guide EC                              -->
+      <!-- ============================================ -->
+      <div id="panel-guide" class="panel">
+        
+        <div class="alert alert-warning">
+          <span>📘</span>
+          <div><strong>Guide méthodologique</strong> — Pour chaque bloc du BMC, les questions clés à se poser lors de la création d'un cabinet 100 % numérique. Ce guide transpose le Canvas standard d'Osterwalder & Pigneur (2010) dans le cadre réglementaire de la profession comptable.</div>
+        </div>
+        
+        <div class="guide-grid" id="guide-grid"></div>
+      </div>
+
+      <!-- ============================================ -->
+      <!-- PANEL: Compliance                            -->
+      <!-- ============================================ -->
+      <div id="panel-compliance" class="panel">
+        
+        <div class="profession-insight" style="margin-bottom:14px">
+          <h4>📚 Ancrage profession comptable — NPMQ 2025 (arrêté 30 mai 2024) &amp; Code de déontologie éd. janvier 2026 (décret n° 2012-432)</h4>
+          <ul>
+            <li>Inscription OEC obligatoire (Art. 3 Ordonnance 1945) + assurance RCP (Art. 17 Ordonnance 1945)</li>
+            <li>Lettre de mission systématique (Art. 151 Code déontologie) + signature électronique conforme eIDAS</li>
+            <li>Secret professionnel et discrétion (Art. 147 Code déontologie) : chiffrement AES-256, MFA, DPO externalisé</li>
+            <li>Communication professionnelle : information utile, mise en œuvre avec discrétion et dignité (Art. 152 Code déontologie)</li>
+            <li>Compétence, conscience et indépendance (Art. 145) : critères d'exclusion formalisés, refus documenté hors périmètre</li>
+            <li>Supervision collaborateurs et sous-traitants (Art. 148) : vérification compétence appropriée, contrôle qualité gérant</li>
+            <li>Devoir d'information et de conseil (Art. 155) : alertes proactives, traçabilité du conseil dispensé</li>
+            <li>Installation matérielle adaptée (Art. 149) : poste sécurisé, stack cloud, coworking ponctuel</li>
+            <li>NPMQ §29-32 : compétences et déontologie des collaborateurs ; §24-28 : ressources technologiques et documentation</li>
+            <li>Confraternité (Art. 161) : conciliation préalable via le président du CROEC (délai : 2 mois pour engager, 4 mois pour aboutir ; à défaut, saisine de la chambre de discipline possible)</li>
+          </ul>
+        </div>
+        
+        <div class="alert alert-info">
+          <span>⚖️</span>
+          <div><strong>Module de conformité réglementaire</strong> — 19 points de contrôle intégrant la NPMQ 2025, le Code de déontologie (décret n° 2012-432), RGPD, LCB-FT, ANSSI et CGI. Cochez chaque obligation au fur et à mesure de votre mise en conformité.</div>
+        </div>
+        
+        <div class="compliance-grid" id="compliance-list"></div>
+        
+        <div class="score-section">
+          <div class="score-header">
+            <strong>Score de conformité</strong>
+            <span id="compliance-score">0/19 (0 %)</span>
+          </div>
+          <div class="score-bar">
+            <div class="score-fill" id="compliance-bar" style="width:0%;background:var(--danger)"></div>
+          </div>
+        </div>
+        
+      </div>
+      
+    </div>
+    
+  </main>
+  
+</div>
+
+<!-- EDIT PANEL (Lateral) -->
+<div class="edit-panel" id="edit-panel">
+  <div class="edit-panel-header">
+    <h2 id="edit-panel-title">✏️ Modifier le bloc</h2>
+    <button class="edit-panel-close" onclick="closeEditPanel()">×</button>
+  </div>
+  <div class="edit-panel-body" id="edit-panel-body"></div>
+</div>
+
+<!-- EDIT MODAL -->
+<div class="edit-modal" id="edit-modal">
+  <div class="edit-modal-content">
+    <div class="edit-modal-header">
+      <h3 id="edit-modal-title">Modifier l'élément</h3>
+      <button class="edit-modal-close" onclick="closeEditModal()">×</button>
+    </div>
+    <div class="edit-modal-body">
+      <input type="text" id="edit-modal-text" placeholder="Texte principal">
+      <textarea id="edit-modal-detail" placeholder="Détail (optionnel)"></textarea>
+    </div>
+    <div class="edit-modal-footer">
+      <button class="btn btn-secondary" onclick="closeEditModal()">Annuler</button>
+      <button class="btn btn-primary" onclick="saveEditModal()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- PDF Export Container -->
+<div id="pdf-export-container">
+  <div class="pdf-page" id="pdf-page"></div>
+</div>
+
+<script>
+// ==========================================
+// BMC DATA — Exemple Cabinet X (pré-rempli)
+// Contenu purement stratégique, sans chiffres financiers
+// (les projections financières relèvent du prévisionnel — Annexe 7)
+// ==========================================
+const cabinetXBmcData = {
+  segments: {
+    title: "Segments clients",
+    icon: "👥",
+    num: "1",
+    items: [
+      { text: "TPE digitales (SaaS, e-commerce)", detail: "CA 50k-500k€, cloud-native, familiarité outils numériques" },
+      { text: "Startups early-stage (Seed / Série A)", detail: "Recherche DAF flexible, pilotage trésorerie, BP investisseurs" },
+      { text: "Professions libérales tech", detail: "Consultants IT, développeurs freelance, designers UX" },
+      { text: "PME en transformation digitale (cible secondaire)", detail: "Migration cloud, intégration API, multi-devises" }
+    ],
+    summary: "Cible : entreprises tech-natives | Critères d'exclusion formalisés (Art. 145)",
+    pdfItems: [
+      "Cible prioritaire :",
+      "• TPE digitales (SaaS, e-commerce) — CA 50k-500k€",
+      "• Startups early-stage Seed/Série A — DAF flexible",
+      "• Professions libérales tech — Consultants IT, devs",
+      "",
+      "Cible secondaire :",
+      "• PME en transformation digitale",
+      "",
+      "Critères d'exclusion (Art. 145) :",
+      "• R&D complexe (CIR lourd)",
+      "• Activités à stocks / production",
+      "• Accompagnement physique fréquent"
+    ]
+  },
+  value: {
+    title: "Proposition de valeur",
+    icon: "💎",
+    num: "💎",
+    sections: [
+      {
+        title: "🚀 RÉACTIVITÉ",
+        items: [
+          "Clôture J+5 après réception des pièces",
+          "Automatisation jusqu'à 70 % de la saisie (OCR + flux bancaires — objectif cible)",
+          "Tableaux de bord de gestion temps réel 24/7",
+          "Réponse < 24 h (email) — < 4 h (urgences)"
+        ]
+      },
+      {
+        title: "🧠 CONSEIL AUGMENTÉ",
+        items: [
+          "DAF externalisé sur mesure",
+          "IA : détection anomalies, comparatifs sectoriels",
+          "E-facture via PA (ex-PDP) — conformité sept. 2026 (Art. 289 bis CGI)",
+          "Réseau experts : fiscal, juridique, social"
+        ]
+      },
+      {
+        title: "🛡️ CONFIANCE",
+        items: [
+          "RGPD : DPO externalisé + audit cyber annuel",
+          "Tarification transparente (Art. 158 Code déontologie)",
+          "EC dédié stable — pas de rotation d'interlocuteur",
+          "Rituels : visio mensuelle + revue trimestrielle"
+        ]
+      }
+    ],
+    summary: "Triptyque : Réactivité + Conseil augmenté + Confiance",
+    pdfItems: [
+      "🚀 RÉACTIVITÉ",
+      "• Clôture J+5 (données temps réel)",
+      "• Automatisation jusqu'à 70 % saisie OCR + flux (objectif cible)",
+      "• Tableaux de bord 24/7",
+      "• Réponse < 24 h (email), < 4 h (urgent)",
+      "",
+      "🧠 CONSEIL AUGMENTÉ",
+      "• DAF externalisé sur mesure",
+      "• IA : anomalies, comparatifs sectoriels",
+      "• E-facture via PA (ex-PDP) — conformité sept. 2026",
+      "• Réseau experts (fiscal, juridique)",
+      "",
+      "🛡️ CONFIANCE",
+      "• RGPD : DPO + audit cyber annuel",
+      "• Tarification transparente (Art. 158)",
+      "• EC dédié stable (pas de rotation)",
+      "• Visio mensuelle + revue trimestrielle"
+    ]
+  },
+  channels: {
+    title: "Canaux",
+    icon: "📢",
+    num: "3",
+    items: [
+      { text: "Tunnel Calendly (≈ 20 %)", detail: "Visio découverte 30 min gratuite → récap 48 h → lettre de mission. Taux conversion testé : 20-30 % (Entretien n° 4, Annexe 25)" },
+      { text: "LinkedIn entrant (≈ 20 %)", detail: "Posts 3x/sem, contenu expert, profil optimisé (Art. 152 Code déontologie)" },
+      { text: "Communautés WhatsApp professionnelles (≈ 20 %)", detail: "Réseau « EC 2.0 » (1 000+ membres, 20+ sous-groupes) : recommandations entre confrères" },
+      { text: "Réseau CJEC / prescripteurs (≈ 20 %)", detail: "Confrères, incubateurs, événements professionnels" },
+      { text: "Blog SEO / référencement (≈ 10 %)", detail: "Articles techniques, guides sectoriels, mots-clés ciblés" },
+      { text: "Recommandation clients (≈ 10 %)", detail: "Formulaire intégré au portail client, suivi CRM, remerciement personnalisé. Aucune contrepartie financière (Art. 152)" }
+    ],
+    summary: "6 canaux complémentaires | Tunnel Calendly testé 20-30 % conversion (Annexe 25)",
+    pdfItems: [
+      "Canaux d'acquisition :",
+      "• Tunnel Calendly (≈ 20 %) — conversion 20-30 %",
+      "• LinkedIn entrant (≈ 20 %) — Art. 152 conforme",
+      "• Communautés WhatsApp EC 2.0 (≈ 20 %)",
+      "• Réseau CJEC / prescripteurs (≈ 20 %)",
+      "• Blog SEO (≈ 10 %)",
+      "• Recommandation clients (≈ 10 %) — Art. 152"
+    ]
+  },
+  relations: {
+    title: "Relations clients",
+    icon: "💬",
+    num: "4",
+    items: [
+      { text: "Onboarding structuré J0 → J30", detail: "Accès portail, visio démarrage, 1ère clôture accompagnée" },
+      { text: "Visio mensuelle de suivi (15 min)", detail: "Lecture indicateurs clés, points d'alerte" },
+      { text: "Revue trimestrielle stratégique (45 min)", detail: "Comparatifs sectoriels, recommandations, ajustements" },
+      { text: "Support email / messagerie < 24 h", detail: "Engagement contractuel dans la lettre de mission (Art. 151)" },
+      { text: "Enquête satisfaction semestrielle", detail: "NPS cible > 70 (objectif interne), plan d'amélioration continu" }
+    ],
+    summary: "Rituel industrialisé | Attrition cible < 10 %/an | NPS cible > 70 (objectifs internes)",
+    pdfItems: [
+      "Rituel client :",
+      "• Onboarding J0→J30 : portail, visio, 1ère clôture",
+      "• Visio mensuelle 15 min — indicateurs clés",
+      "• Revue trimestrielle 45 min — comparatifs",
+      "• Support email/messagerie < 24 h garanti",
+      "• Enquête NPS semestrielle (cible > 70)",
+      "",
+      "Objectifs : attrition < 10 %/an"
+    ]
+  },
+  revenue: {
+    title: "Sources de revenus",
+    icon: "💵",
+    num: "5",
+    items: [
+      { text: "Expertise comptable (mission principale ≈ 71 %)", detail: "Tenue, révision, clôtures, déclarations — abonnement mensuel récurrent" },
+      { text: "DAF externalisé / conseil (≈ 22 %)", detail: "Trésorerie, BP investisseurs, pilotage — facturation horaire ou forfait" },
+      { text: "Social / paie (≈ 4 %)", detail: "Bulletins de paie et DSN — sous-traitance supervisée (Art. 148)" },
+      { text: "Juridique annuel (≈ 3 %)", detail: "AG, modifications statutaires, actes courants" }
+    ],
+    summary: "Modèle hybride : récurrence mensuelle (EC) + missions ponctuelles (DAF, juridique)",
+    pdfItems: [
+      "• Expertise comptable (≈ 71 %) — récurrent",
+      "• DAF externalisé / conseil (≈ 22 %)",
+      "• Social / paie (≈ 4 %) — Art. 148",
+      "• Juridique annuel (≈ 3 %)",
+      "",
+      "Hybride : récurrence + ponctuel"
+    ]
+  },
+  resources: {
+    title: "Ressources clés",
+    icon: "🔧",
+    num: "6",
+    items: [
+      { text: "Expert-comptable inscrit au Tableau OEC", detail: "Direction, conseil DAF, développement commercial, contrôle qualité" },
+      { text: "Collaborateur(s) comptable(s)", detail: "Production comptable, relation client quotidienne" },
+      { text: "Stack SaaS intégrée", detail: "Pennylane + Dext + HubSpot + Yousign + Google Workspace (cf. Annexe 10)" },
+      { text: "Réseau prescripteurs qualifiés", detail: "CJEC, incubateurs, confrères, avocats spécialisés" },
+      { text: "Méthodologies et procédures documentées", detail: "Processus onboarding, clôture, contrôle qualité, supervision (NPMQ §24-28)" }
+    ],
+    summary: "Équipe réduite + stack cloud intégrée + réseau prescripteurs",
+    pdfItems: [
+      "RH : EC inscrit + collaborateur(s)",
+      "Stack : Pennylane + Dext + HubSpot + Yousign",
+      "Capital immatériel : réseau, procédures (NPMQ)"
+    ]
+  },
+  activities: {
+    title: "Activités clés",
+    icon: "⚙️",
+    num: "7",
+    items: [
+      { text: "Production automatisée (≈ 40 % du temps)", detail: "OCR Dext + flux bancaires Pennylane — gain estimé 2-3 h/client/mois (variable selon profil)" },
+      { text: "Conseil DAF / analyses (≈ 35 %)", detail: "Trésorerie, BP investisseurs, pilotage, IA détection anomalies" },
+      { text: "Relation client / GRC (≈ 20 %)", detail: "Onboarding, rituels mensuels/trimestriels, support < 24 h" },
+      { text: "Développement commercial (≈ 5 %)", detail: "Contenus LinkedIn (Art. 152), blog SEO, réseau, Calendly" }
+    ],
+    summary: "40 % production automatisée → 35 % conseil haute valeur ajoutée",
+    pdfItems: [
+      "• Production automatisée : ≈ 40 %",
+      "• Conseil DAF / analyses : ≈ 35 %",
+      "• Relation client / GRC : ≈ 20 %",
+      "• Développement commercial : ≈ 5 %"
+    ]
+  },
+  partners: {
+    title: "Partenaires clés",
+    icon: "🤝",
+    num: "8",
+    items: [
+      { text: "OEC / CJEC (institutionnel)", detail: "Inscription Tableau, réseau, formation continue, événements" },
+      { text: "Éditeurs SaaS (Pennylane, Dext, HubSpot)", detail: "Production comptable, OCR, CRM — contrats DPA signés (Art. 28 RGPD)" },
+      { text: "Banques API (Qonto, Stripe…)", detail: "Flux bancaires automatiques, réconciliation temps réel" },
+      { text: "Incubateurs prescripteurs", detail: "Incubateurs et pépinières d'entreprises locaux — apport de leads qualifiés" },
+      { text: "Sous-traitants social / juridique", detail: "Convention écrite, supervision gérant (Art. 148 Code déontologie)" },
+      { text: "Assureur RCP spécialisé digital", detail: "Couverture cyber incluse, formule adaptée au conseil" }
+    ],
+    summary: "Écosystème API intégré + prescripteurs qualifiés + conformité Art. 148",
+    pdfItems: [
+      "Institutionnels : OEC / CJEC",
+      "Tech (DPA Art. 28) : Pennylane, Dext, HubSpot",
+      "Banques API : Qonto, Stripe",
+      "Prescripteurs : incubateurs",
+      "Opérationnels : sous-traitants (Art. 148), RCP"
+    ]
+  },
+  costs: {
+    title: "Structure des coûts",
+    icon: "💰",
+    num: "9",
+    items: [
+      { text: "Personnel (poste principal)", detail: "Rémunération gérant + collaborateurs + charges sociales" },
+      { text: "Logiciels métier SaaS", detail: "Stack cloud : production comptable, CRM, signature, collaboration (cf. Annexe 10)" },
+      { text: "Marketing & acquisition", detail: "Contenus, SEO, événements réseau, recommandation" },
+      { text: "Assurance RCP + cyber", detail: "Couverture obligatoire (Art. 17 Ordonnance 1945) + extension digitale" },
+      { text: "Charges externes courantes", detail: "Coworking ponctuel, déplacements, honoraires DPO, divers" },
+      { text: "Amortissements matériel informatique", detail: "PC, écrans — amortissement linéaire sur 3 ans" }
+    ],
+    summary: "Structure légère : dominante personnel + SaaS | Pas de loyer fixe (cf. Annexe 7)",
+    pdfItems: [
+      "Personnel : rémunération + charges",
+      "SaaS : ≈ 500 €/mois (Annexe 10)",
+      "Commercial : marketing, SEO, réseau",
+      "Réglementaire : RCP + DPO",
+      "Courant : coworking, matériel (amorti /3 ans)",
+      "",
+      "Avantage structurel : pas de loyer fixe"
+    ]
+  }
+};
+
+let bmcData;
+
+// ==========================================
+// BMC VIDE — État initial (à compléter par l'EC)
+// ==========================================
+const emptyBmcData = {
+  segments: { title:"Segments clients", icon:"👥", num:"1", items:[], summary:"", pdfItems:[] },
+  value: { title:"Proposition de valeur", icon:"💎", num:"💎", sections:[
+    { title:"🚀 RÉACTIVITÉ", items:[] },
+    { title:"🧠 CONSEIL AUGMENTÉ", items:[] },
+    { title:"🛡️ CONFIANCE", items:[] }
+  ], summary:"", pdfItems:[] },
+  channels: { title:"Canaux", icon:"📢", num:"3", items:[], summary:"", pdfItems:[] },
+  relations: { title:"Relations clients", icon:"💬", num:"4", items:[], summary:"", pdfItems:[] },
+  revenue: { title:"Sources de revenus", icon:"💵", num:"5", items:[], summary:"", pdfItems:[] },
+  resources: { title:"Ressources clés", icon:"🔧", num:"6", items:[], summary:"", pdfItems:[] },
+  activities: { title:"Activités clés", icon:"⚙️", num:"7", items:[], summary:"", pdfItems:[] },
+  partners: { title:"Partenaires clés", icon:"🤝", num:"8", items:[], summary:"", pdfItems:[] },
+  costs: { title:"Structure des coûts", icon:"💰", num:"9", items:[], summary:"", pdfItems:[] }
+};
+
+// État initial de conformité Cabinet X (toutes cochées sauf e-facturation)
+const cabinetXComplianceState = [true,true,true,true,true,true,true,true,true,true,true,true,true,false,true,true,true,true,true];
+
+// ==========================================
+// CONFORMITÉ — 19 obligations
+// Démarrage à 0 (non cochées) pour usage par l'EC créateur
+// ==========================================
+let complianceData = [
+  { id:1, title:"Inscription au Tableau de l'Ordre", ref:"Art. 3 Ordonnance n° 45-2138 du 19 sept. 1945", cost:"Cotisation initiale annuelle", arbitrage:"Prérequis légal non négociable. Délai commission CROEC : jusqu'à 90 jours. Chemin critique de la phase de lancement.", checked:false },
+  { id:2, title:"Assurance RCP formule digitale + conseil", ref:"Art. 17 Ordonnance n° 45-2138 du 19 sept. 1945", cost:"Prime annuelle incluant couverture cyber", arbitrage:"Prime incluant couverture cyber et missions de conseil stratégique (DAF externalisé). Activation obligatoire avant toute signature de lettre de mission.", checked:false },
+  { id:3, title:"Lettre de mission systématique", ref:"Art. 151 Code déontologie (décret n° 2012-432)", cost:"Inclus (temps de rédaction)", arbitrage:"Contrat écrit obligatoire. Signature électronique avancée (AES — eIDAS) via Yousign. Modèles conçus par segment : TPE standard, startup, premium.", checked:false },
+  { id:4, title:"Honoraires transparents et conformes", ref:"Art. 158 Code déontologie (décret n° 2012-432)", cost:"Inclus", arbitrage:"Fixation libre en fonction des diligences, difficulté et frais exposés. Grille horaire transparente intégrée à la lettre de mission. Relevé détaillé mensuel.", checked:false },
+  { id:5, title:"Communication professionnelle informative", ref:"Art. 152 Code déontologie (décret n° 2012-432)", cost:"Inclus dans budget marketing", arbitrage:"LinkedIn + blog autorisés si contenu procurant une information utile, mis en œuvre avec discrétion et dignité. Calendly présenté comme prise de connaissance, pas offre promotionnelle.", checked:false },
+  { id:6, title:"Secret professionnel et discrétion", ref:"Art. 147 Code déontologie ; Art. 226-13 Code pénal", cost:"Inclus dans stack SI", arbitrage:"Chiffrement AES-256 au repos et en transit. MFA activé jour 1 sur tous les accès. Contrats de confidentialité sous-traitants.", checked:false },
+  { id:7, title:"Formation continue obligatoire", ref:"Art. 22 Code déontologie (décret n° 2012-432, mod. 2023-388) ; Arrêté du 6 mars 2023 (40 h/an dont 20 homologuées)", cost:"Formation + abonnements annuels", arbitrage:"Priorités : IA appliquée à la comptabilité, cybersécurité, e-facturation, CSRD. Étendue aux collaborateurs par bonne pratique.", checked:false },
+  { id:8, title:"Compétence, conscience et indépendance", ref:"Art. 145 Code déontologie (décret n° 2012-432)", cost:"Inclus", arbitrage:"Critères d'exclusion formalisés dans le Canvas (activités à stocks, CIR complexe, accompagnement physique). Refus de mission hors périmètre documenté et motivé.", checked:false },
+  { id:9, title:"Supervision des collaborateurs et sous-traitants", ref:"Art. 148 Code déontologie (décret n° 2012-432)", cost:"Inclus (temps gérant)", arbitrage:"Convention écrite de sous-traitance sociale. Vérification que le sous-traitant a compétence appropriée. Contrôle qualité systématique par le gérant expert-comptable avant livraison.", checked:false },
+  { id:10, title:"Acceptation de mission conforme", ref:"Art. 150 Code déontologie (décret n° 2012-432)", cost:"Inclus", arbitrage:"Évaluation préalable de la capacité à effectuer la mission conformément aux dispositions en vigueur. Réexamen périodique pour les missions récurrentes.", checked:false },
+  { id:11, title:"Procédures KYC / LCB-FT", ref:"Art. L.561-2 et L.561-5 CMF ; Guide CNOEC/TRACFIN", cost:"Inclus (temps + formation)", arbitrage:"Liste de contrôle intégrée au processus d'onboarding. Pièces collectées via portail sécurisé. Évaluation systématique des risques de blanchiment.", checked:false },
+  { id:12, title:"Déclaration de soupçon TRACFIN", ref:"Art. L.561-15 CMF", cost:"Inclus", arbitrage:"Procédure interne documentée. Formation annuelle obligatoire de l'ensemble de l'équipe.", checked:false },
+  { id:13, title:"Registre des traitements et contrats sous-traitants RGPD", ref:"Art. 28 et 30 RGPD (Règlement UE 2016/679)", cost:"DPO externalisé annuel", arbitrage:"Registre maintenu à jour à chaque nouvel outil. Clauses DPA signées avec Pennylane, Dext, HubSpot, Google Workspace. Localisation données UE vérifiée.", checked:false },
+  { id:14, title:"E-facturation opérationnelle sept. 2026", ref:"Art. 289 bis CGI ; Ordonnance n° 2021-1190 ; Décret n° 2024-266 du 25 mars 2024", cost:"Inclus dans abonnement Pennylane", arbitrage:"Pennylane en cours d'immatriculation comme PA (ex-PDP) auprès de la DGFiP (à vérifier sur la liste officielle, màj régulière). Réception obligatoire au 1er sept. 2026 pour tous les assujettis TVA ; émission TPE/PME au 1er sept. 2027. Clients accompagnés en amont : paramétrage flux Factur-X, tests de réception prévus avant échéance.", checked:false },
+  { id:15, title:"Politique de sécurité du système d'information", ref:"Recommandations ANSSI ; Art. 32 RGPD (mesures techniques appropriées)", cost:"Audit annuel + outils", arbitrage:"MFA sur tous les accès dès J1. Sauvegardes selon principe 3-2-1 (ANSSI). Politique mots de passe robuste. Audit cybersécurité annuel prévu.", checked:false },
+  { id:16, title:"Compétences et déontologie des collaborateurs (NPMQ)", ref:"NPMQ 2025, §29-32 — Arrêté du 30 mai 2024 (JO 17 juil. 2024)", cost:"Inclus (temps managérial)", arbitrage:"Le cabinet documente les modalités de conformité du personnel technique au Code de déontologie. Évaluation annuelle des compétences, plan de formation individualisé, entretien de progression. Supervision systématique des livrables avant envoi client (Art. 148).", checked:false },
+  { id:17, title:"Ressources technologiques et documentation des dossiers (NPMQ)", ref:"NPMQ 2025, §24-28 — Arrêté du 30 mai 2024 (JO 17 juil. 2024)", cost:"Inclus dans stack SI", arbitrage:"Les ressources technologiques (logiciels, matériels, accès) sont adaptées à la nature et au volume des missions. La documentation des dossiers respecte la confidentialité (§28) et permet la traçabilité complète des travaux. Interopérabilité API vérifiée entre briques SI.", checked:false },
+  { id:18, title:"Devoir d'information et de conseil envers le client", ref:"Art. 155 Code déontologie (décret n° 2012-432)", cost:"Inclus (temps professionnel)", arbitrage:"Obligation remplie dans le respect des textes en vigueur. En cabinet 100 % numérique : alertes automatisées, synthèses décisionnelles écrites, visio de conseil tracée. Le devoir de conseil ne se délègue pas à l'outil — il exige un jugement professionnel documenté.", checked:false },
+  { id:19, title:"Installation matérielle adaptée à l'exercice professionnel", ref:"Art. 149 Code déontologie (décret n° 2012-432)", cost:"Inclus (poste de travail + SI cloud)", arbitrage:"Un cabinet sans locaux physiques satisfait l'Art. 149 par : poste de travail sécurisé (chiffrement, MFA), connexion fiable, accès coworking ponctuel pour rendez-vous, stack cloud conforme RGPD. L'installation matérielle s'apprécie au regard de la capacité à exercer dans de bonnes conditions, pas de la présence d'un bail.", checked:false }
+];
+
+// ==========================================
+// GUIDE MÉTHODOLOGIQUE PAR BLOC
+// ==========================================
+const guideData = [
+  { bloc:"1. Segments clients", icon:"👥", questions:["Quels profils d'entreprises sont natifs du numérique dans ma zone ?","Quels segments puis-je servir à distance sans perte de qualité ?","Quels critères d'exclusion formaliser (Art. 145) ?","Mon positionnement est-il défendable face à Indy/Dougs ?"], alert:"Activités à stocks, CIR lourd et accompagnement physique fréquent sont incompatibles avec un modèle 100 % distant.", tip:"Annexe 24 (Q7) : 92,3 % des EC interrogés ont déjà intégré un outil d'IA ou d'automatisation dans leur cabinet (n = 26)." },
+  { bloc:"2. Proposition de valeur", icon:"💎", questions:["Quel triptyque différenciant face aux plateformes en ligne ?","Comment mesurer la réactivité promise (J+5, < 24 h) ?","Quelle part de conseil vs production ?","Comment articuler IA et jugement professionnel (Art. 155) ?"], alert:"Le devoir de conseil ne se délègue pas à l'outil. Chaque recommandation IA doit être validée par l'EC.", tip:"Le triptyque Réactivité + Conseil augmenté + Confiance croise les attentes identifiées en Annexe 24 (Q5) : réactivité et disponibilité (5 mentions), transparence tarifaire (3 mentions) et conseil à forte VA (3 mentions)." },
+  { bloc:"3. Canaux", icon:"📢", questions:["Mes canaux respectent-ils l'Art. 152 (information utile, discrétion, dignité) ?","Quel tunnel de conversion structurer (Calendly, récap, LM) ?","Comment exploiter les communautés professionnelles WhatsApp ?","Quelle part du budget pour chaque canal ?"], alert:"Tout contenu LinkedIn doit procurer une information utile et être mis en œuvre avec discrétion et dignité (Art. 152).", tip:"Le taux de conversion Calendly est estimé à 20-30 % (Entretien n° 4, Annexe 25)." },
+  { bloc:"4. Relations clients", icon:"💬", questions:["Comment industrialiser le rituel client sans perdre la proximité ?","Quel onboarding structuré pour un client 100 % distant ?","Comment mesurer la satisfaction (NPS) et agir sur l'attrition ?","Quels engagements contractualiser dans la lettre de mission (Art. 151) ?"], alert:"L'engagement < 24 h doit figurer dans la lettre de mission. Un engagement non tenu expose à la responsabilité professionnelle.", tip:"L'attrition cible < 10 % suppose un rituel constant : visio mensuelle + revue trimestrielle." },
+  { bloc:"5. Sources de revenus", icon:"💵", questions:["Quelle part de revenus récurrents vs ponctuels ?","Comment tarifer le conseil DAF (forfait, horaire, succès) ?","La sous-traitance sociale est-elle supervisée (Art. 148) ?","Le prévisionnel (Annexe 7) est-il cohérent avec ce bloc ?"], alert:"Le BMC fixe le scénario socle ; le prévisionnel de l'Annexe 7 projette la croissance. Les deux doivent être cohérents.", tip:"Cible stratégique : 71 % de revenus récurrents (EC) pour asseoir le socle de viabilité." },
+  { bloc:"6. Ressources clés", icon:"🔧", questions:["Ma stack SaaS est-elle interopérable (API) et conforme RGPD ?","Les procédures sont-elles documentées conformément à la NPMQ §24-28 ?","Le réseau de prescripteurs est-il activé et qualifié ?","Le benchmark SI (Annexe 10) valide-t-il mes choix technologiques ?"], alert:"NPMQ §24-28 : les ressources technologiques doivent être adaptées à la nature et au volume des missions.", tip:"Le benchmark Dext 2025-2026 recense 232 logiciels en 13 catégories. Éviter l'empilement : privilégier l'intégration." },
+  { bloc:"7. Activités clés", icon:"⚙️", questions:["Quelle répartition cible entre production et conseil ?","L'automatisation OCR + flux permet-elle réellement le gain annoncé ?","Le temps de GRC (20 %) suffit-il pour tenir les rituels ?","Comment mesurer le gain de productivité par client ?"], alert:"Le gain de 2-3 h/client/mois par l'OCR est un objectif, pas une certitude. Il dépend du profil client.", tip:"40 % production + 35 % conseil = 75 % du temps sur les missions. Les 25 % restants couvrent GRC et commercial." },
+  { bloc:"8. Partenaires clés", icon:"🤝", questions:["Les contrats DPA (Art. 28 RGPD) sont-ils signés avec chaque éditeur SaaS ?","La sous-traitance est-elle encadrée par convention écrite (Art. 148) ?","L'assureur couvre-t-il les risques cyber et les missions de conseil ?","Les prescripteurs sont-ils diversifiés (pas uniquement des EC) ?"], alert:"Art. 148 : le gérant reste responsable de la qualité des travaux sous-traités. La convention doit prévoir un contrôle systématique.", tip:"L'Annexe 25 (Entretien n° 1) confirme que le modèle sans murs est perçu positivement par le financeur (point mort plus bas). Les connexions bancaires API sont un critère d'interopérabilité retenu dans l'Annexe 10." },
+  { bloc:"9. Structure des coûts", icon:"💰", questions:["Le budget SaaS mensuel est-il réaliste (cf. Annexe 10) ?","L'absence de loyer compense-t-elle les coûts technologiques ?","Le poste marketing est-il suffisant pour tenir les 6 canaux ?","Les charges de personnel sont-elles cohérentes avec l'Annexe 7 ?"], alert:"Le prévisionnel (Annexe 7) doit refléter exactement la structure de coûts du BMC. Pas de double comptage.", tip:"Avantage structurel du modèle : pas de loyer fixe. Le coworking ponctuel suffit pour les rendez-vous." }
+];
+
+// Variables d'édition
+let currentEditBlock = null;
+let currentEditIndex = null;
+
+// ==========================================
+// INITIALIZATION
+// ==========================================
+document.addEventListener('DOMContentLoaded', function() {
+  loadFromStorage();
+  renderAllBlocks();
+  renderComplianceList();
+  updateComplianceScore();
+  renderGuide();
+  updateKPIs();
+});
+
+// ==========================================
+// STORAGE (localStorage)
+// ==========================================
+function saveToStorage() {
+  try {
+    localStorage.setItem('bmc_data_v5', JSON.stringify(bmcData));
+    localStorage.setItem('compliance_data_v5', JSON.stringify(complianceData));
+  } catch (e) {
+    console.warn('LocalStorage non disponible');
+  }
+}
+
+function loadFromStorage() {
+  try {
+    const savedBmc = localStorage.getItem('bmc_data_v5');
+    const savedCompliance = localStorage.getItem('compliance_data_v5');
+    if (savedBmc) {
+      bmcData = JSON.parse(savedBmc);
+    } else {
+      // Première visite : charger Cabinet X automatiquement
+      bmcData = JSON.parse(JSON.stringify(cabinetXBmcData));
+      cabinetXComplianceState.forEach((val, i) => {
+        if (complianceData[i]) complianceData[i].checked = val;
+      });
+    }
+    if (savedCompliance) complianceData = JSON.parse(savedCompliance);
+  } catch (e) {
+    console.warn('Erreur chargement storage');
+    bmcData = JSON.parse(JSON.stringify(cabinetXBmcData));
+  }
+}
+
+function resetToDefaults() {
+  if (confirm('Réinitialiser toutes les données ?\nLe BMC sera vidé et la conformité décochée.\nCette action est irréversible.')) {
+    bmcData = JSON.parse(JSON.stringify(emptyBmcData));
+    complianceData.forEach(c => c.checked = false);
+    localStorage.removeItem('bmc_data_v5');
+    localStorage.removeItem('compliance_data_v5');
+    renderAllBlocks();
+    renderComplianceList();
+    updateComplianceScore();
+    updateKPIs();
+    closeEditPanel();
+  }
+}
+
+function loadCabinetX() {
+  if (!confirm('Charger l\'exemple complet du Cabinet X ?\n\nCela remplacera toutes les données actuelles\n(BMC + conformité).')) return;
+  bmcData = JSON.parse(JSON.stringify(cabinetXBmcData));
+  cabinetXComplianceState.forEach((val, i) => {
+    if (complianceData[i]) complianceData[i].checked = val;
+  });
+  saveToStorage();
+  renderAllBlocks();
+  renderComplianceList();
+  updateComplianceScore();
+  updateKPIs();
+  closeEditPanel();
+}
+
+// ==========================================
+// EXPORT / IMPORT CONFIG (JSON)
+// ==========================================
+function exportJSON() {
+  const config = {
+    version: 'BMC_v4_config',
+    date: new Date().toISOString(),
+    bmcData: bmcData,
+    complianceData: complianceData
+  };
+  const blob = new Blob([JSON.stringify(config, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'Annexe_08_BMC_config_' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importJSON(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const config = JSON.parse(e.target.result);
+      if (config.version !== 'BMC_v4_config') {
+        alert('Fichier de configuration non reconnu.');
+        return;
+      }
+      if (!confirm('Charger cette configuration du ' + new Date(config.date).toLocaleDateString('fr-FR') + ' ?\nLes données actuelles seront remplacées.')) return;
+      bmcData = config.bmcData;
+      complianceData = config.complianceData;
+      saveToStorage();
+      renderAllBlocks();
+      renderComplianceList();
+      updateComplianceScore();
+      updateKPIs();
+      closeEditPanel();
+      alert('Configuration restaurée avec succès.');
+    } catch (err) {
+      alert('Erreur de lecture du fichier : ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+// ==========================================
+// RENDER FUNCTIONS
+// ==========================================
+function renderAllBlocks() {
+  Object.keys(bmcData).forEach(blockId => {
+    const block = bmcData[blockId];
+    
+    if (blockId === 'value') {
+      const contentEl = document.getElementById('block-value-content');
+      if (contentEl && block.sections) {
+        contentEl.innerHTML = block.sections.map(section => `
+          <div class="value-section">
+            <h4>${section.title}</h4>
+            <ul>${section.items.map(item => `<li>• ${item}</li>`).join('')}</ul>
+          </div>
+        `).join('');
+      }
+    } else {
+      const listEl = document.getElementById('block-' + blockId + '-list');
+      if (listEl && block.items) {
+        const pctClass = blockId === 'revenue' ? 'pct-rev' : blockId === 'costs' ? 'pct-cost' : 'pct';
+        listEl.innerHTML = block.items.map(item => `
+          <li>${highlightNumbers(item.text, pctClass)}${item.detail ? '<span class="item-detail">' + item.detail + '</span>' : ''}</li>
+        `).join('');
+      }
+    }
+    
+    const summaryEl = document.getElementById('block-' + blockId + '-summary');
+    if (summaryEl) summaryEl.textContent = block.summary;
+  });
+  
+  updatePdfItems();
+}
+
+function highlightNumbers(text, cls) {
+  cls = cls || 'pct';
+  return text
+    .replace(/(≈\s*\d+\s*-\s*\d+\s*%)/g, '<span class="' + cls + '">$1</span>')
+    .replace(/(≈\s*\d+[\s]*%)/g, '<span class="' + cls + '">$1</span>')
+    .replace(/(\d+\s*%)/g, function(match, p1, offset, str) {
+      if (str.substring(Math.max(0, offset - 20), offset).includes('class="')) return match;
+      return '<span class="' + cls + '">' + p1 + '</span>';
+    })
+    .replace(/(J\+\d+)/g, '<span class="pct">$1</span>')
+    .replace(/(24\/7)/g, '<span class="pct">$1</span>')
+    .replace(/(< \d+ h)/g, '<span class="pct">$&</span>');
+}
+
+function updatePdfItems() {
+  Object.keys(bmcData).forEach(blockId => {
+    const block = bmcData[blockId];
+    if (blockId === 'value' && block.sections) {
+      block.pdfItems = [];
+      block.sections.forEach(section => {
+        block.pdfItems.push(section.title);
+        section.items.forEach(item => block.pdfItems.push('• ' + item));
+        block.pdfItems.push('');
+      });
+    } else if (block.items) {
+      block.pdfItems = block.items.map(item => 
+        item.detail ? `• ${item.text}\n  → ${item.detail}` : `• ${item.text}`
+      );
+    }
+  });
+}
+
+function updateKPIs() {
+  // Segments count
+  const segCount = bmcData.segments.items.length;
+  document.getElementById('kpi-segments').textContent = segCount;
+  
+  // Channels count
+  const chanCount = bmcData.channels.items.length;
+  document.getElementById('kpi-channels').textContent = chanCount;
+  
+  // Compliance
+  const checked = complianceData.filter(c => c.checked).length;
+  const total = complianceData.length;
+  document.getElementById('kpi-compliance').textContent = checked + '/' + total;
+  
+  const card = document.getElementById('kpi-compliance-card');
+  card.className = 'kpi-card' + (checked === total ? ' success' : checked > total/2 ? ' warning' : ' danger');
+}
+
+// ==========================================
+// COMPLIANCE
+// ==========================================
+function renderComplianceList() {
+  const container = document.getElementById('compliance-list');
+  container.innerHTML = complianceData.map(item => `
+    <div class="compliance-card ${item.checked ? 'checked' : ''}" id="compliance-card-${item.id}">
+      <h4>
+        <input type="checkbox" ${item.checked ? 'checked' : ''} onchange="toggleCompliance(${item.id})">
+        ${item.title}
+      </h4>
+      <div class="ref">📚 ${item.ref}</div>
+      <div class="cost">💶 ${item.cost}</div>
+      <div class="arbitrage">
+        <h5>⚖️ Arbitrage</h5>
+        <p>${item.arbitrage}</p>
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggleCompliance(id) {
+  const item = complianceData.find(c => c.id === id);
+  if (item) {
+    item.checked = !item.checked;
+    document.getElementById('compliance-card-' + id).classList.toggle('checked', item.checked);
+    updateComplianceScore();
+    updateKPIs();
+    saveToStorage();
+  }
+}
+
+function updateComplianceScore() {
+  const checked = complianceData.filter(c => c.checked).length;
+  const total = complianceData.length;
+  const pct = Math.round((checked / total) * 100);
+  
+  document.getElementById('compliance-score').textContent = `${checked}/${total} (${pct} %)`;
+  document.getElementById('compliance-badge').textContent = `${checked}/${total}`;
+  document.getElementById('compliance-badge').className = 'badge ' + (pct >= 80 ? 'success' : pct > 0 ? 'warning' : 'danger');
+  
+  const bar = document.getElementById('compliance-bar');
+  bar.style.width = pct + '%';
+  bar.style.background = pct < 50 ? 'var(--danger)' : pct < 80 ? 'var(--warning)' : 'var(--success)';
+}
+
+// ==========================================
+// GUIDE METHODOLOGIQUE
+// ==========================================
+function renderGuide() {
+  const container = document.getElementById('guide-grid');
+  container.innerHTML = guideData.map(g => `
+    <div class="guide-card">
+      <h4>${g.icon} ${g.bloc}</h4>
+      <ul class="guide-questions">
+        ${g.questions.map(q => `<li>→ ${q}</li>`).join('')}
+      </ul>
+      ${g.alert ? `<div class="guide-alert">⚠️ ${g.alert}</div>` : ''}
+      ${g.tip ? `<div class="guide-tip">💡 ${g.tip}</div>` : ''}
+    </div>
+  `).join('');
+}
+
+// ==========================================
+// NAVIGATION
+// ==========================================
+function showPanel(panelName, keepEditOpen) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  
+  document.getElementById('panel-' + panelName).classList.add('active');
+  if (event && event.target) event.target.closest('.nav-item')?.classList.add('active');
+  
+  const titles = {
+    dashboard: '📊 Business Model Canvas — Cabinet 100 % Numérique',
+    compliance: '⚖️ Conformité & Arbitrages professionnels — 19 obligations',
+    guide: '📘 Guide méthodologique EC — Questions clés par bloc'
+  };
+  document.getElementById('panel-title').textContent = titles[panelName] || 'BMC';
+  if (!keepEditOpen) closeEditPanel();
+}
+
+// ==========================================
+// EDIT PANEL (LATERAL)
+// ==========================================
+function openEditPanel(blockId) {
+  currentEditBlock = blockId;
+  const block = bmcData[blockId];
+  
+  document.getElementById('edit-panel-title').textContent = block.icon + ' Modifier : ' + block.title;
+  
+  let content = `
+    <div class="alert alert-info" style="margin-bottom:12px">
+      <span>✏️</span>
+      <div>Modifiez les éléments ci-dessous. Les changements sont sauvegardés automatiquement.</div>
+    </div>
+  `;
+  
+  if (blockId === 'value' && block.sections) {
+    content += block.sections.map((section, sIndex) => `
+      <div style="margin-bottom:16px;padding:12px;background:#eff6ff;border-radius:8px;border-left:3px solid var(--primary)">
+        <h4 style="font-size:0.85em;color:var(--primary);margin-bottom:8px;font-weight:700">${section.title}</h4>
+        ${section.items.map((item, iIndex) => `
+          <div class="edit-item">
+            <div class="edit-item-content">
+              <div class="edit-item-text">${item}</div>
+            </div>
+            <div class="edit-item-actions">
+              <button class="edit-item-btn" onclick="editValueItem(${sIndex}, ${iIndex})" title="Modifier">✏️</button>
+              <button class="edit-item-btn delete" onclick="deleteValueItem(${sIndex}, ${iIndex})" title="Supprimer">🗑️</button>
+            </div>
+          </div>
+        `).join('')}
+        <div style="margin-top:8px;display:flex;gap:6px">
+          <input type="text" id="add-value-${sIndex}" placeholder="Ajouter un élément..." style="flex:1;padding:8px;border:1px solid #cbd5e1;border-radius:6px;font-size:0.82em;font-family:inherit">
+          <button class="btn btn-primary" style="padding:8px 12px" onclick="addValueItem(${sIndex})">+</button>
+        </div>
+      </div>
+    `).join('');
+  } else if (block.items) {
+    content += block.items.map((item, index) => `
+      <div class="edit-item">
+        <div class="edit-item-content">
+          <div class="edit-item-text">${item.text}</div>
+          ${item.detail ? `<div class="edit-item-detail">${item.detail}</div>` : ''}
+        </div>
+        <div class="edit-item-actions">
+          <button class="edit-item-btn" onclick="editItem(${index})" title="Modifier">✏️</button>
+          <button class="edit-item-btn delete" onclick="deleteItem(${index})" title="Supprimer">🗑️</button>
+        </div>
+      </div>
+    `).join('');
+    
+    content += `
+      <div class="add-form">
+        <h4>➕ Ajouter un élément</h4>
+        <input type="text" id="add-text" placeholder="Texte principal (ex: Nouveau partenaire)">
+        <input type="text" id="add-detail" placeholder="Détail (optionnel)">
+        <div class="form-actions">
+          <button class="btn btn-primary" onclick="addItem()">Ajouter</button>
+        </div>
+      </div>
+    `;
+  }
+  
+  content += `
+    <div style="margin-top:16px;padding:12px;background:#fffbeb;border-radius:8px;border-left:3px solid var(--warning)">
+      <h4 style="font-size:0.82em;color:#92400e;margin-bottom:8px;font-weight:700">📝 Résumé du bloc</h4>
+      <input type="text" id="edit-summary" value="${block.summary}" style="width:100%;padding:9px;border:1px solid #cbd5e1;border-radius:6px;font-size:0.82em;font-family:inherit" onchange="updateSummary()">
+    </div>
+  `;
+  
+  document.getElementById('edit-panel-body').innerHTML = content;
+  document.getElementById('edit-panel').classList.add('open');
+  showPanel('dashboard', true);
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+}
+
+function closeEditPanel() {
+  document.getElementById('edit-panel').classList.remove('open');
+  currentEditBlock = null;
+}
+
+// ==========================================
+// EDIT OPERATIONS
+// ==========================================
+function editItem(index) {
+  currentEditIndex = index;
+  const item = bmcData[currentEditBlock].items[index];
+  document.getElementById('edit-modal-title').textContent = 'Modifier l\'élément';
+  document.getElementById('edit-modal-text').value = item.text;
+  document.getElementById('edit-modal-detail').value = item.detail || '';
+  document.getElementById('edit-modal-detail').style.display = 'block';
+  document.getElementById('edit-modal').classList.add('open');
+}
+
+function deleteItem(index) {
+  if (confirm('Supprimer cet élément ?')) {
+    bmcData[currentEditBlock].items.splice(index, 1);
+    saveToStorage();
+    renderAllBlocks();
+    updateKPIs();
+    openEditPanel(currentEditBlock);
+  }
+}
+
+function addItem() {
+  const text = document.getElementById('add-text').value.trim();
+  const detail = document.getElementById('add-detail').value.trim();
+  if (text) {
+    bmcData[currentEditBlock].items.push({ text, detail: detail || null });
+    saveToStorage();
+    renderAllBlocks();
+    updateKPIs();
+    openEditPanel(currentEditBlock);
+  }
+}
+
+function editValueItem(sectionIndex, itemIndex) {
+  currentEditIndex = { section: sectionIndex, item: itemIndex };
+  const item = bmcData[currentEditBlock].sections[sectionIndex].items[itemIndex];
+  document.getElementById('edit-modal-title').textContent = 'Modifier l\'élément';
+  document.getElementById('edit-modal-text').value = item;
+  document.getElementById('edit-modal-detail').style.display = 'none';
+  document.getElementById('edit-modal').classList.add('open');
+}
+
+function deleteValueItem(sectionIndex, itemIndex) {
+  if (confirm('Supprimer cet élément ?')) {
+    bmcData[currentEditBlock].sections[sectionIndex].items.splice(itemIndex, 1);
+    saveToStorage();
+    renderAllBlocks();
+    openEditPanel(currentEditBlock);
+  }
+}
+
+function addValueItem(sectionIndex) {
+  const input = document.getElementById('add-value-' + sectionIndex);
+  const text = input.value.trim();
+  if (text) {
+    bmcData[currentEditBlock].sections[sectionIndex].items.push(text);
+    saveToStorage();
+    renderAllBlocks();
+    openEditPanel(currentEditBlock);
+  }
+}
+
+function updateSummary() {
+  const summary = document.getElementById('edit-summary').value.trim();
+  if (summary) {
+    bmcData[currentEditBlock].summary = summary;
+    saveToStorage();
+    renderAllBlocks();
+  }
+}
+
+// ==========================================
+// EDIT MODAL
+// ==========================================
+function closeEditModal() {
+  document.getElementById('edit-modal').classList.remove('open');
+  document.getElementById('edit-modal-detail').style.display = 'block';
+  currentEditIndex = null;
+}
+
+function saveEditModal() {
+  const text = document.getElementById('edit-modal-text').value.trim();
+  const detail = document.getElementById('edit-modal-detail').value.trim();
+  
+  if (!text) { alert('Le texte principal est requis.'); return; }
+  
+  if (currentEditBlock === 'value' && typeof currentEditIndex === 'object') {
+    bmcData[currentEditBlock].sections[currentEditIndex.section].items[currentEditIndex.item] = text;
+  } else if (typeof currentEditIndex === 'number') {
+    bmcData[currentEditBlock].items[currentEditIndex] = { text, detail: detail || null };
+  }
+  
+  saveToStorage();
+  renderAllBlocks();
+  updateKPIs();
+  closeEditModal();
+  openEditPanel(currentEditBlock);
+}
+
+// ==========================================
+// PDF EXPORT — A3 Paysage
+// ==========================================
+function exportPDF() {
+  if (typeof html2pdf === 'undefined') {
+    alert('Export PDF indisponible hors connexion.\nOuvrez ce fichier avec une connexion internet pour activer l\'export, ou utilisez Ctrl+P pour imprimer.');
+    return;
+  }
+  
+  const btn = document.getElementById('export-btn');
+  btn.disabled = true;
+  btn.innerHTML = '⏳ Génération…';
+  
+  const date = new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' });
+  
+  const pdfPage = document.getElementById('pdf-page');
+  pdfPage.innerHTML = `
+    <div class="pdf-header">
+      <div>
+        <h1>Business Model Canvas</h1>
+        <div class="subtitle">Cabinet d'expertise comptable 100 % numérique — Osterwalder & Pigneur (2010)</div>
+      </div>
+      <div class="meta">
+        <div class="annexe">📊 Annexe 8</div>
+        <div class="date">${date}</div>
+      </div>
+    </div>
+    
+    <div class="pdf-grid">
+      <div class="pdf-block partners">
+        <h3><span class="num">8</span> Partenaires clés</h3>
+        <ul>${bmcData.partners.pdfItems.map(i => renderPdfItem(i)).join('')}</ul>
+      </div>
+      <div class="pdf-block activities">
+        <h3><span class="num">7</span> Activités clés</h3>
+        <ul>${bmcData.activities.pdfItems.map(i => renderPdfItem(i)).join('')}</ul>
+      </div>
+      <div class="pdf-block resources">
+        <h3><span class="num">6</span> Ressources clés</h3>
+        <ul>${bmcData.resources.pdfItems.map(i => renderPdfItem(i)).join('')}</ul>
+      </div>
+      <div class="pdf-block value">
+        <h3><span class="num">💎</span> Proposition de valeur</h3>
+        <ul>${bmcData.value.pdfItems.map(i => renderPdfItem(i)).join('')}</ul>
+      </div>
+      <div class="pdf-block relations">
+        <h3><span class="num">4</span> Relations clients</h3>
+        <ul>${bmcData.relations.pdfItems.map(i => renderPdfItem(i)).join('')}</ul>
+      </div>
+      <div class="pdf-block channels">
+        <h3><span class="num">3</span> Canaux</h3>
+        <ul>${bmcData.channels.pdfItems.map(i => renderPdfItem(i)).join('')}</ul>
+      </div>
+      <div class="pdf-block segments">
+        <h3><span class="num">1</span> Segments clients</h3>
+        <ul>${bmcData.segments.pdfItems.map(i => renderPdfItem(i)).join('')}</ul>
+      </div>
+      <div class="pdf-block costs">
+        <h3><span class="num">9</span> Structure des coûts</h3>
+        <ul>${bmcData.costs.pdfItems.map(i => renderPdfItem(i)).join('')}</ul>
+      </div>
+      <div class="pdf-block revenue">
+        <h3><span class="num">5</span> Sources de revenus</h3>
+        <ul>${bmcData.revenue.pdfItems.map(i => renderPdfItem(i)).join('')}</ul>
+      </div>
+    </div>
+    
+    <div class="pdf-footer">
+      <span>Source : production candidat | Osterwalder & Pigneur (2010) | NPMQ 2025 | Code déontologie éd. janvier 2026 (décret n° 2012-432) | RGPD | LCB-FT | Décret n° 2024-266 (e-facturation)</span>
+      <span>Cabinet Expert-Comptable 100 % Numérique — Annexe 8</span>
+    </div>
+  `;
+  
+  html2pdf().set({
+    margin: 0,
+    filename: 'Annexe_08_BMC_Cabinet_100_Numerique.pdf',
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2, useCORS: true, logging: false, width: 1683, height: 1190 },
+    jsPDF: { unit: 'mm', format: 'a3', orientation: 'landscape' }
+  }).from(pdfPage).save().then(() => {
+    btn.disabled = false;
+    btn.innerHTML = '📄 Exporter PDF';
+  }).catch(err => {
+    console.error('Erreur PDF:', err);
+    btn.disabled = false;
+    btn.innerHTML = '📄 Exporter PDF';
+    alert('Erreur lors de la génération du PDF.');
+  });
+}
+
+function renderPdfItem(text) {
+  if (!text) return '<li class="empty"></li>';
+  if (text.startsWith('🚀') || text.startsWith('🧠') || text.startsWith('🛡️') || 
+      text.endsWith(':') || text.startsWith('═')) {
+    return `<li class="section-title">${text}</li>`;
+  }
+  return `<li>${text}</li>`;
+}
+</script>
+</body>
+</html>

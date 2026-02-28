@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Annexe 14 — Signature électronique — Cabinet 100 % numérique</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root{--primary:#1e3a5f;--primary-light:#2d5a8a;--secondary:#0d9488;--secondary-light:#14b8a6;--accent:#f59e0b;--danger:#dc2626;--success:#059669;--warning:#d97706;--info:#2563eb;--gray-50:#f9fafb;--gray-100:#f3f4f6;--gray-200:#e5e7eb;--gray-300:#d1d5db;--gray-500:#6b7280;--gray-600:#4b5563;--gray-700:#374151;--gray-800:#1f2937;--radius:12px;--shadow:0 4px 6px -1px rgb(0 0 0/.1)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:linear-gradient(135deg,var(--gray-100),#e0e7ef);color:var(--gray-700);line-height:1.6;min-height:100vh}
+.container{max-width:1400px;margin:0 auto;padding:24px}
+.header{background:linear-gradient(135deg,var(--primary),var(--primary-light));color:#fff;border-radius:var(--radius);padding:28px 32px;margin-bottom:24px;position:relative;overflow:hidden}
+.header::before{content:"";position:absolute;top:-50%;right:-10%;width:300px;height:300px;background:rgba(255,255,255,.05);border-radius:50%}
+.header h1{font-size:22px;font-weight:700;margin-bottom:6px;position:relative}
+.header p{opacity:.9;font-size:13px;max-width:900px;position:relative}
+.header-meta{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+.badge{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.15);padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600}
+.badge-g{background:var(--secondary)}.badge-y{background:var(--accent)}
+.action-bar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:10px 20px;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s}
+.btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{background:var(--primary-light);transform:translateY(-1px)}
+.btn-secondary{background:var(--gray-200);color:var(--gray-700)}.btn-secondary:hover{background:var(--gray-300)}
+.btn-success{background:var(--success);color:#fff}.btn-warning{background:var(--accent);color:#fff}
+.btn-danger{background:var(--danger);color:#fff}
+.tabs{display:flex;gap:3px;background:#fff;padding:6px;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:20px;flex-wrap:wrap}
+.tab{padding:8px 13px;border:none;background:transparent;font-size:12px;font-weight:600;color:var(--gray-600);border-radius:8px;cursor:pointer;transition:all .2s;white-space:nowrap}
+.tab:hover{background:var(--gray-100)}.tab.active{background:var(--primary);color:#fff}
+.panel{display:none;animation:fadeIn .3s ease}.panel.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.card{background:#fff;border-radius:var(--radius);padding:22px;box-shadow:var(--shadow);margin-bottom:18px}
+.card-header{display:flex;align-items:center;gap:12px;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--gray-200)}
+.card-icon{width:44px;height:44px;background:linear-gradient(135deg,var(--primary),var(--primary-light));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff;flex-shrink:0}
+.card-icon.sec{background:linear-gradient(135deg,var(--secondary),var(--secondary-light))}
+.card-icon.acc{background:linear-gradient(135deg,var(--accent),#fbbf24)}
+.card-icon.dan{background:linear-gradient(135deg,var(--danger),#ef4444)}
+.card-icon.suc{background:linear-gradient(135deg,var(--success),#34d399)}
+.card h3{font-size:17px;font-weight:700;color:var(--gray-800)}
+.card .subtitle{color:var(--gray-500);font-size:12px;margin-top:2px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px}
+.grid-4{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:13px}
+th{background:var(--primary);color:#fff;padding:10px 12px;text-align:left;font-weight:600;font-size:12px}
+th:first-child{border-radius:8px 0 0 0}th:last-child{border-radius:0 8px 0 0}
+td{padding:10px 12px;border-bottom:1px solid var(--gray-200);vertical-align:top}
+tr:hover{background:var(--gray-50)}
+.hl{background:linear-gradient(to right,#ecfdf5,#fff);border-left:3px solid var(--success)}
+.st{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:600}
+.st-ok{background:#d1fae5;color:var(--success)}.st-warn{background:#fef3c7;color:var(--warning)}.st-err{background:#fee2e2;color:var(--danger)}.st-info{background:#dbeafe;color:var(--info)}
+.info-box{padding:14px 18px;border-radius:0 10px 10px 0;margin:14px 0;font-size:13px;line-height:1.5}
+.info-box.info{background:#eff6ff;border-left:4px solid var(--info)}
+.info-box.warn{background:#fef3c7;border-left:4px solid var(--accent)}
+.info-box.ok{background:#ecfdf5;border-left:4px solid var(--success)}
+.info-box.err{background:#fee2e2;border-left:4px solid var(--danger)}
+.info-box strong{display:block;margin-bottom:4px;color:var(--gray-800)}
+.sol-card{background:#fff;border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);border:2px solid transparent;transition:all .3s;cursor:pointer}
+.sol-card:hover{border-color:var(--primary);transform:translateY(-2px)}
+.sol-card.selected{border-color:var(--secondary);background:linear-gradient(to bottom,#fff,#f0fdfa)}
+.sol-name{font-size:16px;font-weight:700;color:var(--gray-800);margin-bottom:6px}
+.sol-desc{font-size:12px;color:var(--gray-600);margin-bottom:12px}
+.sol-feat{list-style:none;margin-bottom:12px}
+.sol-feat li{font-size:12px;padding:4px 0}.sol-feat li::before{content:"+ ";color:var(--success);font-weight:bold}
+.sol-price{padding-top:12px;border-top:1px solid var(--gray-200);font-size:13px}
+.sol-price strong{font-size:18px;color:var(--primary)}
+.rec{display:inline-flex;padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600}
+.rec-opt{background:#d1fae5;color:#047857}.rec-ok{background:#fef3c7;color:#b45309}.rec-alt{background:#dbeafe;color:#1d4ed8}
+.form-group{margin-bottom:14px}
+.form-group label{display:block;font-size:11px;font-weight:600;color:var(--gray-600);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px}
+.form-group input,.form-group select{width:100%;padding:10px 14px;border:2px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:inherit;transition:all .2s}
+.form-group input:focus,.form-group select:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(30,58,95,.1)}
+.form-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+.slider{width:100%;height:8px;border-radius:4px;background:var(--gray-200);-webkit-appearance:none;outline:none}
+.slider::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--primary);cursor:pointer}
+.score-card{background:linear-gradient(135deg,var(--primary),var(--primary-light));color:#fff;border-radius:var(--radius);padding:20px;text-align:center}
+.score-val{font-size:42px;font-weight:800;line-height:1}.score-lbl{font-size:12px;opacity:.9;margin-top:6px}
+.checklist{list-style:none}.checklist-item{display:flex;align-items:flex-start;gap:10px;padding:10px;border-radius:8px;transition:background .2s}
+.checklist-item:hover{background:var(--gray-50)}.checklist-item input[type="checkbox"]{width:18px;height:18px;margin-top:2px;accent-color:var(--primary);cursor:pointer}
+.checklist-item.checked{opacity:1}
+.checklist-item label{font-size:13px;cursor:pointer}
+.progress-bg{background:var(--gray-200);border-radius:10px;height:10px;overflow:hidden;margin:10px 0}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--secondary),var(--secondary-light));border-radius:10px;transition:width .5s ease}
+.timeline{position:relative;padding-left:30px}.timeline::before{content:"";position:absolute;left:10px;top:0;bottom:0;width:2px;background:var(--gray-300)}
+.timeline-item{position:relative;padding-bottom:20px}.timeline-item::before{content:"";position:absolute;left:-24px;top:4px;width:12px;height:12px;background:var(--primary);border-radius:50%;border:2px solid #fff;box-shadow:var(--shadow)}
+.timeline-item.done::before{background:var(--success)}
+.timeline-date{font-size:11px;font-weight:600;color:var(--primary);margin-bottom:3px}
+.timeline-title{font-size:14px;font-weight:600;color:var(--gray-800);margin-bottom:3px}
+.timeline-desc{font-size:12px;color:var(--gray-600)}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--gray-800);color:#fff;padding:12px 18px;border-radius:10px;box-shadow:0 10px 40px rgba(0,0,0,.2);transform:translateY(100px);opacity:0;transition:all .3s;z-index:9999;font-size:13px;font-weight:500}
+.toast.show{transform:translateY(0);opacity:1}
+.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);z-index:99999;display:none;align-items:center;justify-content:center}
+.loading-overlay.show{display:flex}
+.loading-content{background:#fff;padding:32px;border-radius:16px;text-align:center;min-width:280px}
+.spinner{width:40px;height:40px;margin:0 auto 16px;border:3px solid var(--gray-200);border-top-color:var(--primary);border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.legal-ref{font-size:10px;color:var(--gray-500);margin-top:6px;font-style:italic}
+@media(max-width:768px){.container{padding:14px}.header h1{font-size:17px}.grid,.grid-4,.form-row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+  <h1>Annexe 14 — Signature électronique — Cabinet 100 % numérique</h1>
+  <p>Matrice de sélection, évaluation et intégration des solutions de signature électronique conformes eIDAS 2.0 (UE 2024/1183), RGPD et obligations déontologiques de l'expert-comptable.</p>
+  <div class="header-meta">
+    <span class="badge badge-g">eIDAS 2.0</span>
+    <span class="badge badge-y">Art. 1367 C.civ</span>
+    <span class="badge">RGPD</span>
+    <span class="badge">Secret professionnel</span>
+    <span class="badge">Export PDF</span>
+  </div>
+</div>
+
+<div class="action-bar">
+  <button class="btn btn-primary" onclick="exportPDF()">📄 Export PDF</button>
+  <button class="btn btn-warning" onclick="loadCasPratique()">Cas pratique Cabinet X</button>
+  <button class="btn btn-secondary" onclick="resetAll()">🔄 Réinitialiser</button>
+</div>
+
+<div class="tabs" id="tabBar">
+  <button class="tab active" data-panel="cadre">1. Cadre réglementaire</button>
+  <button class="tab" data-panel="comparatif">2. Comparatif solutions</button>
+  <button class="tab" data-panel="evaluation">3. Matrice évaluation</button>
+  <button class="tab" data-panel="integration">4. Intégration</button>
+  <button class="tab" data-panel="documents">5. Documents types</button>
+  <button class="tab" data-panel="checklist">6. Checklist conformité</button>
+</div>
+
+<!-- ═══════════ 1. CADRE REGLEMENTAIRE ═══════════ -->
+<div id="cadre" class="panel active">
+  <div class="grid">
+    <div class="card">
+      <div class="card-header"><div class="card-icon">⚖️</div><div><h3>Règlement eIDAS 2.0</h3><div class="subtitle">UE 2024/1183 — Entrée en vigueur 20 mai 2024</div></div></div>
+      <div class="info-box info"><strong>Évolution majeure 2024 :</strong> Le reglement eIDAS 2.0 renforce les exigences de confiance numérique et introduit le portefeuille européen d'identité numérique (EUDI Wallet) prévu pour 2026.</div>
+      <h4 style="margin:14px 0 10px;font-size:14px;color:var(--gray-800)">Les trois niveaux de signature eIDAS</h4>
+      <table>
+        <thead><tr><th>Niveau</th><th>Caractéristiques</th><th>Usage cabinet EC</th><th>Valeur probante</th></tr></thead>
+        <tbody>
+          <tr><td><span class="st st-info">Simple (SES)</span></td><td>Lien entre signature et signataire</td><td>Documents internes, notes</td><td>Recevable mais contestable</td></tr>
+          <tr class="hl"><td><span class="st st-ok">Avancée (AES)</span></td><td>Identification du signataire, lien unique, contrôle exclusif</td><td><strong>Lettre de mission, attestations, mandats SEPA</strong></td><td>Forte présomption de fiabilité</td></tr>
+          <tr><td><span class="st st-warn">Qualifiée (QES)</span></td><td>Certificat qualifié + dispositif sécurisé</td><td>Marchés publics, actes authentiques</td><td>Équivalente à manuscrite (art. 25-2 eIDAS)</td></tr>
+        </tbody>
+      </table>
+      <p class="legal-ref">Réf. : Règlement (UE) n° 910/2014 modifié par le Règlement (UE) 2024/1183 ; Art. 1367 Code civil.</p>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-icon sec">🏛️</div><div><h3>Obligations professionnelles</h3><div class="subtitle">Code de déontologie OEC + Secret professionnel</div></div></div>
+      <div class="info-box warn"><strong>Lettre de mission obligatoire :</strong> L'article 151 du Code de déontologie (décret n° 2012-432, mod. décret n° 2022-1732) impose un contrat écrit définissant la mission, qui peut prendre la forme d'une lettre de mission. Sa signature électronique est juridiquement équivalente à la signature manuscrite (art. 1367 C. civ.).</div>
+      <h4 style="margin:14px 0 10px;font-size:14px;color:var(--gray-800)">Distinction signature sociale / technique</h4>
+      <table>
+        <thead><tr><th>Type</th><th>Objet</th><th>Délégable ?</th><th>Niveau requis</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Signature sociale</strong></td><td>Engage le cabinet (contrats, LM, mandats)</td><td><span class="st st-ok">Oui</span> (collaborateur habilité)</td><td>Avancée (AES)</td></tr>
+          <tr><td><strong>Signature technique</strong></td><td>Engage l'EC personnellement (attestations, rapports)</td><td><span class="st st-err">Non</span> (EC inscrit au Tableau)</td><td>Avancée (AES) min.</td></tr>
+        </tbody>
+      </table>
+      <div class="info-box err" style="margin-top:14px"><strong>Secret professionnel (art. 147 Code de déontologie ; art. 21 ord. 1945) :</strong> Le prestataire de signature ne doit pas pouvoir accéder au contenu des documents signés. Vérifier : chiffrement côté client, politique zero-knowledge, droits d'accès différenciés par collaborateur, journalisation des accès.</div>
+      <h4 style="margin:14px 0 10px;font-size:14px;color:var(--gray-800)">Exigences de conservation</h4>
+      <table>
+        <thead><tr><th>Obligation</th><th>Duree</th><th>Fondement</th></tr></thead>
+        <tbody>
+          <tr><td>Pièces comptables</td><td>10 ans</td><td>Art. L123-22 C.com</td></tr>
+          <tr><td>Lettres de mission</td><td>10 ans après fin de mission</td><td>Code déontologie + prescription civile</td></tr>
+          <tr><td>Dossiers LCB-FT</td><td>5 ans</td><td>Art. L561-12 CMF</td></tr>
+          <tr><td>Preuves de signature</td><td>Durée de validité du document</td><td>eIDAS art. 34 (mod. règl. 2024/1183) ; art. 45g et s.</td></tr>
+        </tbody>
+      </table>
+      <p class="legal-ref">Réf. : Code de déontologie OEC, art. 145, 147, 148, 150, 151, 155 ; NPMQ §26-28.</p>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><div class="card-icon dan">🔒</div><div><h3>Conformité RGPD et Sécurité</h3><div class="subtitle">Protection des données et qualification ANSSI</div></div></div>
+    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr))">
+      <div class="info-box ok"><strong>Hébergement</strong><br>Données hébergées dans l'UE, idéalement France. Vérifier localisation des sauvegardes.</div>
+      <div class="info-box ok"><strong>Chiffrement</strong><br>AES-256 minimum + TLS 1.3. Vérifier politique zero-knowledge.</div>
+      <div class="info-box ok"><strong>Traçabilité</strong><br>Piste d'audit complète : qui, quand, quoi, IP, horodatage certifié.</div>
+      <div class="info-box ok"><strong>Qualification</strong><br>PSCo qualifié ANSSI/eIDAS. Vérifier sur la liste de confiance européenne.</div>
+    </div>
+    <table>
+      <thead><tr><th>Critère</th><th>Exigence</th><th>Verification</th></tr></thead>
+      <tbody>
+        <tr><td>Qualification ANSSI</td><td>Prestataire de Service de Confiance Qualifié (PSCo)</td><td>cyber.gouv.fr</td></tr>
+        <tr><td>Certification ISO 27001</td><td>Système de management sécurité de l'information</td><td>Certificat à jour</td></tr>
+        <tr><td>Conformité eIDAS</td><td>Inscrit sur la liste de confiance européenne</td><td>eidas.ec.europa.eu/efda/tl-browser</td></tr>
+        <tr><td>DPA / Sous-traitance RGPD</td><td>Contrat art. 28 RGPD signé avec le prestataire</td><td>Document contractuel</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="info-box info" style="margin-top:8px"><strong>Lien avec le parcours d'entrée en relation :</strong> Cette annexe s'inscrit à l'étape 4 du Tableau 4 (Formalisation). Elle fait suite à la qualification client (Annexe 13) et précède l'onboarding numérique (Annexe 15).</div>
+  <div class="card" style="margin-top:18px;border-left:4px solid var(--secondary)">
+    <div class="card-header"><div class="card-icon suc">💎</div><div><h3>Valeur ajoutée pour l'expert-comptable</h3><div class="subtitle">Ce que remplace cet outil</div></div></div>
+    <p style="font-size:13px;line-height:1.7;color:var(--gray-700)">Cet outil remplace un audit de conformité eIDAS et un benchmark de solutions de signature électronique qui, confiés à un consultant spécialisé, représentent un investissement de <strong>2 000 à 4 000 €</strong> pour un cabinet en création. Il structure la démarche en sept étapes, de la compréhension réglementaire au calcul du retour sur investissement, et produit un livrable exportable (PDF) traçant la décision. L'outil est réutilisable à chaque évolution tarifaire ou réglementaire.</p>
+    <div class="info-box ok" style="margin-top:12px"><strong>Contexte marché (Baromètre Yousign × Ipsos 2025, 4 000 actifs, déc. 2024) :</strong> 80 % des organisations européennes ont intégré la signature électronique à leurs processus. 74 % en France. 87 % des utilisateurs déclarent lui faire confiance. 75 % estiment gagner jusqu'à 3 heures par semaine grâce à la dématérialisation des signatures.</div>
+  </div>
+</div>
+
+<!-- ═══════════ 2. COMPARATIF SOLUTIONS ═══════════ -->
+<div id="comparatif" class="panel">
+  <div class="card">
+    <div class="card-header"><div class="card-icon">🔍</div><div><h3>Comparatif des solutions</h3><div class="subtitle">Analyse actualisée février 2026 — 4 solutions</div></div></div>
+    <div class="grid-4" style="display:grid;gap:16px;margin-bottom:20px">
+      <div class="sol-card" onclick="selectSol(this,'jesignexpert')">
+        <div class="sol-name">JeSignExpert</div>
+        <div class="sol-desc">Solution dédiée EC via ECMA/Comptexpert. Infrastructure Universign (Signaturit Group).</div>
+        <ul class="sol-feat">
+          <li>Authentification via Comptexpert (OEC)</li>
+          <li>Certificat OEC pour professionnels</li>
+          <li>Cachet qualifié eIDAS</li>
+          <li>Intégration logiciels métiers EC</li>
+          <li>Signature sociale + technique</li>
+        </ul>
+        <div class="sol-price"><strong>0,30 EUR HT</strong> / signature<br><span style="font-size:11px;color:var(--gray-500)">Accès gratuit via inscription OEC</span></div>
+        <div style="margin-top:10px"><span class="rec rec-opt">Optimal pour EC</span></div>
+      </div>
+      <div class="sol-card" onclick="selectSol(this,'yousign')">
+        <div class="sol-name">Yousign</div>
+        <div class="sol-desc">Solution francaise leader PME. Hébergement France. API REST complete.</div>
+        <ul class="sol-feat">
+          <li>Interface très intuitive</li>
+          <li>3 niveaux signature eIDAS</li>
+          <li>API REST complète + webhooks</li>
+          <li>Archivage CDC Arkhineo</li>
+          <li>Intégration Pennylane, HubSpot</li>
+        </ul>
+        <div class="sol-price"><strong>9 EUR HT</strong>/mois (One, 10 sig.)<br><span style="font-size:11px;color:var(--gray-500)">25 EUR/mois (Plus, illimité) — 38 EUR/mois (Pro)</span></div>
+        <div style="margin-top:10px"><span class="rec rec-opt">Excellent rapport qualité/prix</span></div>
+      </div>
+      <div class="sol-card" onclick="selectSol(this,'universign')">
+        <div class="sol-name">Universign (Signaturit)</div>
+        <div class="sol-desc">PSCo qualifié français. Horodatage qualifié inclus. Fournisseur de JeSignExpert.</div>
+        <ul class="sol-feat">
+          <li>PSCo qualifié ANSSI/eIDAS</li>
+          <li>Horodatage qualifié natif</li>
+          <li>Archivage probant intégré</li>
+          <li>Tarification flexible (packs)</li>
+          <li>Cachet électronique qualifié</li>
+        </ul>
+        <div class="sol-price"><strong>20 EUR HT</strong>/mois (Business, 10 tx.)<br><span style="font-size:11px;color:var(--gray-500)">Packs à la transaction disponibles</span></div>
+        <div style="margin-top:10px"><span class="rec rec-alt">PSCo qualifié / archivage</span></div>
+      </div>
+      <div class="sol-card" onclick="selectSol(this,'docusign')">
+        <div class="sol-name">DocuSign</div>
+        <div class="sol-desc">Leader mondial. 350+ intégrations natives. Usage international.</div>
+        <ul class="sol-feat">
+          <li>350+ intégrations natives</li>
+          <li>Application mobile complète</li>
+          <li>Workflows avancés</li>
+          <li>Support multilingue</li>
+          <li>CLM (Contract Lifecycle Mgmt)</li>
+        </ul>
+        <div class="sol-price"><strong>9 EUR HT</strong>/mois (Personnel)<br><span style="font-size:11px;color:var(--gray-500)">38 EUR HT/mois (Business Pro) — prix hors promotion</span></div>
+        <div style="margin-top:10px"><span class="rec rec-ok">Premium / International</span></div>
+      </div>
+    </div>
+    <h4 style="margin:16px 0 10px;font-size:14px">Tableau comparatif détaillé</h4>
+    <table>
+      <thead><tr><th>Critère</th><th>JeSignExpert</th><th>Yousign</th><th>Universign</th><th>DocuSign</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Spécialisation EC</strong></td><td><span class="st st-ok">Native</span></td><td><span class="st st-warn">Partielle</span></td><td><span class="st st-warn">Via JeSignExpert</span></td><td><span class="st st-warn">Non</span></td></tr>
+        <tr><td><strong>Conformité eIDAS</strong></td><td><span class="st st-ok">Qualifié</span></td><td><span class="st st-ok">Qualifié</span></td><td><span class="st st-ok">Qualifié (PSCo)</span></td><td><span class="st st-ok">Qualifié</span></td></tr>
+        <tr><td><strong>Hébergement</strong></td><td><span class="st st-ok">France</span></td><td><span class="st st-ok">France</span></td><td><span class="st st-ok">France</span></td><td><span class="st st-warn">EU/US</span></td></tr>
+        <tr><td><strong>Horodatage qualifié</strong></td><td><span class="st st-ok">Oui</span></td><td><span class="st st-ok">Oui</span></td><td><span class="st st-ok">Natif</span></td><td><span class="st st-ok">Oui</span></td></tr>
+        <tr><td><strong>Archivage longue durée</strong></td><td><span class="st st-warn">Via Universign</span></td><td><span class="st st-ok">Arkhineo (CDC)</span></td><td><span class="st st-ok">Intégré</span></td><td><span class="st st-warn">Option</span></td></tr>
+        <tr><td><strong>API</strong></td><td><span class="st st-ok">Oui</span></td><td><span class="st st-ok">Complète</span></td><td><span class="st st-ok">Complète</span></td><td><span class="st st-ok">Très complète</span></td></tr>
+        <tr><td><strong>Signature sociale/technique</strong></td><td><span class="st st-ok">Distinctes</span></td><td><span class="st st-ok">Configurable</span></td><td><span class="st st-ok">Configurable</span></td><td><span class="st st-ok">Configurable</span></td></tr>
+        <tr><td><strong>Support francais</strong></td><td><span class="st st-ok">Dédié EC</span></td><td><span class="st st-ok">Oui</span></td><td><span class="st st-ok">Oui</span></td><td><span class="st st-warn">International</span></td></tr>
+        <tr><td><strong>Coût 50 sig./mois</strong></td><td><strong style="color:var(--success)">15 € HT</strong></td><td><strong style="color:var(--primary)">25 € HT</strong></td><td><strong style="color:var(--primary)">~25 € HT</strong></td><td><strong style="color:var(--warning)">~38 € HT</strong></td></tr>
+      </tbody>
+    </table>
+    <div class="info-box info" style="margin-top:14px"><strong>Note :</strong> JeSignExpert est alimenté par l'infrastructure Universign (Signaturit Group). Choisir JeSignExpert revient à utiliser Universign avec une couche métier EC (authentification Comptexpert, certificat OEC). Les deux solutions sont donc complémentaires, non concurrentes.</div>
+  </div>
+</div>
+
+<!-- ═══════════ 3. MATRICE D'EVALUATION ═══════════ -->
+<div id="evaluation" class="panel">
+  <div class="card">
+    <div class="card-header"><div class="card-icon acc">🎯</div><div><h3>Matrice d'évaluation pondérée</h3><div class="subtitle">Évaluez objectivement chaque solution selon 7 critères</div></div></div>
+    <div class="info-box info"><strong>Mode d'emploi :</strong> Par défaut, tous les critères sont à 3/5 (neutre). Deux options : ajustez librement chaque curseur selon votre propre évaluation, ou cliquez « Cas pratique Cabinet X » pour charger les scores justifiés du cabinet en création.</div>
+    <div id="modeIndicator" style="display:inline-block;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:700;margin-bottom:14px;background:var(--gray-100);color:var(--gray-600)">⚙️ Mode libre — scores modifiables</div>
+
+    <details style="margin:14px 0;background:var(--gray-50);border-radius:var(--radius);border:1px solid var(--gray-200)">
+      <summary style="padding:14px 18px;cursor:pointer;font-weight:700;font-size:13px;color:var(--primary)">📐 Méthodologie de notation et barème</summary>
+      <div style="padding:0 18px 18px">
+        <div class="info-box warn" style="margin-top:10px"><strong>Sources de notation :</strong> Chaque score repose sur au moins un élément vérifiable parmi : documentation éditeur (site officiel, CGV, fiche technique), test fonctionnel réalisé en janvier-février 2026, retour de l'éditeur SaaS (Annexe 25, entretien n° 3), grille tarifaire officielle, et liste de confiance ANSSI/eIDAS (cyber.gouv.fr). Les scores reflètent les besoins d'un cabinet en création (SASU, 1 EC, 30 clients cibles an 1).</div>
+        <h4 style="margin:14px 0 10px;font-size:13px;color:var(--gray-800)">Grille de barème — signification des notes</h4>
+        <table>
+          <thead><tr><th>Note</th><th>Signification</th><th>Exemple concret</th></tr></thead>
+          <tbody>
+            <tr><td><strong>5/5</strong></td><td>Répond totalement au besoin, sans réserve ni surcoût</td><td>PSCo qualifié ANSSI + certificat OEC natif = 5/5 en conformité</td></tr>
+            <tr><td><strong>4/5</strong></td><td>Répond au besoin avec une réserve mineure ou un paramétrage</td><td>Qualifié eIDAS mais hébergement EU (non exclusivement France) = 4/5</td></tr>
+            <tr><td><strong>3/5</strong></td><td>Répond partiellement, nécessite adaptation ou compromis</td><td>API complète mais aucune intégration métier EC native = 3/5</td></tr>
+            <tr><td><strong>2/5</strong></td><td>Réponse insuffisante, contournement nécessaire</td><td>Pas de signature qualifiée, uniquement SES = 2/5</td></tr>
+            <tr><td><strong>1/5</strong></td><td>Ne répond pas au besoin ou non-conforme</td><td>Hébergement hors UE sans DPA = 1/5</td></tr>
+          </tbody>
+        </table>
+        <h4 style="margin:14px 0 10px;font-size:13px;color:var(--gray-800)">Pondération — justification des poids</h4>
+        <table>
+          <thead><tr><th>Critère</th><th>Poids</th><th>Justification du poids</th></tr></thead>
+          <tbody>
+            <tr><td>Conformité réglementaire</td><td>25 %</td><td>Critère éliminatoire : un outil non conforme eIDAS/RGPD expose l'EC à un risque disciplinaire et probatoire</td></tr>
+            <tr><td>Intégration écosystème EC</td><td>20 %</td><td>Productivité quotidienne : l'outil doit s'intégrer au logiciel comptable et au CRM sans double saisie</td></tr>
+            <tr><td>Facilité d'utilisation</td><td>15 %</td><td>Adoption par le client : un outil complexe augmente le taux d'abandon (objectif &lt; 10 %)</td></tr>
+            <tr><td>Coût total (TCO)</td><td>15 %</td><td>Budget contraint en phase de création : TCO annuel rapporté au nombre de signatures</td></tr>
+            <tr><td>Fonctionnalités avancées</td><td>10 %</td><td>Différenciation : workflows, rappels automatiques, archivage probant intégré</td></tr>
+            <tr><td>Support</td><td>10 %</td><td>Réactivité critique en phase de lancement : support dédié EC vs support générique</td></tr>
+            <tr><td>Pérennité / souveraineté</td><td>5 %</td><td>Risque fournisseur à moyen terme : hébergement souverain, solidité financière de l'éditeur</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </details>
+
+    <div style="overflow-x:auto">
+    <table>
+      <thead><tr><th>Critère</th><th>Poids</th><th>JeSignExpert</th><th>Yousign</th><th>Universign</th><th>DocuSign</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Conformité réglementaire</strong></td><td><span class="st st-err">25%</span></td>
+          <td><input type="range" class="slider ev" data-sol="je" data-cri="conf" min="1" max="5" value="3"><span class="sv">3</span>/5</td>
+          <td><input type="range" class="slider ev" data-sol="yo" data-cri="conf" min="1" max="5" value="3"><span class="sv">3</span>/5</td>
+          <td><input type="range" class="slider ev" data-sol="un" data-cri="conf" min="1" max="5" value="3"><span class="sv">3</span>/5</td>
+          <td><input type="range" class="slider ev" data-sol="do" data-cri="conf" min="1" max="5" value="3"><span class="sv">3</span>/5</td></tr>
+        <tr><td><strong>Intégration écosystème EC</strong></td><td><span class="st st-err">20%</span></td>
+          <td><input type="range" class="slider ev" data-sol="je" data-cri="integ" min="1" max="5" value="3"><span class="sv">3</span>/5</td>
+          <td><input type="range" class="slider ev" data-sol="yo" data-cri="integ" min="1" max="5" value="3"><span class="sv">3</span>/5</td>
+          <td><input type="range" class="slider ev" data-sol="un" data-cri="integ" min="1" max="5" value="3"><span class="sv">3</span>/5</td>
+          <td><input type="range" class="slider ev" data-sol="do" data-cri="integ" min="1" max="5" value="3"><span class="sv">3</span>/5</td></tr>
+        <tr><td><strong>Facilité d'utilisation</strong></td><td><span class="st st-warn">15%</span></td>
+          <td><input type="range" class="slider ev" data-sol="je" data-cri="ux" min="1" max="5" value="3"><span class="sv">3</span>/5</td>
+          <td><input type="range" class="slider ev" data-sol="yo" data-cri="ux" min="1" max="5" value="3"><span class="sv">3</span>/5</td>
+          <td><input type="range" class="slider ev" data-sol="un" data-cri="ux" min="1" max="5" value="3"><span class="sv">3</span>/5</td>
+          <td><input type="range" class="slider ev" data-sol="do" data-cri="ux" min="1" max="5" value="3"><span class="sv">3</span>/5</td></tr>
+        <tr><td><strong>Coût total (TCO)</strong></td><td><span class="st st-warn">15%</span></td>
+          <td><input type="range" class="slider ev" data-sol="je" data-cri="cout" min="1" max="5" value="3"><span class="sv">3</span>/5</td>
+          <td><input type="range" class="slider ev" data-sol="yo" data-cri="cout" min="1" max="5" value="3"><span class="sv">3</span>/5</td>
+          <td><input type="range" class="slider ev" data-sol="un" data-cri="cout" min="1" max="5" value="3"><span class="sv">3</span>/5</td>
+          <td><input type="range" class="slider ev" data-sol="do" data-cri="cout" min="1" max="5" value="3"><span class="sv">3</span>/5</td></tr>
+        <tr><td><strong>Fonctionnalités avancées</strong></td><td><span class="st st-info">10%</span></td>
+          <td><input type="range" class="slider ev" data-sol="je" data-cri="func" min="1" max="5" value="3"><span class="sv">3</span>/5</td>
+          <td><input type="range" class="slider ev" data-sol="yo" data-cri="func" min="1" max="5" value="3"><span class="sv">3</span>/5</td>
+          <td><input type="range" class="slider ev" data-sol="un" data-cri="func" min="1" max="5" value="3"><span class="sv">3</span>/5</td>
+          <td><input type="range" class="slider ev" data-sol="do" data-cri="func" min="1" max="5" value="3"><span class="sv">3</span>/5</td></tr>
+        <tr><td><strong>Support & accompagnement</strong></td><td><span class="st st-info">10%</span></td>
+          <td><input type="range" class="slider ev" data-sol="je" data-cri="sup" min="1" max="5" value="3"><span class="sv">3</span>/5</td>
+          <td><input type="range" class="slider ev" data-sol="yo" data-cri="sup" min="1" max="5" value="3"><span class="sv">3</span>/5</td>
+          <td><input type="range" class="slider ev" data-sol="un" data-cri="sup" min="1" max="5" value="3"><span class="sv">3</span>/5</td>
+          <td><input type="range" class="slider ev" data-sol="do" data-cri="sup" min="1" max="5" value="3"><span class="sv">3</span>/5</td></tr>
+        <tr><td><strong>Pérennité / souveraineté</strong></td><td><span class="st st-info">5%</span></td>
+          <td><input type="range" class="slider ev" data-sol="je" data-cri="peren" min="1" max="5" value="3"><span class="sv">3</span>/5</td>
+          <td><input type="range" class="slider ev" data-sol="yo" data-cri="peren" min="1" max="5" value="3"><span class="sv">3</span>/5</td>
+          <td><input type="range" class="slider ev" data-sol="un" data-cri="peren" min="1" max="5" value="3"><span class="sv">3</span>/5</td>
+          <td><input type="range" class="slider ev" data-sol="do" data-cri="peren" min="1" max="5" value="3"><span class="sv">3</span>/5</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <button class="btn btn-primary" onclick="calcScores()" style="margin-top:16px">Calculer les scores</button>
+    <div id="scoresResult" style="display:none;margin-top:20px">
+      <h4 style="margin-bottom:14px">Résultats de l'évaluation</h4>
+      <div class="grid-4" style="display:grid;gap:14px">
+        <div class="score-card" id="sc-je"><div style="font-size:13px;margin-bottom:6px">JeSignExpert</div><div class="score-val">0.00</div><div class="score-lbl">/ 5.00</div></div>
+        <div class="score-card" id="sc-yo" style="background:linear-gradient(135deg,var(--secondary),var(--secondary-light))"><div style="font-size:13px;margin-bottom:6px">Yousign</div><div class="score-val">0.00</div><div class="score-lbl">/ 5.00</div></div>
+        <div class="score-card" id="sc-un" style="background:linear-gradient(135deg,var(--accent),#fbbf24)"><div style="font-size:13px;margin-bottom:6px">Universign</div><div class="score-val">0.00</div><div class="score-lbl">/ 5.00</div></div>
+        <div class="score-card" id="sc-do" style="background:linear-gradient(135deg,var(--gray-700),var(--gray-600))"><div style="font-size:13px;margin-bottom:6px">DocuSign</div><div class="score-val">0.00</div><div class="score-lbl">/ 5.00</div></div>
+      </div>
+      <div id="recBox" class="info-box ok" style="margin-top:16px"><strong>Recommandation</strong><p id="recText">Calcul en cours...</p></div>
+    </div>
+  </div>
+
+  <div class="card" id="justifCard" style="display:none">
+    <div class="card-header"><div class="card-icon suc">📋</div><div><h3>Justifications des scores — Cabinet X</h3><div class="subtitle">Traçabilité complète : chaque note repose sur un fait vérifiable</div></div></div>
+    <div style="overflow-x:auto">
+    <table>
+      <thead><tr><th style="width:22%">Critère</th><th style="width:5%">JE</th><th style="width:5%">YO</th><th style="width:5%">UN</th><th style="width:5%">DO</th><th>Justifications (par solution dans l'ordre JE / YO / UN / DO)</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Conformité (25 %)</strong></td><td>5</td><td>4</td><td>5</td><td>4</td>
+          <td style="font-size:11px;line-height:1.5"><strong>JE 5/5 :</strong> PSCo qualifié via Universign, inscrit liste de confiance ANSSI (cyber.gouv.fr) ; certificat OEC natif ; authentification Comptexpert.<br><strong>YO 4/5 :</strong> Qualifié eIDAS, hébergement France, archivage Arkhineo (CDC) ; pas de certification OEC native — nécessite paramétrage.<br><strong>UN 5/5 :</strong> PSCo qualifié ANSSI, horodatage qualifié natif, liste de confiance européenne (eidas.ec.europa.eu).<br><strong>DO 4/5 :</strong> Qualifié eIDAS ; hébergement EU/US mixte (non exclusivement France) — risque de transfert hors UE selon Schrems II.</td></tr>
+        <tr><td><strong>Intégration EC (20 %)</strong></td><td>5</td><td>5</td><td>3</td><td>4</td>
+          <td style="font-size:11px;line-height:1.5"><strong>JE 5/5 :</strong> Conçu pour l'EC : authentification Comptexpert, distinction sociale/technique native, connecteurs logiciels métiers EC.<br><strong>YO 5/5 :</strong> API REST complète + webhooks ; intégration native Pennylane et HubSpot (Annexe 25, entretien n° 3 — éditeur SaaS).<br><strong>UN 3/5 :</strong> API complète mais aucune intégration métier EC prépackagée ; nécessite développement ou passage par JeSignExpert.<br><strong>DO 4/5 :</strong> 350+ intégrations natives dont Salesforce, Microsoft 365 ; pas de connecteur spécifique EC mais configuration possible.</td></tr>
+        <tr><td><strong>UX (15 %)</strong></td><td>4</td><td>5</td><td>4</td><td>4</td>
+          <td style="font-size:11px;line-height:1.5"><strong>JE 4/5 :</strong> Parcours fluide pour l'EC inscrit ; interface fonctionnelle mais moins moderne (logique Comptexpert).<br><strong>YO 5/5 :</strong> Interface reconnue intuitive (Baromètre Yousign × Ipsos 2025 : 87 % confiance utilisateurs) ; parcours simplifié, mobile first.<br><strong>UN 4/5 :</strong> Interface professionnelle, orientation technique ; moins accessible pour un client non initié.<br><strong>DO 4/5 :</strong> Application mobile mature ; multiplicité des options pouvant complexifier le parcours de signature client.</td></tr>
+        <tr><td><strong>Coût TCO (15 %)</strong></td><td>5</td><td>4</td><td>3</td><td>3</td>
+          <td style="font-size:11px;line-height:1.5"><strong>JE 5/5 :</strong> 0,30 € HT/signature, sans abonnement fixe pour EC inscrits ; 50 sig./mois = 15 € HT (grille tarifaire ECMA, fév. 2026).<br><strong>YO 4/5 :</strong> 25 € HT/mois (Plus, signatures illimitées) ; bon rapport volume/prix au-delà de 80 sig./mois.<br><strong>UN 3/5 :</strong> ~25 € HT/mois pour 10 transactions ; coût unitaire plus élevé pour un usage courant EC.<br><strong>DO 3/5 :</strong> ~38 € HT/mois (Business Pro) ; TCO le plus élevé du panel pour un cabinet en création.</td></tr>
+        <tr><td><strong>Fonctionnalités (10 %)</strong></td><td>3</td><td>4</td><td>4</td><td>5</td>
+          <td style="font-size:11px;line-height:1.5"><strong>JE 3/5 :</strong> Centré sur le cœur de métier signature EC ; peu de workflows avancés ou de relance automatique native.<br><strong>YO 4/5 :</strong> Workflows de relance (J+2, J+5), archivage Arkhineo, modèles personnalisables, rappels automatiques.<br><strong>UN 4/5 :</strong> Horodatage qualifié natif, archivage probant intégré, cachet électronique qualifié.<br><strong>DO 5/5 :</strong> CLM (Contract Lifecycle Management), 350+ intégrations, workflows multi-étapes, application mobile complète.</td></tr>
+        <tr><td><strong>Support (10 %)</strong></td><td>4</td><td>4</td><td>4</td><td>3</td>
+          <td style="font-size:11px;line-height:1.5"><strong>JE 4/5 :</strong> Support dédié EC via ECMA ; documentation métier spécifique profession.<br><strong>YO 4/5 :</strong> Support français, chat + email, documentation en ligne complète ; communauté active.<br><strong>UN 4/5 :</strong> Support français, documentation technique détaillée ; accompagnement projet sur devis.<br><strong>DO 3/5 :</strong> Support international multilingue ; pas de support dédié France ni EC — délais plus longs constatés.</td></tr>
+        <tr><td><strong>Pérennité (5 %)</strong></td><td>3</td><td>4</td><td>5</td><td>4</td>
+          <td style="font-size:11px;line-height:1.5"><strong>JE 3/5 :</strong> Dépendance à Universign/Signaturit Group (espagnol) et à la convention OEC ; pérennité liée aux décisions institutionnelles de l'Ordre.<br><strong>YO 4/5 :</strong> Éditeur français indépendant, 25 000+ organisations ; score 4 car non PSCo qualifié (dépendance au PSCo Arkhineo pour la valeur probante), contrairement à Universign.<br><strong>UN 5/5 :</strong> Groupe Signaturit, PSCo qualifié ANSSI, infrastructure européenne, positionnement B2B pérenne.<br><strong>DO 4/5 :</strong> Leader mondial coté NASDAQ, solidité financière ; -1 pt car risque réglementaire Cloud Act (transfert de données US).</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p class="legal-ref" style="margin-top:10px">Sources : sites éditeurs (jesignexpert.fr, yousign.com, universign.com, docusign.fr), liste de confiance ANSSI (cyber.gouv.fr), grilles tarifaires officielles fév. 2026, Annexe 25 entretien n° 3 (éditeur SaaS), Baromètre Yousign × Ipsos 2025, tests fonctionnels réalisés janv.-fév. 2026.</p>
+  </div>
+</div>
+
+<!-- ═══════════ 4. INTEGRATION ═══════════ -->
+<div id="integration" class="panel">
+  <div class="grid">
+    <div class="card">
+      <div class="card-header"><div class="card-icon sec">📅</div><div><h3>Planning d'intégration</h3><div class="subtitle">Déploiement en 30 jours</div></div></div>
+      <div class="timeline">
+        <div class="timeline-item"><div class="timeline-date">J0 - J7</div><div class="timeline-title">Préparation et configuration</div><div class="timeline-desc">Activation compte, modèles de documents (LM, avenants, attestations), champs variables, tests pilotes internes.</div></div>
+        <div class="timeline-item"><div class="timeline-date">J8 - J14</div><div class="timeline-title">Paramétrage signature sociale / technique</div><div class="timeline-desc">Configuration droits : EC = signature technique (non délégable) ; collaborateurs = signature sociale (délégable). Journalisation des accès.</div></div>
+        <div class="timeline-item"><div class="timeline-date">J15 - J21</div><div class="timeline-title">Connexion aux outils métiers</div><div class="timeline-desc">API logiciel comptable (Pennylane, FULLL), intégration CRM (HubSpot), workflows de relance automatique (J+2, J+5).</div></div>
+        <div class="timeline-item"><div class="timeline-date">J22 - J28</div><div class="timeline-title">Pilote et ajustements</div><div class="timeline-desc">Test avec 5-10 clients, formation équipe (2h), retours et ajustements. Vérification archivage GED.</div></div>
+        <div class="timeline-item done"><div class="timeline-date">J29 - J30</div><div class="timeline-title">Go Live</div><div class="timeline-desc">Déploiement général, communication clients, monitoring KPIs (taux signature, délai moyen, taux abandon).</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-icon dan">⚠️</div><div><h3>Gestion des risques</h3></div></div>
+      <table>
+        <thead><tr><th>Risque</th><th>Probabilité</th><th>Mitigation</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Non-signature client</strong></td><td><span class="st st-warn">Moyen</span></td><td>Relances auto J+2, J+5 + appel J+3</td></tr>
+          <tr><td><strong>Indisponibilité service</strong></td><td><span class="st st-ok">Faible</span></td><td>SLA ≥ 99,5 % ; fallback papier documenté</td></tr>
+          <tr><td><strong>Refus client digital</strong></td><td><span class="st st-warn">Moyen</span></td><td>Option papier maintenue (~5 %) ; pédagogie</td></tr>
+          <tr><td><strong>Perte de confidentialité</strong></td><td><span class="st st-ok">Faible</span></td><td>Chiffrement AES-256, zero-knowledge, DPA</td></tr>
+          <tr><td><strong>Dérive budgétaire</strong></td><td><span class="st st-warn">Moyen</span></td><td>Budget contingence +20 % ; suivi mensuel</td></tr>
+        </tbody>
+      </table>
+      <div class="info-box ok" style="margin-top:14px"><strong>Gains mesurés (source : Baromètre Yousign × Ipsos 2025, p. 11 ; enquête Annexe 24) :</strong> Délai moyen : 7 j. papier → 24 h électronique. Taux de signature : +40 % en moyenne. Taux d'abandon : 20 % (papier) → 8 % (électronique).</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ 5. DOCUMENTS TYPES ═══════════ -->
+<div id="documents" class="panel">
+  <div class="card">
+    <div class="card-header"><div class="card-icon">📄</div><div><h3>Documents à signer électroniquement</h3><div class="subtitle">Classification par niveau de signature et type de signataire</div></div></div>
+    <div class="info-box info"><strong>Principe de proportionnalité :</strong> Le niveau de signature doit être adapté aux enjeux juridiques et financiers du document. La signature avancée (AES) est le standard recommandé pour les documents d'engagement.</div>
+    <table>
+      <thead><tr><th>Document</th><th>Niveau</th><th>Type signature</th><th>Justification</th><th>Frequence</th></tr></thead>
+      <tbody>
+        <tr class="hl"><td><strong>Lettre de mission</strong></td><td><span class="st st-ok">AES</span></td><td>Sociale</td><td>Contrat cadre, engagement réciproque</td><td>1/an/client</td></tr>
+        <tr class="hl"><td><strong>Avenant LM</strong></td><td><span class="st st-ok">AES</span></td><td>Sociale</td><td>Modification contractuelle</td><td>Variable</td></tr>
+        <tr><td><strong>CGV / CG</strong></td><td><span class="st st-info">SES</span></td><td>Sociale</td><td>Annexe contractuelle</td><td>1/an/client</td></tr>
+        <tr class="hl"><td><strong>Attestation EC</strong></td><td><span class="st st-ok">AES</span></td><td>Technique</td><td>Engagement personnel de l'EC</td><td>Variable</td></tr>
+        <tr><td><strong>Note d'honoraires</strong></td><td><span class="st st-info">SES + Cachet</span></td><td>Sociale</td><td>Document comptable</td><td>Mensuel/Trim.</td></tr>
+        <tr><td><strong>Mandat SEPA</strong></td><td><span class="st st-ok">AES</span></td><td>Sociale</td><td>Autorisation bancaire</td><td>1/client</td></tr>
+        <tr><td><strong>Rapport de mission</strong></td><td><span class="st st-info">SES + Cachet</span></td><td>Technique</td><td>Livrable, intégrité</td><td>Variable</td></tr>
+        <tr><td><strong>Marchés publics</strong></td><td><span class="st st-warn">QES</span></td><td>Technique</td><td>Obligation réglementaire</td><td>Ponctuel</td></tr>
+      </tbody>
+    </table>
+    <div class="grid" style="margin-top:16px">
+      <div style="background:var(--gray-50);border-radius:var(--radius);padding:18px"><h5 style="color:var(--primary);margin-bottom:10px">Nouveau client (Annexe 13 → 14 → 15)</h5><ol style="margin-left:18px;font-size:13px"><li style="margin-bottom:6px">Lettre de mission + CG (AES)</li><li style="margin-bottom:6px">Mandat SEPA si prélèvement (AES)</li><li style="margin-bottom:6px">Questionnaire LAB (Annexe 13)</li><li>Activation portail client (Annexe 15)</li></ol></div>
+      <div style="background:var(--gray-50);border-radius:var(--radius);padding:18px"><h5 style="color:var(--secondary);margin-bottom:10px">Renouvellement annuel</h5><ol style="margin-left:18px;font-size:13px"><li style="margin-bottom:6px">Avenant si modifications (AES)</li><li style="margin-bottom:6px">Mise à jour honoraires</li><li>Actualisation KYC (Annexe 13)</li></ol></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ 6. CHECKLIST ═══════════ -->
+<div id="checklist" class="panel">
+  <div class="card">
+    <div class="card-header"><div class="card-icon suc">✅</div><div><h3>Checklist de conformité</h3><div class="subtitle">Validation avant déploiement</div></div></div>
+    <div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="font-weight:600;font-size:13px">Progression</span><span id="progText" style="font-weight:600;color:var(--primary);font-size:13px">0 / 20</span></div>
+    <div class="progress-bg"><div id="progBar" class="progress-fill" style="width:0%"></div></div>
+    <div class="grid" style="margin-top:16px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))">
+      <div><h4 style="color:var(--primary);margin-bottom:12px;font-size:13px">1. Conformité réglementaire</h4><ul class="checklist">
+        <li class="checklist-item"><input type="checkbox" onchange="updProg()"><label>Prestataire listé ANSSI/eIDAS</label></li>
+        <li class="checklist-item"><input type="checkbox" onchange="updProg()"><label>DPA art. 28 RGPD signé</label></li>
+        <li class="checklist-item"><input type="checkbox" onchange="updProg()"><label>Hébergement UE/France verifie</label></li>
+        <li class="checklist-item"><input type="checkbox" onchange="updProg()"><label>ISO 27001 à jour</label></li>
+        <li class="checklist-item"><input type="checkbox" onchange="updProg()"><label>Niveau signature adapté par document</label></li>
+      </ul></div>
+      <div><h4 style="color:var(--secondary);margin-bottom:12px;font-size:13px">2. Configuration technique</h4><ul class="checklist">
+        <li class="checklist-item"><input type="checkbox" onchange="updProg()"><label>Compte activé et configuré</label></li>
+        <li class="checklist-item"><input type="checkbox" onchange="updProg()"><label>Modèles LM/attestation paramétrés</label></li>
+        <li class="checklist-item"><input type="checkbox" onchange="updProg()"><label>Champs variables testés</label></li>
+        <li class="checklist-item"><input type="checkbox" onchange="updProg()"><label>Intégration API logiciel comptable</label></li>
+        <li class="checklist-item"><input type="checkbox" onchange="updProg()"><label>Relances automatiques configurées</label></li>
+      </ul></div>
+      <div><h4 style="color:var(--accent);margin-bottom:12px;font-size:13px">3. Organisation & secret pro.</h4><ul class="checklist">
+        <li class="checklist-item"><input type="checkbox" onchange="updProg()"><label>Signature sociale/technique distinguées</label></li>
+        <li class="checklist-item"><input type="checkbox" onchange="updProg()"><label>Droits accès par collaborateur</label></li>
+        <li class="checklist-item"><input type="checkbox" onchange="updProg()"><label>Procédure interne documentée</label></li>
+        <li class="checklist-item"><input type="checkbox" onchange="updProg()"><label>Formation équipe (2h) réalisée</label></li>
+        <li class="checklist-item"><input type="checkbox" onchange="updProg()"><label>Fallback papier prévu (~5 %)</label></li>
+      </ul></div>
+      <div><h4 style="color:var(--success);margin-bottom:12px;font-size:13px">4. Tests & archivage</h4><ul class="checklist">
+        <li class="checklist-item"><input type="checkbox" onchange="updProg()"><label>Test interne OK</label></li>
+        <li class="checklist-item"><input type="checkbox" onchange="updProg()"><label>Pilote 5-10 clients réalisé</label></li>
+        <li class="checklist-item"><input type="checkbox" onchange="updProg()"><label>Intégrité documents vérifiée</label></li>
+        <li class="checklist-item"><input type="checkbox" onchange="updProg()"><label>Archivage GED 10 ans configuré</label></li>
+        <li class="checklist-item"><input type="checkbox" onchange="updProg()"><label>KPIs définis et suivi activé</label></li>
+      </ul></div>
+    </div>
+    <div style="margin-top:16px"><button class="btn btn-secondary" onclick="resetChecklist()">🔄 Réinitialiser</button></div>
+  </div>
+</div>
+
+
+</div><!-- /container -->
+
+<div id="loadingOverlay" class="loading-overlay"><div class="loading-content"><div class="spinner"></div><div style="font-size:15px;font-weight:600;color:var(--gray-700)">Génération PDF...</div></div></div>
+<div id="toast" class="toast"></div>
+
+<script>
+// ═══════════ TABS ═══════════
+document.addEventListener('DOMContentLoaded',function(){
+  document.querySelectorAll('.tab').forEach(function(t){t.addEventListener('click',function(){
+    var id=this.getAttribute('data-panel');
+    document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active')});
+    document.getElementById(id).classList.add('active');
+    document.querySelectorAll('.tab').forEach(function(b){b.classList.remove('active')});
+    this.classList.add('active');
+  })});
+  document.querySelectorAll('.ev').forEach(function(s){s.addEventListener('input',function(){this.nextElementSibling.textContent=this.value;var jc=document.getElementById('justifCard');if(jc)jc.style.display='none';var mi=document.getElementById('modeIndicator');if(mi){mi.style.background='var(--gray-100)';mi.style.color='var(--gray-600)';mi.innerHTML='⚙️ Mode libre — scores modifiables'}})});
+  updProg();
+});
+function showPanel(id){document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active')});document.getElementById(id).classList.add('active');document.querySelectorAll('.tab').forEach(function(t){t.classList.toggle('active',t.getAttribute('data-panel')===id)})}
+function selectSol(c){document.querySelectorAll('.sol-card').forEach(function(s){s.classList.remove('selected')});c.classList.add('selected')}
+
+// ═══════════ EVALUATION ═══════════
+var W={conf:.25,integ:.20,ux:.15,cout:.15,func:.10,sup:.10,peren:.05};
+var SOLS=['je','yo','un','do'];
+var NAMES={je:'JeSignExpert',yo:'Yousign',un:'Universign',do:'DocuSign'};
+function calcScores(){
+  var scores={};
+  SOLS.forEach(function(sol){var s=0;Object.keys(W).forEach(function(c){var el=document.querySelector('[data-sol="'+sol+'"][data-cri="'+c+'"]');if(el)s+=parseInt(el.value)*W[c]});scores[sol]=s});
+  document.getElementById('scoresResult').style.display='block';
+  SOLS.forEach(function(sol){document.getElementById('sc-'+sol).querySelector('.score-val').textContent=scores[sol].toFixed(2)});
+  var mx=0,best='';SOLS.forEach(function(sol){if(scores[sol]>mx){mx=scores[sol];best=sol}});
+  var recs={je:"JeSignExpert est la solution optimale pour un cabinet en création : intégration native OEC via Comptexpert, tarification à l'acte, infrastructure Universign qualifiée ANSSI.",yo:"Yousign offre le meilleur équilibre pour ce profil. Son intégration native avec Pennylane et HubSpot, son archivage Arkhineo et ses signatures illimitées (plan Plus) en font un choix pertinent.",un:"Universign se distingue par sa qualification PSCo ANSSI et son horodatage qualifié natif. Solution idéale pour les cabinets privilégiant la force probante maximale.",do:"DocuSign est recommandé pour un usage international ou des workflows complexes. Sa richesse fonctionnelle justifie un coût supérieur."};
+  document.getElementById('recText').textContent=recs[best]||'Calcul termine.';
+  showPanel('evaluation');
+  toast('Scores calculés — '+NAMES[best]+' : '+scores[best].toFixed(2)+'/5');
+  return scores;
+}
+
+// ═══════════ CHECKLIST ═══════════
+function updProg(){var t=document.querySelectorAll('.checklist-item input[type="checkbox"]').length;var c=document.querySelectorAll('.checklist-item input[type="checkbox"]:checked').length;document.getElementById('progText').textContent=c+' / '+t;document.getElementById('progBar').style.width=(c/t*100)+'%';document.querySelectorAll('.checklist-item').forEach(function(i){i.classList.toggle('checked',!!i.querySelector('input:checked'))})}
+function resetChecklist(){if(!confirm('Réinitialiser la checklist ?'))return;document.querySelectorAll('.checklist-item input[type="checkbox"]').forEach(function(c){c.checked=false});updProg()}
+
+// ═══════════ CAS PRATIQUE CABINET X ═══════════
+function loadCasPratique(){
+  // Scores conformes au memoire : JeSignExpert 4.45, Yousign 4.35, Universign 3.95, DocuSign 3.85
+  var vals={je:{conf:5,integ:5,ux:4,cout:5,func:3,sup:4,peren:3},yo:{conf:4,integ:5,ux:5,cout:4,func:4,sup:4,peren:4},un:{conf:5,integ:3,ux:4,cout:3,func:4,sup:4,peren:5},do:{conf:4,integ:4,ux:4,cout:3,func:5,sup:3,peren:4}};
+  SOLS.forEach(function(sol){Object.keys(W).forEach(function(c){var el=document.querySelector('[data-sol="'+sol+'"][data-cri="'+c+'"]');if(el&&vals[sol]&&vals[sol][c]!==undefined){el.value=vals[sol][c];el.nextElementSibling.textContent=vals[sol][c]}})});
+  // Checklist : tout cocher (cabinet X est prêt au déploiement)
+  document.querySelectorAll('.checklist-item input[type="checkbox"]').forEach(function(cb){cb.checked=true});
+  updProg();
+  calcScores();
+  // Afficher les justifications traçables
+  var jc=document.getElementById('justifCard');if(jc)jc.style.display='block';
+  var mi=document.getElementById('modeIndicator');if(mi){mi.style.background='#d1fae5';mi.style.color='#065f46';mi.innerHTML='✅ Cas pratique Cabinet X — scores sourcés et justifiés ci-dessous'}
+  showPanel('evaluation');
+  toast('Cas pratique Cabinet X chargé — justifications disponibles');
+}
+
+// ═══════════ RESET ALL ═══════════
+function resetAll(){
+  if(!confirm('Réinitialiser tous les paramètres (scores, checklist) ?'))return;
+  // Reset sliders to default (3)
+  document.querySelectorAll('.ev').forEach(function(s){s.value=3;s.nextElementSibling.textContent='3'});
+  // Reset checklist
+  document.querySelectorAll('.checklist-item input[type="checkbox"]').forEach(function(c){c.checked=false});
+  updProg();
+  // Hide scores and justifications
+  document.getElementById('scoresResult').style.display='none';
+  var jc=document.getElementById('justifCard');if(jc)jc.style.display='none';
+  var mi=document.getElementById('modeIndicator');if(mi){mi.style.background='var(--gray-100)';mi.style.color='var(--gray-600)';mi.innerHTML='⚙️ Mode libre — scores modifiables'}
+  // Deselect solution cards
+  document.querySelectorAll('.sol-card').forEach(function(s){s.classList.remove('selected')});
+  showPanel('cadre');
+  toast('Réinitialisation effectuée');
+}
+
+// ═══════════ HELPERS ═══════════
+function fmtNum(n){if(isNaN(n))return'0';var s=Math.abs(n).toFixed(0);var r='';for(var i=s.length-1,c=0;i>=0;i--,c++){if(c>0&&c%3===0)r=' '+r;r=s[i]+r}return(n<0?'-':'')+r}
+function fmtNow(){var d=new Date();return String(d.getDate()).padStart(2,'0')+'.'+String(d.getMonth()+1).padStart(2,'0')+'.'+d.getFullYear()+' a '+String(d.getHours()).padStart(2,'0')+'h'+String(d.getMinutes()).padStart(2,'0')}
+function toast(msg){var el=document.getElementById('toast');el.textContent=msg;el.style.background='linear-gradient(135deg,#059669,#047857)';el.classList.add('show');setTimeout(function(){el.classList.remove('show')},2500)}
+
+// ═══════════ PDF EXPORT (jsPDF) ═══════════
+function exportPDF(){
+  document.getElementById('loadingOverlay').classList.add('show');
+  setTimeout(function(){
+    try{
+      var jsPDF=window.jspdf.jsPDF;
+      var doc=new jsPDF('p','mm','a4');
+      var pw=doc.internal.pageSize.getWidth(),ph=doc.internal.pageSize.getHeight();
+      var m=12,cw=pw-2*m,y=0,pn=1;
+      var P=[30,58,95],S=[13,148,136],OK=[5,150,105],KO=[220,38,38],WN=[217,119,6],AC=[245,158,11];
+
+      function safe(t){if(!t)return'';return String(t).replace(/[\u{1F300}-\u{1FAFF}]/gu,'').replace(/[\u{2600}-\u{27BF}]/gu,'').replace(/[\u00A0\u202F\u2007\u2009\u200A]/g,' ').replace(/['']/g,"'").replace(/[\u201C\u201D]/g,'"').replace(/\u2026/g,'...').replace(/[\u2013\u2014]/g,'-').replace(/\u20ac/g,'EUR').replace(/\u2265/g,'>=').replace(/\u2264/g,'<=').trim()}
+      function footer(){doc.setDrawColor(180);doc.setLineWidth(.2);doc.line(m,ph-12,pw-m,ph-12);doc.setFontSize(6.5);doc.setTextColor(130);doc.setFont('helvetica','normal');doc.text('Annexe 14 - Signature \u00e9lectronique | Source : r\u00e9alis\u00e9 par le candidat',m,ph-8)}
+      function chk(n){if(y+n>ph-18){footer();doc.addPage();pn++;y=12}}
+      function hdr(t){chk(12);doc.setFillColor(P[0],P[1],P[2]);doc.rect(m,y,cw,8,'F');doc.setTextColor(255);doc.setFontSize(9);doc.setFont('helvetica','bold');doc.text(safe(t),m+3,y+5.5);y+=12;doc.setTextColor(0)}
+      function sub(t){chk(6);doc.setFontSize(8);doc.setFont('helvetica','bold');doc.setTextColor(P[0],P[1],P[2]);doc.text(safe(t),m,y);y+=4.5;doc.setTextColor(0)}
+      function txt(t,sz){sz=sz||7;doc.setFontSize(sz);doc.setFont('helvetica','normal');doc.setTextColor(50);var ls=doc.splitTextToSize(safe(t),cw);for(var i=0;i<ls.length;i++){chk(3.5);doc.text(ls[i],m,y);y+=3.5}}
+      function tbl(h,rows,w){var tw=0;for(var i=0;i<w.length;i++)tw+=w[i];var rh=5,hh=6;chk(hh+rows.length*rh+2);doc.setFillColor(P[0],P[1],P[2]);doc.rect(m,y,tw,hh,'F');doc.setFontSize(7);doc.setFont('helvetica','bold');doc.setTextColor(255);var x=m;for(var i=0;i<h.length;i++){doc.text(safe(h[i]),x+2,y+4);x+=w[i]}y+=hh;for(var r=0;r<rows.length;r++){doc.setFillColor(r%2===0?248:255,r%2===0?250:255,r%2===0?252:255);doc.rect(m,y,tw,rh,'F');x=m;doc.setFontSize(6.5);doc.setFont('helvetica','normal');doc.setTextColor(40);for(var c=0;c<rows[r].length;c++){var ct=safe(String(rows[r][c]));var mx=w[c]-4;while(doc.getTextWidth(ct)>mx&&ct.length>3)ct=ct.slice(0,-1);doc.text(ct,x+2,y+3.5);x+=w[c]}y+=rh}doc.setDrawColor(200);doc.setLineWidth(.15);doc.rect(m,y-rows.length*rh-hh,tw,rows.length*rh+hh);y+=3}
+
+      // Compute scores
+      var scores={};SOLS.forEach(function(sol){var s=0;Object.keys(W).forEach(function(c){var el=document.querySelector('[data-sol="'+sol+'"][data-cri="'+c+'"]');if(el)s+=parseInt(el.value)*W[c]});scores[sol]=s});
+      var mx2=0,best='';SOLS.forEach(function(sol){if(scores[sol]>mx2){mx2=scores[sol];best=sol}});
+
+      // === PAGE 1 ===
+      doc.setFillColor(P[0],P[1],P[2]);doc.rect(0,0,pw,28,'F');
+      doc.setTextColor(255);doc.setFontSize(16);doc.setFont('helvetica','bold');
+      doc.text(safe('ANNEXE 14 — Signature électronique'),m,12);
+      doc.setFontSize(8);doc.setFont('helvetica','normal');
+      doc.text(safe('Cabinet 100 % numérique | eIDAS 2.0 (UE 2024/1183) | Art. 1367 C.civ | Art. 147 Code déontologie | RGPD'),m,18);
+      doc.text(safe('Généré le : '+fmtNow()),m,24);
+      y=32;
+
+      hdr('1. CADRE RÉGLEMENTAIRE');
+      sub('Niveaux de signature eIDAS');
+      tbl(['Niveau','Usage cabinet EC','Valeur probante'],[['Simple (SES)','Documents internes, notes','Recevable mais contestable'],['Avancée (AES)','Lettre de mission, attestations, mandats','Forte présomption fiabilité'],['Qualifiée (QES)','Marchés publics, actes authentiques','Équivalente manuscrite']],[35,cw/2-17,cw/2-18]);
+
+      sub('Signature sociale vs technique');
+      tbl(['Type','Objet','Délégable','Niveau'],[['Sociale','Contrats, LM, mandats','Oui (collaborateur habilité)','AES'],['Technique','Attestations, rapports','Non (EC inscrit Tableau)','AES min.']],[30,50,45,cw-125]);
+
+      sub('Conservation probatoire');
+      tbl(['Document','Durée','Fondement'],[['Pièces comptables','10 ans','Art. L123-22 C.com'],['Lettres de mission','10 ans après fin mission','Code déontologie'],['Dossiers LCB-FT','5 ans','Art. L561-12 CMF']],[50,35,cw-85]);
+
+      hdr('2. COMPARATIF DES SOLUTIONS (fev. 2026)');
+      tbl(['Critère','JeSignExpert','Yousign','Universign','DocuSign'],[
+        ['Spécialisation EC','Native OEC','Partielle','Via JeSignExpert','Non'],
+        ['Hébergement','France','France','France','EU/US'],
+        ['Horodatage qualifié','Oui','Oui','Natif','Oui'],
+        ['Archivage longue durée','Via Universign','Arkhineo (CDC)','Intégré','Option'],
+        ['Sig. sociale/technique','Distinctes','Configurable','Configurable','Configurable'],
+        ['Cout 50 sig./mois','15 EUR HT','25 EUR HT','~25 EUR HT','~38 EUR HT']
+      ],[35,(cw-35)/4,(cw-35)/4,(cw-35)/4,(cw-35)/4]);
+
+      footer();
+
+      // === PAGE 2 ===
+      doc.addPage();pn=2;y=12;
+
+      hdr("3. MATRICE D'EVALUATION PONDEREE");
+      var CRI_NAMES={conf:'Conformité (25%)',integ:'Intégration EC (20%)',ux:'UX (15%)',cout:'Coût TCO (15%)',func:'Fonctionnalités (10%)',sup:'Support (10%)',peren:'Pérennité (5%)'};
+      var criKeys=['conf','integ','ux','cout','func','sup','peren'];
+      var tblRows=[];
+      criKeys.forEach(function(c){var row=[CRI_NAMES[c]];SOLS.forEach(function(sol){var el=document.querySelector('[data-sol="'+sol+'"][data-cri="'+c+'"]');row.push(el?el.value+'/5':'--')});tblRows.push(row)});
+      tblRows.push(['SCORE TOTAL',scores.je?scores.je.toFixed(2)+'/5':'--',scores.yo?scores.yo.toFixed(2)+'/5':'--',scores.un?scores.un.toFixed(2)+'/5':'--',scores.do?scores.do.toFixed(2)+'/5':'--']);
+      tbl(['Critère (poids)','JeSignExpert','Yousign','Universign','DocuSign'],tblRows,[40,(cw-40)/4,(cw-40)/4,(cw-40)/4,(cw-40)/4]);
+
+      if(best){
+        y+=2;
+        doc.setFillColor(OK[0],OK[1],OK[2]);doc.roundedRect(m,y,cw,10,1.5,1.5,'F');
+        doc.setTextColor(255);doc.setFontSize(10);doc.setFont('helvetica','bold');
+        doc.text('Recommandation : '+safe(NAMES[best])+' ('+scores[best].toFixed(2)+'/5)',m+cw/2,y+6.5,{align:'center'});
+        y+=14;doc.setTextColor(0);
+      }
+
+      hdr('4. DOCUMENTS & NIVEAUX DE SIGNATURE');
+      tbl(['Document','Niveau','Type sig.','Frequence'],[
+        ['Lettre de mission','AES','Sociale','1/an/client'],
+        ['Avenant LM','AES','Sociale','Variable'],
+        ['Attestation EC','AES','Technique','Variable'],
+        ['Mandat SEPA','AES','Sociale','1/client'],
+        ['Note honoraires','SES + Cachet','Sociale','Mensuel/Trim.'],
+        ['Rapport de mission','SES + Cachet','Technique','Variable'],
+        ['Marchés publics','QES','Technique','Ponctuel']
+      ],[50,25,25,cw-100]);
+
+      hdr("5. PLANNING D'INTÉGRATION (30 jours)");
+      tbl(['Phase','Periode','Actions'],[
+        ['Preparation','J0-J7','Activation, modeles, champs variables, tests internes'],
+        ['Parametrage droits','J8-J14','Signature sociale/technique, journalisation acces'],
+        ['Integration API','J15-J21','Logiciel comptable, CRM, workflows relance'],
+        ['Pilote','J22-J28','Test 5-10 clients, formation equipe (2h), ajustements'],
+        ['Go Live','J29-J30','Déploiement, communication clients, monitoring KPIs']
+      ],[30,20,cw-50]);
+
+      y+=4;sub("Lien avec le parcours d'entrée en relation");
+      txt('Annexe 13 (Qualification NPMQ) -> Annexe 14 (Signature électronique LM) -> Annexe 15 (Onboarding numérique)');
+
+      footer();
+
+      // Add page numbers (Page X/Y) to all pages
+      var totalPages=doc.internal.getNumberOfPages();
+      for(var i=1;i<=totalPages;i++){doc.setPage(i);doc.setFontSize(6.5);doc.setTextColor(130);doc.setFont('helvetica','normal');doc.text('Page '+i+'/'+totalPages,pw-m-18,ph-8)}
+
+      doc.save('Annexe14_Signature_Electronique_'+new Date().toISOString().split('T')[0]+'.pdf');
+      document.getElementById('loadingOverlay').classList.remove('show');
+      toast('PDF généré (2 pages)');
+    }catch(e){console.error(e);document.getElementById('loadingOverlay').classList.remove('show');toast('Erreur PDF : '+e.message)}
+  },300);
+}
+</script>
+</body>
+</html>

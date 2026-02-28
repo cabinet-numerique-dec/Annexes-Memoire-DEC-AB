@@ -1,0 +1,2332 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Annexe 2 — Diagnostic de Maturité Digitale</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    :root {
+      --primary: #1e3a5f;
+      --primary-light: #2d5a8a;
+      --secondary: #0d9488;
+      --secondary-light: #14b8a6;
+      --accent: #f59e0b;
+      --danger: #dc2626;
+      --success: #059669;
+      --warning: #d97706;
+      --info: #2563eb;
+      --gray-50: #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-300: #d1d5db;
+      --gray-500: #6b7280;
+      --gray-600: #4b5563;
+      --gray-700: #374151;
+      --gray-800: #1f2937;
+      --radius: 12px;
+      --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: linear-gradient(135deg, var(--gray-100) 0%, #e0e7ef 100%);
+      color: var(--gray-700);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    .container { max-width: 1400px; margin: 0 auto; padding: 18px; }
+
+    .header {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      color: white;
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-bottom: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    .header::before {
+      content: "";
+      position: absolute;
+      top: -50%;
+      right: -10%;
+      width: 300px;
+      height: 300px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 50%;
+    }
+    .header h1 { font-size: 20px; font-weight: 700; margin-bottom: 6px; position: relative; }
+    .header p { opacity: 0.9; font-size: 12px; max-width: 900px; position: relative; }
+    .header-meta { display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
+    .badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(255,255,255,0.15);
+      padding: 5px 12px; border-radius: 20px;
+      font-size: 11px; font-weight: 600;
+    }
+    .badge-accent { background: var(--secondary); color: white; }
+
+    .context-box {
+      background: rgba(255,255,255,0.1);
+      border-left: 4px solid var(--accent);
+      padding: 16px 20px;
+      border-radius: 0 8px 8px 0;
+      margin-top: 20px;
+    }
+    .context-box p { font-size: 11.5px; margin-bottom: 5px; opacity: 0.95; }
+    .context-box p:last-child { margin-bottom: 0; }
+
+    .action-bar { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 20px; border: none; border-radius: 8px;
+      font-size: 12.5px; font-weight: 600; cursor: pointer;
+      transition: all 0.2s; text-decoration: none;
+    }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: var(--primary-light); transform: translateY(-2px); box-shadow: var(--shadow); }
+    .btn-secondary { background: var(--gray-200); color: var(--gray-700); }
+    .btn-secondary:hover { background: var(--gray-300); transform: translateY(-2px); }
+    .btn-warning { background: var(--primary-light); color: white; }
+    .btn-warning:hover { background: var(--primary); }
+    .btn-danger { background: var(--danger); color: white; }
+    .btn-danger:hover { background: #b91c1c; }
+
+    .tabs {
+      display: flex; gap: 4px; background: white; padding: 8px;
+      border-radius: var(--radius); box-shadow: var(--shadow);
+      margin-bottom: 24px; flex-wrap: wrap;
+    }
+    .tab {
+      padding: 8px 14px; border: none; background: transparent;
+      font-size: 12px; font-weight: 600; color: var(--gray-600);
+      border-radius: 8px; cursor: pointer; transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .tab:hover { background: var(--gray-100); }
+    .tab.active { background: var(--primary); color: white; }
+
+    .panel { display: none; animation: fadeIn 0.3s ease; }
+    .panel.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    .card {
+      background: white; border-radius: var(--radius);
+      padding: 20px; box-shadow: var(--shadow); margin-bottom: 16px;
+    }
+    .card-header {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 16px; padding-bottom: 16px;
+      border-bottom: 1px solid var(--gray-200);
+    }
+    .card-icon {
+      width: 40px; height: 40px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      border-radius: 10px; display: flex; align-items: center; justify-content: center;
+      font-size: 18px; color: white; flex-shrink: 0;
+    }
+    .card-icon.secondary { background: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-light) 100%); }
+    .card-icon.accent { background: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-light) 100%); }
+    .card-icon.danger { background: linear-gradient(135deg, var(--danger) 0%, #ef4444 100%); }
+    .card-icon.success { background: linear-gradient(135deg, var(--success) 0%, #34d399 100%); }
+    .card h3 { font-size: 15px; font-weight: 700; color: var(--gray-800); }
+    .card .subtitle { color: var(--gray-500); font-size: 11.5px; margin-top: 2px; }
+
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 20px; }
+
+    .stat-card {
+      background: white; border-radius: var(--radius); padding: 16px;
+      box-shadow: var(--shadow); text-align: center;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .stat-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+    .stat-value {
+      font-size: 26px; font-weight: 800;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .stat-label { font-size: 11.5px; color: var(--gray-600); margin-top: 3px; font-weight: 500; }
+    .stat-trend { font-size: 10px; margin-top: 6px; padding: 3px 8px; border-radius: 20px; display: inline-block; }
+    .stat-trend.up { background: #d1fae5; color: var(--success); }
+    .stat-trend.down { background: #fee2e2; color: var(--danger); }
+    .stat-trend.neutral { background: var(--gray-100); color: var(--gray-600); }
+
+    .profil-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin: 20px 0; }
+    .profil-field label { display: block; font-size: 12px; font-weight: 600; color: var(--gray-600); margin-bottom: 6px; }
+    .profil-field select {
+      width: 100%; padding: 10px 14px; border: 2px solid var(--gray-200);
+      border-radius: 8px; font-size: 14px; background: white;
+      transition: border-color 0.2s; cursor: pointer;
+    }
+    .profil-field select:focus { outline: none; border-color: var(--primary); }
+
+    .score-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+    @media (max-width: 900px) { .score-grid { grid-template-columns: 1fr; } }
+
+    .score-card {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      color: white; border-radius: var(--radius); padding: 20px;
+      box-shadow: var(--shadow-lg);
+    }
+    .score-card.conformite {
+      background: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-light) 100%);
+    }
+    .score-card h4 { font-size: 12px; opacity: 0.9; margin-bottom: 6px; }
+    .score-card .score-value { font-size: 38px; font-weight: 800; margin: 6px 0; }
+    .score-card .score-label { font-size: 14px; font-weight: 600; }
+    .score-card .score-sub { font-size: 11.5px; opacity: 0.85; margin-top: 6px; }
+
+    .alert {
+      padding: 16px 20px; border-radius: var(--radius); margin-bottom: 16px;
+      display: flex; align-items: flex-start; gap: 12px;
+    }
+    .alert-icon { font-size: 20px; flex-shrink: 0; }
+    .alert-content { flex: 1; }
+    .alert-title { font-weight: 700; margin-bottom: 4px; }
+    .alert-danger { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
+    .alert-warning { background: #fffbeb; border: 1px solid #fde68a; color: #92400e; }
+
+    .dimension-card {
+      background: white; border-radius: var(--radius);
+      box-shadow: var(--shadow); margin-bottom: 20px; overflow: hidden;
+    }
+    .dimension-header {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      color: white; padding: 16px 20px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .dimension-title { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 700; }
+    .dimension-score { font-size: 17px; font-weight: 800; }
+    .dimension-body { padding: 20px; }
+
+    .critere-item {
+      background: var(--gray-50); border-radius: 10px;
+      padding: 12px; margin-bottom: 10px;
+      border: 2px solid var(--gray-200);
+      transition: all 0.2s;
+    }
+    .critere-item:hover { border-color: var(--primary); box-shadow: 0 2px 8px rgba(30,58,95,0.1); }
+    .critere-item:last-child { margin-bottom: 0; }
+
+    .critere-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 10px; }
+    .critere-info { flex: 1; }
+    .critere-label { font-weight: 700; color: var(--gray-800); margin-bottom: 3px; font-size: 13px; }
+    .critere-exemple { font-size: 11px; color: var(--gray-500); font-style: italic; }
+
+    .critere-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+    .tag {
+      padding: 4px 10px; border-radius: 6px;
+      font-size: 11px; font-weight: 600; cursor: pointer;
+      transition: all 0.2s;
+    }
+    .tag:hover { filter: brightness(0.95); transform: scale(1.02); }
+    .tag-norme { background: #dbeafe; color: #1e40af; }
+    .tag-clients { background: #d1fae5; color: #065f46; }
+    .tag-collaborateurs { background: #e9d5ff; color: #6b21a8; }
+    .tag-normes { background: #fed7aa; color: #9a3412; }
+
+    .score-buttons { display: flex; gap: 6px; flex-shrink: 0; }
+    .score-btn {
+      width: 38px; height: 38px; border: 2px solid var(--gray-300);
+      border-radius: 8px; background: white; font-weight: 800; font-size: 14px;
+      color: var(--gray-500); cursor: pointer; transition: all 0.15s;
+    }
+    .score-btn:hover { transform: scale(1.08); border-color: var(--primary); }
+    .score-btn.active { color: white; transform: scale(1.1); border-color: transparent; }
+    .score-btn.active[data-score="0"] { background: var(--danger); }
+    .score-btn.active[data-score="1"] { background: #f97316; }
+    .score-btn.active[data-score="2"] { background: var(--accent); }
+    .score-btn.active[data-score="3"] { background: var(--info); }
+    .score-btn.active[data-score="4"] { background: var(--success); }
+
+    .critere-comment { margin-top: 10px; }
+    .critere-comment label { display: block; font-size: 11px; font-weight: 600; color: var(--gray-600); margin-bottom: 4px; }
+    .critere-comment textarea {
+      width: 100%; min-height: 60px; padding: 10px; border: 2px solid var(--gray-200);
+      border-radius: 8px; font-size: 12px; resize: vertical; transition: border-color 0.2s;
+    }
+    .critere-comment textarea:focus { outline: none; border-color: var(--primary); }
+
+    .progress-row { display: flex; align-items: center; margin-bottom: 12px; gap: 12px; }
+    .progress-label { width: 160px; font-size: 13px; color: var(--gray-700); flex-shrink: 0; font-weight: 500; }
+    .progress-container { flex: 1; background: var(--gray-200); border-radius: 10px; height: 24px; overflow: visible; position: relative; }
+    .progress-bar {
+      height: 100%; border-radius: 10px;
+      display: flex; align-items: center; justify-content: flex-end;
+      padding-right: 8px; font-size: 11px; font-weight: 600; color: white;
+      transition: width 0.5s ease; min-width: 42px; white-space: nowrap;
+    }
+    .progress-bar.primary { background: linear-gradient(90deg, var(--primary), var(--primary-light)); }
+
+    .legende { display: flex; gap: 16px; flex-wrap: wrap; margin: 16px 0; }
+    .legende-item { display: flex; align-items: center; gap: 8px; }
+    .legende-box {
+      width: 32px; height: 32px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-weight: 800; font-size: 14px;
+    }
+    .legende-text { font-size: 12px; }
+    .legende-text strong { display: block; color: var(--gray-800); }
+    .legende-text span { color: var(--gray-500); font-size: 10px; }
+
+    .synthese-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+    .synthese-item {
+      background: var(--gray-50); padding: 16px; border-radius: 10px;
+      border-left: 4px solid var(--primary);
+    }
+    .synthese-item h4 { font-size: 14px; color: var(--gray-700); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+
+    .insight-box {
+      background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+      border-left: 4px solid var(--success);
+      padding: 16px 20px; border-radius: 0 8px 8px 0; margin: 16px 0;
+    }
+    .insight-box.warning { background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border-left-color: var(--warning); }
+    .insight-box.info { background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border-left-color: var(--info); }
+    .insight-box.danger { background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border-left-color: var(--danger); }
+    .insight-box strong { color: var(--gray-800); }
+
+    .reco-item {
+      background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+      border-left: 4px solid var(--accent);
+      padding: 16px 20px; border-radius: 0 8px 8px 0; margin-bottom: 16px;
+    }
+    .reco-item h4 { color: #92400e; font-size: 13px; margin-bottom: 8px; }
+    .reco-item ul { margin-left: 20px; color: #78350f; font-size: 12px; }
+    .reco-item li { margin-bottom: 5px; }
+
+    /* === PLAN D'ACTION === */
+    .phase-card {
+      background: white; border-radius: var(--radius); box-shadow: var(--shadow);
+      margin-bottom: 14px; overflow: hidden; border-left: 5px solid var(--gray-300);
+    }
+    .phase-card.phase-1 { border-left-color: #dc2626; }
+    .phase-card.phase-2 { border-left-color: #f59e0b; }
+    .phase-card.phase-3 { border-left-color: #059669; }
+    .phase-header {
+      padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;
+      cursor: pointer; transition: background 0.2s;
+    }
+    .phase-header:hover { background: var(--gray-50); }
+    .phase-title { font-weight: 700; font-size: 12.5px; color: var(--gray-800); display: flex; align-items: center; gap: 6px; }
+    .phase-meta { display: flex; gap: 8px; align-items: center; }
+    .phase-budget {
+      background: var(--gray-100); padding: 3px 8px; border-radius: 6px;
+      font-size: 10.5px; font-weight: 600; color: var(--gray-700);
+    }
+    .phase-timeline {
+      background: #dbeafe; padding: 3px 8px; border-radius: 6px;
+      font-size: 10.5px; font-weight: 600; color: #1e40af;
+    }
+    .phase-body { padding: 0 16px 14px; }
+    .action-item {
+      display: flex; justify-content: space-between; align-items: center; gap: 10px;
+      padding: 7px 10px; background: var(--gray-50); border-radius: 6px;
+      margin-bottom: 6px; font-size: 12px;
+    }
+    .action-item:last-child { margin-bottom: 0; }
+    .action-label { color: var(--gray-800); font-weight: 500; flex: 1; }
+    .action-label .action-detail { display: block; font-size: 10.5px; color: var(--gray-500); font-weight: 400; margin-top: 1px; }
+    .action-norm {
+      padding: 2px 7px; border-radius: 4px; font-size: 9.5px; font-weight: 600;
+      white-space: nowrap; flex-shrink: 0;
+    }
+    .norm-rgpd { background: #dbeafe; color: #1e40af; }
+    .norm-npmq { background: #fce7f3; color: #9d174d; }
+    .norm-deonto { background: #fed7aa; color: #9a3412; }
+    .norm-anssi { background: #d1fae5; color: #065f46; }
+    .norm-efact { background: #e9d5ff; color: #6b21a8; }
+    .norm-eidas { background: #ccfbf1; color: #0f766e; }
+    .norm-lcbft { background: #fef3c7; color: #92400e; }
+    .action-annexe {
+      padding: 2px 7px; border-radius: 4px; font-size: 9.5px; font-weight: 600;
+      background: var(--primary); color: white; white-space: nowrap;
+    }
+    .dim-reco-card {
+      background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      margin-bottom: 8px; overflow: hidden;
+    }
+    .dim-reco-header {
+      padding: 10px 14px; display: flex; justify-content: space-between; align-items: center;
+      cursor: pointer;
+    }
+    .dim-reco-header:hover { background: var(--gray-50); }
+    .dim-reco-title { font-weight: 600; font-size: 12.5px; color: var(--gray-800); display: flex; align-items: center; gap: 6px; }
+    .dim-reco-score {
+      padding: 3px 8px; border-radius: 5px; font-size: 10.5px; font-weight: 700;
+    }
+    .dim-reco-score.critical { background: #fee2e2; color: #991b1b; }
+    .dim-reco-score.warning { background: #fef3c7; color: #92400e; }
+    .dim-reco-score.good { background: #d1fae5; color: #065f46; }
+    .dim-reco-body { padding: 8px 14px 12px; }
+
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(15,23,42,0.6);
+      display: none; align-items: center; justify-content: center;
+      z-index: 9998; padding: 20px;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal {
+      background: white; border-radius: var(--radius);
+      max-width: 600px; width: 100%; max-height: 80vh;
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); overflow: hidden;
+    }
+    .modal-header {
+      background: var(--primary); color: white;
+      padding: 16px 20px; display: flex; justify-content: space-between; align-items: center;
+    }
+    .modal-title { font-weight: 700; font-size: 16px; }
+    .modal-close {
+      background: rgba(255,255,255,0.2); border: none; color: white;
+      padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: 600;
+    }
+    .modal-close:hover { background: rgba(255,255,255,0.3); }
+    .modal-body { padding: 20px; overflow-y: auto; max-height: 60vh; }
+    .modal-body p { margin-bottom: 12px; color: var(--gray-700); font-size: 14px; }
+    .modal-body ul { margin-left: 20px; color: var(--gray-700); font-size: 14px; }
+    .modal-body li { margin-bottom: 8px; }
+
+    .toast {
+      position: fixed; bottom: 24px; right: 24px;
+      background: var(--gray-800); color: white;
+      padding: 14px 20px; border-radius: 10px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+      transform: translateY(100px); opacity: 0;
+      transition: all 0.3s ease; z-index: 9999;
+      font-size: 14px; font-weight: 500;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+
+    .loading-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+      display: none; align-items: center; justify-content: center; z-index: 9999;
+    }
+    .loading-overlay.show { display: flex; }
+    .loading-spinner { background: white; padding: 32px 48px; border-radius: var(--radius); text-align: center; }
+    .spinner {
+      width: 48px; height: 48px; border: 4px solid var(--gray-200);
+      border-top-color: var(--primary); border-radius: 50%;
+      animation: spin 1s linear infinite; margin: 0 auto 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .file-input-wrapper { position: relative; overflow: hidden; display: inline-block; }
+    .file-input-wrapper input[type="file"] {
+      position: absolute; left: 0; top: 0; opacity: 0;
+      width: 100%; height: 100%; cursor: pointer;
+    }
+
+    @media print {
+      body { background: white; }
+      .container { padding: 0; max-width: none; }
+      .tabs, .action-bar, .toast, .modal-overlay, .loading-overlay { display: none !important; }
+      .panel { display: block !important; page-break-inside: avoid; margin-bottom: 30px; }
+      .card, .dimension-card { box-shadow: none; border: 1px solid var(--gray-200); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <h1>Annexe 2 — Diagnostic de Maturité Digitale</h1>
+    <p>Outil d'évaluation personnalisé pour la création d'un cabinet d'expertise comptable 100% numérique. Analyse des 6 dimensions clés de la transformation digitale.</p>
+    <div class="header-meta">
+      <span class="badge">🎯 Outil interactif</span>
+      <span class="badge">📈 6 dimensions, 42 critères</span>
+      <span class="badge badge-accent">⚖️ Conformité RGPD / NEP / Déontologie</span>
+      <span class="badge">📝 Source : Réalisé par le candidat</span>
+    </div>
+    <div class="context-box">
+      <p><strong>Public cible :</strong> Tout profil d'expert-comptable (création ex-nihilo, reprise, transformation de cabinet existant).</p>
+      <p><strong>Objectif :</strong> État des lieux objectif de la maturité numérique en tenant compte des normes professionnelles, des besoins clients et des attentes collaborateurs.</p>
+      <p><strong>Référentiel :</strong> Code de déontologie (édition 2026) + NPMQ (transposition ISQM 1) + RGPD + NPLAB / LCB-FT + ANSSI + eIDAS.</p>
+      <p><strong>Lecture DEC :</strong> Les critères <em>normatifs</em> (RGPD / sécurité / traçabilité) sont des <strong>pré-requis</strong> : une non-conformité est bloquante.</p>
+    </div>
+  </div>
+
+  <div class="action-bar">
+    <button class="btn btn-primary" onclick="exportPDF()">📥 Export PDF </button>
+    <button class="btn btn-secondary" onclick="saveState()">💾 Sauvegarder</button>
+    <button class="btn btn-secondary" onclick="loadState()">📂 Charger</button>
+    <button class="btn btn-warning" onclick="exportJSON()">🧾 Export JSON</button>
+    <div class="file-input-wrapper">
+      <button class="btn btn-secondary">📎 Import JSON</button>
+      <input type="file" id="importFile" accept=".json" onchange="importJSON(event)">
+    </div>
+    <button class="btn btn-warning" onclick="loadCabinetXExample()" style="background:#f59e0b;color:white;">📋 Cas pratique Cabinet X</button>
+    <button class="btn btn-danger" onclick="resetAll()">🔄 Réinitialiser</button>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="showPanel('dashboard')">📊 Tableau de bord</button>
+    <button class="tab" onclick="showPanel('evaluation')">✏️ Évaluation</button>
+    <button class="tab" onclick="showPanel('synthese')">📈 Synthèse</button>
+    <button class="tab" onclick="showPanel('recommandations')">🎯 Plan d'action</button>
+    <button class="tab" onclick="showPanel('methodologie')">📚 Méthodologie</button>
+  </div>
+
+  <div id="caseStudyBox" style="display:none; background:linear-gradient(135deg,rgba(245,158,11,0.15),rgba(251,191,36,0.1)); border:2px solid #f59e0b; border-radius:12px; padding:20px; margin-bottom:24px;">
+    <h4 style="color:#92400e; margin-bottom:8px; font-size:16px;">🔬 Cas pratique : Diagnostic rétrospectif — Année 1 du cabinet (Monsieur X, 2026)</h4>
+    <p style="font-size:13px; color:#78350f; margin-bottom:6px;"><strong>Contexte :</strong> Microsoft 365 en place avec MFA activée + OneDrive. Mais : aucun registre RGPD, postes non chiffrés, accès non restreint de l'alternant à l'ensemble des dossiers clients, aucun audit trail, aucun plan de continuité.</p>
+    <p style="font-size:13px; color:#78350f; margin-bottom:6px;"><strong>Constat :</strong> Score global « initial » — « la norme, pas l'exception » pour les cabinets de moins de 5 salariés (consultant cybersécurité, 2025).</p>
+    <p style="font-size:13px; color:#78350f;"><strong>Plan d'action :</strong> 3 phases sur 12 mois, priorisées par le score de conformité réglementaire.</p>
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px; margin-top:12px;">
+      <div style="background:white;padding:10px;border-radius:8px;text-align:center;"><div style="font-size:11px;color:#6b7280;">Type</div><div style="font-weight:700;color:#1f2937;">Création ex-nihilo</div></div>
+      <div style="background:white;padding:10px;border-radius:8px;text-align:center;"><div style="font-size:11px;color:#6b7280;">Effectif</div><div style="font-weight:700;color:#1f2937;">Solo (0-1)</div></div>
+      <div style="background:white;padding:10px;border-radius:8px;text-align:center;"><div style="font-size:11px;color:#6b7280;">Score global</div><div style="font-weight:700;color:#dc2626;" id="caseStudyScore">— / 4</div></div>
+      <div style="background:white;padding:10px;border-radius:8px;text-align:center;"><div style="font-size:11px;color:#6b7280;">Conformité</div><div style="font-weight:700;color:#dc2626;" id="caseStudyConf">— / 4</div></div>
+      <div style="background:white;padding:10px;border-radius:8px;text-align:center;"><div style="font-size:11px;color:#6b7280;">Points faibles</div><div style="font-weight:700;color:#dc2626;" id="caseStudyFaibles">— / 42</div></div>
+
+    </div>
+  </div>
+
+  <div id="alertes"></div>
+
+
+  <!-- Panel 1: Dashboard -->
+  <div id="dashboard" class="panel active">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon accent">🏢</div>
+        <div>
+          <h3>Profil du cabinet</h3>
+          <div class="subtitle">Personnalisez les recommandations selon votre contexte</div>
+        </div>
+      </div>
+      <div class="profil-grid">
+        <div class="profil-field">
+          <label>Type de création</label>
+          <select id="typeCabinet" onchange="renderAll()">
+            <option value="">Sélectionner...</option>
+            <option value="Ex-nihilo">Création ex-nihilo</option>
+            <option value="Reprise">Reprise de cabinet</option>
+            <option value="Transformation">Transformation cabinet existant</option>
+          </select>
+        </div>
+        <div class="profil-field">
+          <label>Effectif visé</label>
+          <select id="effectif" onchange="renderAll()">
+            <option value="">Sélectionner...</option>
+            <option value="Solo">Solo (0-1 collaborateur)</option>
+            <option value="TPE">TPE (2-5 collaborateurs)</option>
+            <option value="PME">PME (6-20 collaborateurs)</option>
+            <option value="ETI">ETI (20+ collaborateurs)</option>
+          </select>
+        </div>
+        <div class="profil-field">
+          <label>Spécialisation</label>
+          <select id="secteur" onchange="renderAll()">
+            <option value="">Sélectionner...</option>
+            <option value="Généraliste">Généraliste</option>
+            <option value="Startups">Startups / Tech</option>
+            <option value="Libérales">Professions libérales</option>
+            <option value="Artisans">Artisans / TPE</option>
+            <option value="Commerce">Commerce / Retail</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="score-grid">
+      <div class="score-card">
+        <h4>🎯 Score global de maturité</h4>
+        <div class="score-value" id="scoreGlobal">0.0 / 4.0</div>
+        <div class="score-label" id="niveauMaturite">Non évalué</div>
+        <div class="score-sub" id="recommandationGlobal"></div>
+      </div>
+      <div class="score-card conformite">
+        <h4>⚖️ Score de conformité (critères normatifs)</h4>
+        <div class="score-value" id="scoreConformite">0.0 / 4.0</div>
+        <div class="score-label" id="statutConformite">Non évalué</div>
+        <div class="score-sub">Les critères normatifs sont des pré-requis bloquants</div>
+      </div>
+    </div>
+
+    <div class="grid-4" id="statsRapides">
+      <div class="stat-card">
+        <div class="stat-value" id="statCriteresEvalues">0</div>
+        <div class="stat-label">Critères évalués</div>
+        <div class="stat-trend neutral">sur 42 critères</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="statDimensionsComplete">0</div>
+        <div class="stat-label">Dimensions complètes</div>
+        <div class="stat-trend neutral">sur 6 dimensions</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="statPointsForts">0</div>
+        <div class="stat-label">Points forts (≥3)</div>
+        <div class="stat-trend up">Excellence</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="statPointsFaibles">0</div>
+        <div class="stat-label">Points faibles (<2)</div>
+        <div class="stat-trend down">À améliorer</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon secondary">📈</div>
+        <div>
+          <h3>Radar de maturité digitale</h3>
+          <div class="subtitle">Vue synthétique des 6 dimensions</div>
+        </div>
+      </div>
+      <div style="display: flex; justify-content: center;">
+        <canvas id="radarChart" width="400" height="400"></canvas>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">📏</div>
+        <div>
+          <h3>Échelle d'évaluation</h3>
+          <div class="subtitle">Notation de 0 à 4 pour chaque critère</div>
+        </div>
+      </div>
+      <div class="legende">
+        <div class="legende-item">
+          <div class="legende-box" style="background: var(--danger);">0</div>
+          <div class="legende-text"><strong>Inexistant</strong><span>Pas mis en place</span></div>
+        </div>
+        <div class="legende-item">
+          <div class="legende-box" style="background: #f97316;">1</div>
+          <div class="legende-text"><strong>Initial</strong><span>En réflexion</span></div>
+        </div>
+        <div class="legende-item">
+          <div class="legende-box" style="background: var(--accent);">2</div>
+          <div class="legende-text"><strong>En cours</strong><span>Partiellement déployé</span></div>
+        </div>
+        <div class="legende-item">
+          <div class="legende-box" style="background: var(--info);">3</div>
+          <div class="legende-text"><strong>Maîtrisé</strong><span>Opérationnel</span></div>
+        </div>
+        <div class="legende-item">
+          <div class="legende-box" style="background: var(--success);">4</div>
+          <div class="legende-text"><strong>Optimisé</strong><span>Excellence</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Panel 2: Evaluation -->
+  <div id="evaluation" class="panel">
+    <div id="dimensionsContainer"></div>
+  </div>
+
+  <!-- Panel 3: Synthese -->
+  <div id="synthese" class="panel">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">📊</div>
+        <div>
+          <h3>Synthèse par dimension</h3>
+          <div class="subtitle">Progression détaillée de chaque axe</div>
+        </div>
+      </div>
+      <div class="synthese-grid" id="syntheseGrid"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon success">✅</div>
+        <div>
+          <h3>Points forts identifiés</h3>
+          <div class="subtitle">Critères notés 3 ou 4</div>
+        </div>
+      </div>
+      <div id="pointsForts"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon danger">⚠️</div>
+        <div>
+          <h3>Axes d'amélioration prioritaires</h3>
+          <div class="subtitle">Critères notés 0 ou 1</div>
+        </div>
+      </div>
+      <div id="pointsFaibles"></div>
+    </div>
+  </div>
+
+  <!-- Panel 4: Recommandations -->
+  <div id="recommandations" class="panel">
+    <div id="recommandationsContainer"></div>
+  </div>
+
+  <!-- Panel 5: Methodologie -->
+  <div id="methodologie" class="panel">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">📚</div>
+        <div>
+          <h3>Méthodologie du diagnostic</h3>
+          <div class="subtitle">Fondements et référentiels utilisés</div>
+        </div>
+      </div>
+      
+      <h4 style="color: var(--primary); margin: 20px 0 12px;">1. Objectif de l'outil</h4>
+      <p style="margin-bottom: 16px; color: var(--gray-700);">
+        Ce diagnostic de maturité digitale permet d'établir un état des lieux objectif et quantifié de la transformation numérique d'un cabinet d'expertise comptable. Il constitue une base factuelle pour identifier les priorités d'investissement et structurer un plan d'action en trois phases.
+      </p>
+      
+      <h4 style="color: var(--primary); margin: 20px 0 12px;">2. Les 6 dimensions évaluées</h4>
+      <div class="insight-box info">
+        <strong>🔧 Infrastructure & Outils</strong> – Socle technologique : logiciels cloud, GED, signature électronique, sécurité.<br>
+        <strong>👥 Relation Client</strong> – Portail client, CRM, facturation électronique, collecte automatisée.<br>
+        <strong>⚙️ Processus & Automatisation</strong> – OCR, rapprochement bancaire, workflows, déclarations dématérialisées.<br>
+        <strong>🎓 Compétences & Culture</strong> – Formation, sensibilisation cybersécurité, veille technologique.<br>
+        <strong>📱 Marketing Digital</strong> – Site web, réseaux sociaux, SEO, content marketing.<br>
+        <strong>📊 Pilotage & Data</strong> – Tableaux de bord, KPIs, Business Intelligence, analytics.
+      </div>
+      
+      <h4 style="color: var(--primary); margin: 20px 0 12px;">3. Référentiels de conformité</h4>
+      <p style="margin-bottom: 12px; color: var(--gray-700); font-size:13px;">Les critères normatifs sont identifiés par le tag <span class="tag tag-normes">Impact : normes</span> et sont considérés comme des pré-requis :</p>
+      <ul style="margin-left: 24px; color: var(--gray-700); margin-bottom: 16px; font-size:13px;">
+        <li><strong>RGPD</strong> – Règlement (UE) 2016/679 : sécurité des données, mesures techniques et organisationnelles (art. 32)</li>
+        <li><strong>Code de déontologie</strong> – Édition 2026 : secret professionnel (art. 147), indépendance, compétence (art. 145)</li>
+        <li><strong>NPMQ</strong> – Transposition ISQM 1 : acceptation/maintien missions (§26-28), supervision, documentation (§A44)</li>
+        <li><strong>NPLAB / LCB-FT</strong> – Lutte contre le blanchiment : procédures de vigilance, classification risques, TRACFIN</li>
+        <li><strong>eIDAS</strong> – Règlement (UE) 910/2014 : signature électronique qualifiée</li>
+        <li><strong>Facturation électronique</strong> – Art. 91 LF 2024 : réception sept. 2026, émission sept. 2027</li>
+        <li><strong>ANSSI</strong> – Socle minimal de sécurité pour les TPE/PME (2023)</li>
+        <li><strong>AI Act</strong> – Règlement (UE) 2024/1689 : obligations de transparence</li>
+      </ul>
+      
+      <h4 style="color: var(--primary); margin: 20px 0 12px;">4. Interprétation des scores</h4>
+      <table style="width: 100%; border-collapse: collapse; margin: 16px 0;">
+        <thead>
+          <tr style="background: var(--primary); color: white;">
+            <th style="padding: 10px; text-align: left;">Score</th>
+            <th style="padding: 10px; text-align: left;">Niveau</th>
+            <th style="padding: 10px; text-align: left;">Interprétation</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="background: #fef2f2;">
+            <td style="padding: 10px; border-bottom: 1px solid var(--gray-200);">< 1.0</td>
+            <td style="padding: 10px; border-bottom: 1px solid var(--gray-200);"><strong>Débutant</strong></td>
+            <td style="padding: 10px; border-bottom: 1px solid var(--gray-200);">Investissement majeur nécessaire</td>
+          </tr>
+          <tr style="background: #fffbeb;">
+            <td style="padding: 10px; border-bottom: 1px solid var(--gray-200);">1.0 - 1.9</td>
+            <td style="padding: 10px; border-bottom: 1px solid var(--gray-200);"><strong>En développement</strong></td>
+            <td style="padding: 10px; border-bottom: 1px solid var(--gray-200);">Actions prioritaires requises</td>
+          </tr>
+          <tr style="background: #fef3c7;">
+            <td style="padding: 10px; border-bottom: 1px solid var(--gray-200);">2.0 - 2.9</td>
+            <td style="padding: 10px; border-bottom: 1px solid var(--gray-200);"><strong>Intermédiaire</strong></td>
+            <td style="padding: 10px; border-bottom: 1px solid var(--gray-200);">Transformation en cours</td>
+          </tr>
+          <tr style="background: #dbeafe;">
+            <td style="padding: 10px; border-bottom: 1px solid var(--gray-200);">3.0 - 3.4</td>
+            <td style="padding: 10px; border-bottom: 1px solid var(--gray-200);"><strong>Avancé</strong></td>
+            <td style="padding: 10px; border-bottom: 1px solid var(--gray-200);">Bon niveau, optimisation continue</td>
+          </tr>
+          <tr style="background: #d1fae5;">
+            <td style="padding: 10px;">≥ 3.5</td>
+            <td style="padding: 10px;"><strong>Expert</strong></td>
+            <td style="padding: 10px;">Excellence, leadership technologique</td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <h4 style="color: var(--primary); margin: 20px 0 12px; font-size:14px;">5. Sources et références</h4>
+      <ul style="margin-left: 24px; color: var(--gray-700); font-size:13px;">
+        <li>CNOEC – Référentiel normatif de la profession, édition 2025 (NPMQ, NPLAB)</li>
+        <li>Code de déontologie des experts-comptables, édition 2026</li>
+        <li>OMECA – Baromètre des métiers de l'expertise comptable, S2 2025</li>
+        <li>ANSSI – Panorama de la cybermenace 2024 ; Socle minimal sécurité TPE (2023)</li>
+        <li>RGPD – Règlement (UE) 2016/679 du 27 avril 2016</li>
+        <li>AI Act – Règlement (UE) 2024/1689 du 13 juin 2024</li>
+        <li>eIDAS – Règlement (UE) 910/2014 du 23 juillet 2014</li>
+        <li>Facturation électronique – Art. 91 Loi de finances 2024</li>
+        <li>Enquête auprès de 26 experts-comptables (Annexe 24) et entretiens ciblés (Annexe 25)</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle">Aide</div>
+      <button class="modal-close" onclick="closeModal()">Fermer</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-spinner">
+    <div class="spinner"></div>
+    <div>Génération du PDF en cours...</div>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY = "annexe2_diagnostic_v3";
+
+const dimensions = [
+  {
+    nom: "Infrastructure & Outils Numériques",
+    icon: "🔧",
+    criteres: [
+      { label: "Logiciel de production comptable cloud", exemple: "Ex: Sage, Quadratus Cloud, Cegid, ACD", impact: "clients", norme: "" },
+      { label: "Solution de GED (Gestion Électronique Documents)", exemple: "Ex: Zeendoc, DocuWare", impact: "normes", norme: "NEP - Archivage / conservation" },
+      { label: "Système de signature électronique qualifiée", exemple: "Ex: Yousign, DocuSign", impact: "clients", norme: "eIDAS (niveau adapté)" },
+      { label: "Plateforme collaborative (équipe)", exemple: "Ex: Teams, Slack, Google Workspace", impact: "collaborateurs", norme: "" },
+      { label: "Outil de gestion de projet", exemple: "Ex: Trello, Asana, Monday", impact: "collaborateurs", norme: "" },
+      { label: "Sécurité & sauvegarde données (RGPD)", exemple: "Ex: Sauvegarde 3-2-1, 2FA, logs", impact: "normes", norme: "RGPD Art. 32" },
+      { label: "Connexions API entre outils", exemple: "Ex: Zapier, Make, API natives", impact: "collaborateurs", norme: "" }
+    ]
+  },
+  {
+    nom: "Relation Client Digitale",
+    icon: "👥",
+    criteres: [
+      { label: "Portail client en ligne sécurisé", exemple: "Ex: Accès documents 24/7", impact: "clients", norme: "Déontologie / secret pro" },
+      { label: "CRM (Gestion Relation Client)", exemple: "Ex: HubSpot, Salesforce, Pipedrive", impact: "clients", norme: "" },
+      { label: "Facturation électronique", exemple: "Ex: PA, conformité calendrier", impact: "normes", norme: "Facturation électronique (LF 2024)" },
+      { label: "Outils visioconférence professionnels", exemple: "Ex: Zoom, Teams avec planning", impact: "clients", norme: "" },
+      { label: "Automatisation relances clients", exemple: "Ex: Rappels auto échéances", impact: "clients", norme: "" },
+      { label: "Chatbot ou support client digital", exemple: "Ex: FAQ auto, prise RDV", impact: "clients", norme: "" },
+      { label: "Collecte auto pièces comptables", exemple: "Ex: OCR, API bancaires", impact: "clients", norme: "" }
+    ]
+  },
+  {
+    nom: "Processus & Automatisation",
+    icon: "⚙️",
+    criteres: [
+      { label: "Automatisation saisie comptable", exemple: "Ex: IA, OCR, pré-comptabilisation", impact: "collaborateurs", norme: "" },
+      { label: "Rapprochement bancaire auto", exemple: "Ex: Lettrage auto, API PSD2", impact: "collaborateurs", norme: "" },
+      { label: "Déclarations fiscales dématérialisées", exemple: "Ex: TVA, DSN automatisées", impact: "normes", norme: "EDI (DGFIP/URSSAF)" },
+      { label: "Workflow validation digitalisé", exemple: "Ex: Circuit validation traçable", impact: "collaborateurs", norme: "Traçabilité / documentation" },
+      { label: "Génération auto reportings", exemple: "Ex: Dashboards temps réel", impact: "clients", norme: "" },
+      { label: "OCR/IA traitement documents", exemple: "Ex: Extraction données factures", impact: "collaborateurs", norme: "" },
+      { label: "Processus standardisés documentés", exemple: "Ex: Procédures écrites", impact: "collaborateurs", norme: "Documentation" }
+    ]
+  },
+  {
+    nom: "Compétences & Culture Digitale",
+    icon: "🎓",
+    criteres: [
+      { label: "Formation continue outils numériques", exemple: "Ex: Budget formation, e-learning", impact: "collaborateurs", norme: "Déontologie (compétence)" },
+      { label: "Sensibilisation cybersécurité", exemple: "Ex: Formation phishing, RGPD", impact: "normes", norme: "RGPD / sécurité" },
+      { label: "Référent digital/IT", exemple: "Ex: Responsable transformation", impact: "collaborateurs", norme: "" },
+      { label: "Culture innovation continue", exemple: "Ex: Tests outils, feedback équipe", impact: "collaborateurs", norme: "" },
+      { label: "Veille technologique active", exemple: "Ex: Congrès OEC, Lab50", impact: "collaborateurs", norme: "" },
+      { label: "Compétences data analytics", exemple: "Ex: Power BI, Excel avancé", impact: "clients", norme: "" },
+      { label: "Capacité adaptation nouveaux outils", exemple: "Ex: Agilité, test & learn", impact: "collaborateurs", norme: "" }
+    ]
+  },
+  {
+    nom: "Marketing & Communication Digitale",
+    icon: "📱",
+    criteres: [
+      { label: "Site web professionnel actualisé", exemple: "Ex: Site vitrine responsive", impact: "clients", norme: "" },
+      { label: "Présence réseaux sociaux", exemple: "Ex: LinkedIn, personal branding", impact: "clients", norme: "" },
+      { label: "Stratégie content marketing", exemple: "Ex: Blog, webinaires", impact: "clients", norme: "" },
+      { label: "Newsletter digitale", exemple: "Ex: Actualités fiscales mensuelles", impact: "clients", norme: "" },
+      { label: "Référencement naturel (SEO)", exemple: "Ex: Optimisation Google local", impact: "clients", norme: "" },
+      { label: "Collecte avis clients", exemple: "Ex: Google Reviews, NPS", impact: "clients", norme: "" },
+      { label: "Outils prospection digitale", exemple: "Ex: LinkedIn Sales Navigator", impact: "clients", norme: "" }
+    ]
+  },
+  {
+    nom: "Pilotage & Analyse Données",
+    icon: "📊",
+    criteres: [
+      { label: "Tableaux bord pilotage cabinet", exemple: "Ex: Rentabilité, productivité", impact: "collaborateurs", norme: "" },
+      { label: "Suivi KPIs temps réel", exemple: "Ex: CA, heures facturables", impact: "collaborateurs", norme: "" },
+      { label: "Analyse rentabilité client/mission", exemple: "Ex: Temps vs honoraires", impact: "collaborateurs", norme: "" },
+      { label: "Outils Business Intelligence", exemple: "Ex: Power BI, Tableau", impact: "collaborateurs", norme: "" },
+      { label: "Suivi temps passé digitalisé", exemple: "Ex: Time tracking auto", impact: "collaborateurs", norme: "" },
+      { label: "Exploitation données conseil clients", exemple: "Ex: Benchmark, analyse prédictive", impact: "clients", norme: "" },
+      { label: "Reporting auto performance", exemple: "Ex: Envoi auto dashboards", impact: "clients", norme: "" }
+    ]
+  }
+];
+
+const niveaux = ['Inexistant', 'Initial', 'En cours', 'Maitrise', 'Optimise'];
+let evaluations = {};
+let commentaires = {};
+// ============================================================
+// CAS PRATIQUE CABINET X — Scores tirés de la rédaction §1.2
+// Score global ~1.5/4, conformité ~1.1/4
+// M365+MFA+OneDrive OK, mais pas de RGPD, pas chiffrement,
+// accès non restreints, pas audit trail, pas PCA
+// ============================================================
+const CABINET_X_SCORES = {
+  "Infrastructure & Outils Numériques": {
+    "Logiciel de production comptable cloud": { score: 2, comment: "Logiciel de production en place, fonctionnalités cloud partiellement exploitées. Pas d'intégration API." },
+    "Solution de GED (Gestion Électronique Documents)": { score: 1, comment: "Documents stockés dans l'arborescence OneDrive sans classement normé. Gestion rudimentaire, non conforme aux exigences NEP d'archivage et de conservation." },
+    "Système de signature électronique qualifiée": { score: 1, comment: "Signature basique par email. Aucune signature électronique qualifiée eIDAS. Lettres de mission signées manuellement." },
+    "Plateforme collaborative (équipe)": { score: 3, comment: "Microsoft Teams opérationnel via M365. Visio, chat, partage de fichiers fonctionnels. Point fort du cabinet." },
+    "Outil de gestion de projet": { score: 2, comment: "Suivi des dossiers par tableur Excel structuré avec échéancier. Pas d'outil dédié (Trello/Asana)." },
+    "Sécurité & sauvegarde données (RGPD)": { score: 2, comment: "MFA activée sur M365 — bon point. OneDrive = sauvegarde cloud. MAIS : pas de sauvegarde secondaire (règle 3-2-1 non respectée), postes NON chiffrés (ni BitLocker ni FileVault), pas de journalisation. NON CONFORME RGPD art. 32." },
+    "Connexions API entre outils": { score: 1, comment: "Intégrations basiques au sein de la suite M365 (Teams/OneDrive/Outlook). Aucune interconnexion avec le logiciel comptable." }
+  },
+  "Relation Client Digitale": {
+    "Portail client en ligne sécurisé": { score: 1, comment: "Partage de documents via liens OneDrive. Pas de portail client dédié et sécurisé. Risque au regard du secret professionnel (art. 12 code déontologie)." },
+    "CRM (Gestion Relation Client)": { score: 1, comment: "Suivi clients par fichier Excel avec historique basique des interactions. Pas de CRM dédié." },
+    "Facturation électronique": { score: 0, comment: "Non préparé. Obligation de réception au 1er sept. 2026. Aucune PA sélectionnée. BLOQUANT à court terme." },
+    "Outils visioconférence professionnels": { score: 3, comment: "Teams pleinement opérationnel. Rendez-vous clients réguliers en visio. Gain de temps significatif." },
+    "Automatisation relances clients": { score: 1, comment: "Relances manuelles par email avec rappels Outlook. Pas d'automatisation ni de suivi systématique." },
+    "Chatbot ou support client digital": { score: 0, comment: "Inexistant. Pas de FAQ, pas de prise de RDV en ligne." },
+    "Collecte auto pièces comptables": { score: 2, comment: "Collecte par email avec dossiers OneDrive dédiés par client. Organisation fonctionnelle mais sans OCR ni automatisation." }
+  },
+  "Processus & Automatisation": {
+    "Automatisation saisie comptable": { score: 2, comment: "Imports bancaires basiques fonctionnels via le logiciel de production. Saisie encore partiellement manuelle pour les OD et pièces fournisseurs." },
+    "Rapprochement bancaire auto": { score: 2, comment: "Rapprochement semi-automatique via connexion bancaire. Lettrage manuel résiduel sur les écritures complexes." },
+    "Déclarations fiscales dématérialisées": { score: 2, comment: "EDI fonctionnel pour TVA et DSN via le logiciel de production. Processus opérationnel." },
+    "Workflow validation digitalisé": { score: 0, comment: "AUCUN circuit de validation formalisé. L'alternant avait accès non restreint à l'ensemble des dossiers clients. NON CONFORME — traçabilité absente." },
+    "Génération auto reportings": { score: 1, comment: "Reporting client basique sous Excel. Pas de dashboard automatisé ni de génération programmée." },
+    "OCR/IA traitement documents": { score: 2, comment: "Numérisation des documents entrants réalisée. Extraction automatique des données non déployée." },
+    "Processus standardisés documentés": { score: 0, comment: "AUCUNE procédure écrite. Fonctionnement informel. Non conforme aux exigences de documentation NPMQ." }
+  },
+  "Compétences & Culture Digitale": {
+    "Formation continue outils numériques": { score: 2, comment: "Formation de base M365 suivie. Budget formation limité. Pas de plan structuré de développement des compétences numériques." },
+    "Sensibilisation cybersécurité": { score: 2, comment: "Prise de conscience renforcée après l'incident de phishing (faux courrier URSSAF). Formations ponctuelles suivies, mais pas de programme structuré ni de simulation régulière." },
+    "Référent digital/IT": { score: 2, comment: "Le dirigeant assure de fait le rôle de référent IT. Compétent mais en surcharge — pas de délégation possible en solo." },
+    "Culture innovation continue": { score: 2, comment: "Appétence réelle pour le numérique, mais pas de processus structuré de test & learn ni de veille outillée." },
+    "Veille technologique active": { score: 3, comment: "Veille active via congrès OEC, Lab50 et réseaux professionnels LinkedIn. Participation régulière aux événements de la profession." },
+    "Compétences data analytics": { score: 1, comment: "Excel standard. Pas de Power BI ni outil avancé. Capacité d'analyse limitée aux tableaux croisés dynamiques." },
+    "Capacité adaptation nouveaux outils": { score: 3, comment: "Bonne agilité personnelle du dirigeant. Capacité avérée d'adoption rapide de nouveaux outils. Point fort." }
+  },
+  "Marketing & Communication Digitale": {
+    "Site web professionnel actualisé": { score: 2, comment: "Site vitrine fonctionnel mais non optimisé mobile. Contenu statique, pas de blog ni d'espace ressources." },
+    "Présence réseaux sociaux": { score: 2, comment: "Profil LinkedIn actif avec publications occasionnelles. Pas de stratégie éditoriale structurée." },
+    "Stratégie content marketing": { score: 1, comment: "Publications LinkedIn ponctuelles sur l'actualité fiscale. Pas de calendrier éditorial ni de blog." },
+    "Newsletter digitale": { score: 0, comment: "Inexistante. Aucune communication régulière vers les clients." },
+    "Référencement naturel (SEO)": { score: 1, comment: "SEO non travaillé. Fiche Google My Business créée mais non optimisée. Visibilité locale faible." },
+    "Collecte avis clients": { score: 1, comment: "Quelques avis Google obtenus de manière informelle. Pas de démarche proactive de collecte." },
+    "Outils prospection digitale": { score: 2, comment: "Prospection active via réseau personnel et LinkedIn. Pas d'outil dédié (Sales Navigator, emailing)." }
+  },
+  "Pilotage & Analyse Données": {
+    "Tableaux bord pilotage cabinet": { score: 2, comment: "Tableau de suivi du CA mensuel sur Excel. Fonctionnel mais pas de dashboard structuré avec indicateurs multiples." },
+    "Suivi KPIs temps réel": { score: 2, comment: "Suivi mensuel basique du CA et des encaissements sur Excel. Pas de remontée en temps réel." },
+    "Analyse rentabilité client/mission": { score: 1, comment: "Estimation approximative de la rentabilité par client. Pas de méthode formalisée temps/honoraires." },
+    "Outils Business Intelligence": { score: 0, comment: "Aucun outil BI déployé. Analyse limitée aux fonctions Excel de base." },
+    "Suivi temps passé digitalisé": { score: 2, comment: "Suivi approximatif par dossier sur Excel. Pas de time tracking automatisé ni d'outil dédié." },
+    "Exploitation données conseil clients": { score: 1, comment: "Données comptables partagées ponctuellement avec les clients pour du conseil basique. Pas d'exploitation structurée." },
+    "Reporting auto performance": { score: 1, comment: "Reporting trimestriel manuel pour les principaux clients. Pas d'automatisation." }
+  }
+};
+
+function loadCabinetXExample() {
+  if (!confirm('Charger le cas pratique du Cabinet X (diagnostic rétrospectif année 1) ?\n\nCela remplacera toutes les évaluations actuelles par les données du mémoire.')) return;
+
+  // Profil
+  document.getElementById('typeCabinet').value = 'Ex-nihilo';
+  document.getElementById('effectif').value = 'Solo';
+  document.getElementById('secteur').value = 'Généraliste';
+
+  // Scores et commentaires
+  dimensions.forEach(function(dim) {
+    var dimData = CABINET_X_SCORES[dim.nom];
+    if (dimData) {
+      dim.criteres.forEach(function(crit) {
+        var critData = dimData[crit.label];
+        if (critData) {
+          evaluations[dim.nom][crit.label] = critData.score;
+          commentaires[dim.nom][crit.label] = critData.comment;
+        }
+      });
+    }
+  });
+
+  // Afficher le bandeau cas pratique
+  document.getElementById('caseStudyBox').style.display = 'block';
+
+  // Sauvegarder et recalculer
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(getStateObject())); } catch(e) {}
+  renderAll();
+
+  // Mettre à jour les scores dynamiques du bandeau
+  var sg = calculerScoreGlobal();
+  var sc = calculerScoreConformite();
+  var stats = getStats();
+  if (sg !== null) document.getElementById('caseStudyScore').textContent = sg.toFixed(1) + ' / 4';
+  if (sc !== null) document.getElementById('caseStudyConf').textContent = sc.toFixed(1) + ' / 4';
+  document.getElementById('caseStudyFaibles').textContent = stats.pointsFaibles + ' / 42';
+
+  toast('✅ Cas pratique Cabinet X chargé — Score ' + (sg ? sg.toFixed(1) : '?') + '/4');
+}
+
+
+function initState() {
+  dimensions.forEach(dim => {
+    evaluations[dim.nom] = {};
+    commentaires[dim.nom] = {};
+    dim.criteres.forEach(crit => {
+      evaluations[dim.nom][crit.label] = null;
+      commentaires[dim.nom][crit.label] = "";
+    });
+  });
+}
+initState();
+
+function showPanel(panelId) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById(panelId).classList.add('active');
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+}
+
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+function openModal(title, body) {
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalBody').innerHTML = body;
+  document.getElementById('modalOverlay').classList.add('show');
+}
+
+function closeModal(e) {
+  if (e && e.target.id !== 'modalOverlay') return;
+  document.getElementById('modalOverlay').classList.remove('show');
+}
+
+function escapeHTML(s) {
+  return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+}
+
+function evaluer(dimension, critere, valeur) {
+  evaluations[dimension][critere] = valeur;
+  autoSave();
+  renderAll();
+}
+
+function setComment(dimension, critere, value) {
+  commentaires[dimension][critere] = value;
+  autoSave();
+}
+
+function calculerScoreDimension(dimension) {
+  const vals = Object.values(evaluations[dimension]).filter(v => v !== null);
+  if (vals.length === 0) return null;
+  return Number((vals.reduce((s, v) => s + v, 0) / vals.length).toFixed(1));
+}
+
+function calculerScoreGlobal() {
+  const scores = dimensions.map(d => calculerScoreDimension(d.nom)).filter(s => s !== null);
+  if (scores.length === 0) return null;
+  return Number((scores.reduce((s, v) => s + v, 0) / scores.length).toFixed(1));
+}
+
+function calculerScoreConformite() {
+  const vals = [];
+  dimensions.forEach(dim => {
+    dim.criteres.forEach(crit => {
+      if (crit.norme || crit.impact === 'normes') {
+        const v = evaluations[dim.nom][crit.label];
+        if (v !== null) vals.push(v);
+      }
+    });
+  });
+  if (vals.length === 0) return null;
+  return Number((vals.reduce((s, v) => s + v, 0) / vals.length).toFixed(1));
+}
+
+function getNiveauMaturite(score) {
+  if (score === null) return "Non evalue";
+  if (score < 1) return "Niveau 1 - Debutant";
+  if (score < 2) return "Niveau 2 - En developpement";
+  if (score < 3) return "Niveau 3 - Intermediaire";
+  if (score < 3.5) return "Niveau 4 - Avance";
+  return "Niveau 5 - Expert";
+}
+
+function getRecommandation(score) {
+  if (score === null) return "";
+  if (score < 1.5) return "Priorite critique : investissement majeur requis";
+  if (score < 2.5) return "Actions prioritaires : accelerer la transformation";
+  if (score < 3.5) return "Bon niveau : continuer l'optimisation";
+  return "Excellence : maintenir le leadership";
+}
+
+function getStatutConformite(score) {
+  if (score === null) return { label: "Non evalue", type: "neutral" };
+  if (score < 2) return { label: "Non conforme (bloquant)", type: "danger" };
+  if (score < 3) return { label: "A ameliorer (risque)", type: "warning" };
+  return { label: "Conforme", type: "success" };
+}
+
+function getStats() {
+  let criteresEvalues = 0, dimensionsComplete = 0, pointsForts = 0, pointsFaibles = 0;
+  dimensions.forEach(dim => {
+    let dimComplete = true;
+    dim.criteres.forEach(crit => {
+      const v = evaluations[dim.nom][crit.label];
+      if (v !== null) {
+        criteresEvalues++;
+        if (v >= 3) pointsForts++;
+        if (v < 2) pointsFaibles++;
+      } else { dimComplete = false; }
+    });
+    if (dimComplete) dimensionsComplete++;
+  });
+  return { criteresEvalues, dimensionsComplete, pointsForts, pointsFaibles };
+}
+
+function getAlertes() {
+  const alertes = [];
+  const sc = calculerScoreConformite();
+  if (sc !== null && sc < 2) {
+    alertes.push({ type: 'danger', icon: '🚨', title: 'Non-conformite bloquante', message: 'Score conformite : ' + sc + '/4. Les criteres normatifs sont insuffisants.' });
+  } else if (sc !== null && sc < 3) {
+    alertes.push({ type: 'warning', icon: '⚠️', title: 'Conformite a ameliorer', message: 'Score conformite : ' + sc + '/4. Risque professionnel a traiter.' });
+  }
+  return alertes;
+}
+
+function renderAll() {
+  renderScores();
+  renderStats();
+  renderAlertes();
+  renderDimensions();
+  renderSynthese();
+  renderRecommandations();
+  renderRadar();
+  // Mettre à jour les scores du bandeau cas pratique si visible
+  var csBox = document.getElementById('caseStudyBox');
+  if (csBox && csBox.style.display !== 'none') {
+    var sg = calculerScoreGlobal();
+    var sc = calculerScoreConformite();
+    var stats = getStats();
+    var elScore = document.getElementById('caseStudyScore');
+    var elConf = document.getElementById('caseStudyConf');
+    var elFaibles = document.getElementById('caseStudyFaibles');
+    if (elScore && sg !== null) elScore.textContent = sg.toFixed(1) + ' / 4';
+    if (elConf && sc !== null) elConf.textContent = sc.toFixed(1) + ' / 4';
+    if (elFaibles) elFaibles.textContent = stats.pointsFaibles + ' / 42';
+  }
+}
+
+function renderScores() {
+  const sg = calculerScoreGlobal();
+  const sc = calculerScoreConformite();
+  const statut = getStatutConformite(sc);
+  document.getElementById('scoreGlobal').textContent = (sg ?? 0).toFixed(1) + ' / 4.0';
+  document.getElementById('niveauMaturite').textContent = getNiveauMaturite(sg);
+  document.getElementById('recommandationGlobal').textContent = getRecommandation(sg);
+  document.getElementById('scoreConformite').textContent = (sc ?? 0).toFixed(1) + ' / 4.0';
+  document.getElementById('statutConformite').textContent = statut.label;
+}
+
+function renderStats() {
+  const stats = getStats();
+  document.getElementById('statCriteresEvalues').textContent = stats.criteresEvalues;
+  document.getElementById('statDimensionsComplete').textContent = stats.dimensionsComplete;
+  document.getElementById('statPointsForts').textContent = stats.pointsForts;
+  document.getElementById('statPointsFaibles').textContent = stats.pointsFaibles;
+}
+
+function renderAlertes() {
+  const alertes = getAlertes();
+  document.getElementById('alertes').innerHTML = alertes.length === 0 ? '' :
+    alertes.map(a => '<div class="alert alert-' + a.type + '"><div class="alert-icon">' + a.icon + '</div><div class="alert-content"><div class="alert-title">' + a.title + '</div><div>' + a.message + '</div></div></div>').join('');
+}
+
+function renderDimensions() {
+  const container = document.getElementById('dimensionsContainer');
+  container.innerHTML = dimensions.map(dim => {
+    const score = calculerScoreDimension(dim.nom);
+    const scoreText = score === null ? "—" : score + ' / 4.0';
+    const criteresHTML = dim.criteres.map(crit => {
+      const buttonsHTML = [0,1,2,3,4].map(val => {
+        const isActive = evaluations[dim.nom][crit.label] === val;
+        return '<button class="score-btn ' + (isActive ? 'active' : '') + '" data-score="' + val + '" onclick="evaluer(\'' + dim.nom.replace(/'/g, "\\'") + '\', \'' + crit.label.replace(/'/g, "\\'") + '\', ' + val + ')">' + val + '</button>';
+      }).join('');
+      const normeBadge = crit.norme ? '<span class="tag tag-norme" onclick="showNormeHelp()">⚖️ ' + escapeHTML(crit.norme) + '</span>' : '';
+      const impactClass = 'tag-' + crit.impact;
+      const impactLabel = crit.impact === 'normes' ? 'Normes' : crit.impact === 'clients' ? 'Clients' : 'Collaborateurs';
+      return '<div class="critere-item"><div class="critere-header"><div class="critere-info"><div class="critere-label">' + escapeHTML(crit.label) + '</div><div class="critere-exemple">' + escapeHTML(crit.exemple) + '</div><div class="critere-tags">' + normeBadge + '<span class="tag ' + impactClass + '" onclick="showImpactHelp(\'' + crit.impact + '\')">Impact : ' + impactLabel + '</span></div></div><div class="score-buttons">' + buttonsHTML + '</div></div><div class="critere-comment"><label>📝 Commentaires / preuves</label><textarea placeholder="Ex : 2FA active, sauvegarde 3-2-1..." onchange="setComment(\'' + dim.nom.replace(/'/g, "\\'") + '\', \'' + crit.label.replace(/'/g, "\\'") + '\', this.value)">' + escapeHTML(commentaires[dim.nom][crit.label] || '') + '</textarea></div></div>';
+    }).join('');
+    return '<div class="dimension-card"><div class="dimension-header"><div class="dimension-title"><span>' + dim.icon + '</span> ' + escapeHTML(dim.nom) + '</div><div class="dimension-score">' + scoreText + '</div></div><div class="dimension-body">' + criteresHTML + '</div></div>';
+  }).join('');
+}
+
+function renderSynthese() {
+  const gridHTML = dimensions.map(dim => {
+    const score = calculerScoreDimension(dim.nom);
+    const pct = score === null ? 0 : (score / 4) * 100;
+    return '<div class="synthese-item"><h4><span>' + dim.icon + '</span> ' + escapeHTML(dim.nom) + '</h4><div class="progress-container"><div class="progress-bar primary" style="width: ' + pct + '%;">' + (score === null ? '—' : score + '/4') + '</div></div></div>';
+  }).join('');
+  document.getElementById('syntheseGrid').innerHTML = gridHTML;
+
+  const forts = [], faibles = [];
+  dimensions.forEach(dim => {
+    dim.criteres.forEach(crit => {
+      const v = evaluations[dim.nom][crit.label];
+      if (v !== null) {
+        if (v >= 3) forts.push({ dim: dim.nom, icon: dim.icon, crit: crit.label, score: v });
+        if (v < 2) faibles.push({ dim: dim.nom, icon: dim.icon, crit: crit.label, score: v });
+      }
+    });
+  });
+
+  document.getElementById('pointsForts').innerHTML = forts.length === 0 ? '<p style="color: var(--gray-500); font-style: italic;">Aucun critere note 3 ou 4 pour le moment.</p>' : forts.map(f => '<div class="insight-box"><strong>' + f.icon + ' ' + f.crit + '</strong> (' + f.dim + ') - Score : ' + f.score + '/4</div>').join('');
+  document.getElementById('pointsFaibles').innerHTML = faibles.length === 0 ? '<p style="color: var(--gray-500); font-style: italic;">Aucun critere note 0 ou 1 pour le moment.</p>' : faibles.map(f => '<div class="insight-box danger"><strong>' + f.icon + ' ' + f.crit + '</strong> (' + f.dim + ') - Score : ' + f.score + '/4</div>').join('');
+}
+
+function renderRecommandations() {
+  var container = document.getElementById('recommandationsContainer');
+  var sg = calculerScoreGlobal();
+  var sc = calculerScoreConformite();
+  var stats = getStats();
+  var html = '';
+
+  if (stats.criteresEvalues === 0) {
+    container.innerHTML = '<div class="card"><div class="insight-box info"><strong>Complétez l\'évaluation</strong> pour générer le plan d\'action personnalisé.</div></div>';
+    return;
+  }
+
+  // === ALERTE CONFORMITÉ (compacte) ===
+  if (sc !== null && sc < 2) {
+    html += '<div class="alert alert-danger" style="margin-bottom:14px;font-size:12px;"><div class="alert-icon">🚨</div><div class="alert-content"><div class="alert-title">Non-conformité bloquante — ' + sc.toFixed(1) + '/4</div>Critères normatifs insuffisants. Actions de Phase 1 à traiter en priorité absolue.</div></div>';
+  } else if (sc !== null && sc < 3) {
+    html += '<div class="alert alert-warning" style="margin-bottom:14px;font-size:12px;"><div class="alert-icon">⚠️</div><div class="alert-content"><div class="alert-title">Conformité partielle — ' + sc.toFixed(1) + '/4</div>Des lacunes subsistent. Prioriser les Phases 1 et 2.</div></div>';
+  }
+
+  // === PLAN D'ACTION EN 3 PHASES ===
+  html += '<div class="card"><div class="card-header"><div class="card-icon danger">🎯</div><div><h3>Plan d\'action en 3 phases</h3><div class="subtitle">Budget total : 8 500 – 16 000 € sur 12 mois (inférieur au coût moyen d\'un incident cyber : 59 000 €)</div></div></div>';
+
+  // Phase 1
+  html += buildPhaseHTML('1', '🔴', 'Mise en conformité immédiate', '500 – 1 000 €', 'S1 → S4', [
+    ['Registre des traitements RGPD', 'RGPD Art. 30', 'norm-rgpd'],
+    ['Chiffrement postes (BitLocker / FileVault)', 'RGPD Art. 32', 'norm-rgpd'],
+    ['Sauvegarde externalisée (règle 3-2-1)', 'ANSSI', 'norm-anssi'],
+    ['MFA sur tous les comptes', 'ANSSI', 'norm-anssi'],
+    ['Charte SI + politique de confidentialité', 'Art. 12 Déonto.', 'norm-deonto']
+  ]);
+
+  // Actions conditionnelles Phase 1
+  var scoreFE = getScoreForCritere("Relation Client Digitale", "Facturation électronique");
+  var scoreWF = getScoreForCritere("Processus & Automatisation", "Workflow validation digitalisé");
+  var extra = [];
+  if (scoreFE !== null && scoreFE < 2) extra.push(['Initier le projet e-facture (réception sept. 2026)', 'Art. 91 LF 2024', 'norm-efact']);
+  if (scoreWF !== null && scoreWF === 0) extra.push(['Circuit de validation minimal (traçabilité)', 'NPMQ §26', 'norm-npmq']);
+  if (extra.length > 0) {
+    html += '<div style="padding:0 18px 10px;border-left:5px solid #dc2626;margin-top:-16px;background:white;border-radius:0 0 12px 12px;margin-bottom:14px;">';
+    extra.forEach(function(a) { html += '<div class="action-item"><div class="action-label">' + a[0] + '</div><span class="action-norm ' + a[2] + '">' + a[1] + '</span></div>'; });
+    html += '</div>';
+  }
+
+  // Phase 2
+  html += buildPhaseHTML('2', '🟡', 'Fondation de l\'architecture numérique', '3 000 – 5 000 €', 'M2 → M6', [
+    ['Contrôle d\'accès par rôles (RBAC)', 'RGPD Art. 32', 'norm-rgpd'],
+    ['Journalisation des accès (audit trail)', 'NPMQ', 'norm-npmq'],
+    ['Procédures NPMQ (acceptation/maintien)', 'NPMQ §26-28', 'norm-npmq'],
+    ['GED conforme (archivage, conservation)', 'NEP Archivage', 'norm-npmq'],
+    ['Signature électronique qualifiée', 'eIDAS', 'norm-eidas'],
+    ['Portail client sécurisé', 'Art. 12 Déonto.', 'norm-deonto'],
+    ['Procédures LCB-FT (vigilance, TRACFIN)', 'LCB-FT', 'norm-lcbft']
+  ]);
+
+  // Phase 3
+  html += buildPhaseHTML('3', '🟢', 'Consolidation et optimisation', '5 000 – 10 000 €', 'M6 → M12', [
+    ['Supervision sécurité (SIEM / logs centralisés)', 'ANSSI', 'norm-anssi'],
+    ['Conformité e-facture finalisée', 'Art. 91 LF 2024', 'norm-efact'],
+    ['Formation cybersécurité + simulations phishing', 'Art. 145 Déonto.', 'norm-deonto'],
+    ['Tableaux de bord BI / time tracking', '', ''],
+    ['OCR + IA traitement documentaire', '', ''],
+    ['Plan de continuité d\'activité (PCA)', 'NPMQ', 'norm-npmq'],
+    ['Stratégie marketing digital structurée', '', '']
+  ]);
+
+  html += '</div>';
+
+  // === AXES PRIORITAIRES PAR DIMENSION (compacts, repliés) ===
+  html += '<div class="card"><div class="card-header"><div class="card-icon secondary">📋</div><div><h3>Axes prioritaires par dimension</h3><div class="subtitle">Filtrés selon vos scores — Cliquez pour déplier</div></div></div>';
+
+  dimensions.forEach(function(dim, idx) {
+    var dimScore = calculerScoreDimension(dim.nom);
+    if (dimScore === null) return;
+    var scoreClass = dimScore < 2 ? 'critical' : dimScore < 3 ? 'warning' : 'good';
+    var recos = getDimensionRecos(idx, dimScore);
+
+    if (recos.length === 0) {
+      html += '<div class="dim-reco-card"><div class="dim-reco-header"><div class="dim-reco-title">' + dim.icon + ' ' + dim.nom + '</div><span class="dim-reco-score ' + scoreClass + '">' + dimScore.toFixed(1) + '/4 ✓</span></div></div>';
+      return;
+    }
+
+    html += '<div class="dim-reco-card"><div class="dim-reco-header" onclick="var b=this.nextElementSibling;b.style.display=b.style.display===\'none\'?\'block\':\'none\'"><div class="dim-reco-title">' + dim.icon + ' ' + dim.nom + ' <span style="font-size:10px;color:var(--gray-500);font-weight:400;">(' + recos.length + ')</span></div><span class="dim-reco-score ' + scoreClass + '">' + dimScore.toFixed(1) + '/4</span></div>';
+    html += '<div class="dim-reco-body" style="display:none;">';
+
+    recos.forEach(function(r) {
+      html += '<div class="action-item"><div class="action-label">' + r[0];
+      if (r[3]) html += '<span class="action-detail">' + r[3] + '</span>';
+      html += '</div>';
+      if (r[1]) html += '<span class="action-norm ' + r[2] + '">' + r[1] + '</span>';
+      html += '</div>';
+    });
+
+    var pass = getPasserelles(idx);
+    if (pass.length > 0) {
+      html += '<div style="padding-top:6px;border-top:1px solid var(--gray-100);margin-top:6px;display:flex;gap:5px;flex-wrap:wrap;align-items:center;"><span style="font-size:10px;color:var(--gray-500);font-weight:600;">🔗</span>';
+      pass.forEach(function(p) { html += '<span class="action-annexe" style="font-size:9.5px;">' + p + '</span>'; });
+      html += '</div>';
+    }
+    html += '</div></div>';
+  });
+
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+function buildPhaseHTML(num, icon, title, budget, timeline, actions) {
+  var cls = 'phase-' + num;
+  var h = '<div class="phase-card ' + cls + '"><div class="phase-header" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display===\'none\'?\'block\':\'none\'"><div class="phase-title">' + icon + ' Phase ' + num + ' — ' + title + '</div><div class="phase-meta"><span class="phase-budget">' + budget + '</span><span class="phase-timeline">' + timeline + '</span></div></div><div class="phase-body">';
+  actions.forEach(function(a) {
+    h += '<div class="action-item"><div class="action-label">' + a[0] + '</div>';
+    if (a[1]) h += '<span class="action-norm ' + a[2] + '">' + a[1] + '</span>';
+    h += '</div>';
+  });
+  h += '</div></div>';
+  return h;
+}
+
+function getScoreForCritere(dimNom, critLabel) {
+  if (evaluations[dimNom] && evaluations[dimNom][critLabel] !== undefined) return evaluations[dimNom][critLabel];
+  return null;
+}
+
+function getDimensionRecos(dimIndex, score) {
+  var data = [
+    [[2,'Migrer vers une production comptable full-cloud','ANSSI','norm-anssi',''],
+     [2,'Déployer une GED structurée avec archivage conforme','NEP','norm-npmq',''],
+     [2,'Sécuriser l\'infrastructure (chiffrement, MFA, backup)','RGPD Art. 32','norm-rgpd',''],
+     [3,'Développer les interconnexions API entre outils','','',''],
+     [4,'Orchestrer les workflows inter-outils','','','']],
+    [[2,'Mettre en place un portail client sécurisé','Art. 12 Déonto.','norm-deonto',''],
+     [1,'Préparer la facturation électronique (réception sept. 2026)','Art. 91 LF 2024','norm-efact',''],
+     [2,'Déployer un CRM adapté (remplacement fichier Excel)','','',''],
+     [3,'Automatiser la collecte des pièces comptables (OCR)','','',''],
+     [4,'Expérience client digitale (chatbot, prise RDV)','','','']],
+    [[1,'Formaliser et documenter les procédures métier','NPMQ §A44','norm-npmq',''],
+     [1,'Instaurer un workflow de validation traçable','NPMQ','norm-npmq',''],
+     [2,'Automatiser la saisie comptable (OCR + IA)','','','Gain estimé : –40 % temps saisie'],
+     [3,'Automatiser les déclarations fiscales (EDI complet)','EDI DGFIP','norm-efact',''],
+     [4,'Génération automatique de reportings clients','','','']],
+    [[2,'Formation cybersécurité (simulations phishing)','RGPD + Art. 145','norm-deonto',''],
+     [2,'Plan de formation numérique (OPCO Atlas)','Art. 145 Déonto.','norm-deonto',''],
+     [3,'Compétences data analytics (Power BI)','','',''],
+     [3,'Veille technologique formalisée','','','']],
+    [[2,'Optimiser site web (mobile + SEO local)','','',''],
+     [2,'Présence LinkedIn structurée','','',''],
+     [3,'Newsletter mensuelle','','',''],
+     [3,'Collecte d\'avis clients (Google, NPS)','','','']],
+    [[2,'Tableau de bord de pilotage (KPIs)','','',''],
+     [2,'Time tracking automatisé','','',''],
+     [2,'Analyse de rentabilité par mission','NPMQ Maintien','norm-npmq',''],
+     [3,'Outil de BI (Power BI, Tableau)','','','']]
+  ];
+  var dimData = data[dimIndex] || [];
+  return dimData.filter(function(r) { return score < r[0]; }).map(function(r) { return [r[1],r[2],r[3],r[4]]; });
+}
+
+function getPasserelles(dimIndex) {
+  var p = [
+    ['Annexe 6','Annexe 10','Annexe 11'],
+    ['Annexe 13','Annexe 15','Annexe 17'],
+    ['Annexe 4','Annexe 9','Annexe 13'],
+    ['Annexe 22','Annexe 23','Annexe 24'],
+    ['Annexe 8','Annexe 15','Annexe 17'],
+    ['Annexe 7','Annexe 8','Annexe 9']
+  ];
+  return p[dimIndex] || [];
+}
+
+
+function renderRadar() {
+  var canvas = document.getElementById('radarChart');
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width;
+  var H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+  
+  var cx = W / 2;
+  var cy = H / 2;
+  var radius = Math.min(W, H) * 0.32;
+  var n = dimensions.length;
+
+  // Labels courts pour chaque dimension
+  var labels = [
+    'Infrastructure',
+    'Relation Client',
+    'Processus',
+    'Compétences',
+    'Marketing',
+    'Pilotage'
+  ];
+
+  // Couleurs de la charte graphique
+  var primaryColor = 'rgba(30, 58, 95, 0.85)';      // Bleu foncé
+  var primaryFill = 'rgba(30, 58, 95, 0.25)';       // Bleu foncé transparent
+  var secondaryColor = 'rgba(13, 148, 136, 0.9)';   // Vert-bleu (secondary)
+  var secondaryFill = 'rgba(13, 148, 136, 0.2)';    // Vert-bleu transparent
+  var gridColor = '#e5e7eb';
+  var axisColor = '#d1d5db';
+  var textColor = '#1f2937';
+  var scoreTextColor = '#1e3a5f';
+
+  // Dessiner les cercles de la grille (niveaux 1, 2, 3, 4)
+  ctx.lineWidth = 1;
+  ctx.strokeStyle = gridColor;
+
+  for (var k = 1; k <= 4; k++) {
+    var r = radius * (k / 4);
+    ctx.beginPath();
+    for (var i = 0; i < n; i++) {
+      var angle = (Math.PI * 2 * i / n) - Math.PI / 2;
+      var x = cx + r * Math.cos(angle);
+      var y = cy + r * Math.sin(angle);
+      if (i === 0) {
+        ctx.moveTo(x, y);
+      } else {
+        ctx.lineTo(x, y);
+      }
+    }
+    ctx.closePath();
+    ctx.stroke();
+
+    // Afficher le niveau (1, 2, 3, 4) sur l'axe vertical
+    if (k < 4) {
+      ctx.fillStyle = '#9ca3af';
+      ctx.font = '10px system-ui, sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText(k.toString(), cx + 4, cy - r + 3);
+    }
+  }
+
+  // Dessiner les axes et les labels
+  ctx.strokeStyle = axisColor;
+  ctx.fillStyle = textColor;
+  ctx.font = 'bold 11px system-ui, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
+  for (var i = 0; i < n; i++) {
+    var angle = (Math.PI * 2 * i / n) - Math.PI / 2;
+    var xEnd = cx + radius * Math.cos(angle);
+    var yEnd = cy + radius * Math.sin(angle);
+    
+    // Dessiner l'axe
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(xEnd, yEnd);
+    ctx.stroke();
+
+    // Position du label (plus éloigné du centre)
+    var labelDistance = radius + 35;
+    var lx = cx + labelDistance * Math.cos(angle);
+    var ly = cy + labelDistance * Math.sin(angle);
+
+    // Ajuster l'alignement du texte selon la position
+    if (angle > -Math.PI / 4 && angle < Math.PI / 4) {
+      // Droite
+      ctx.textAlign = 'left';
+      lx = cx + (radius + 15) * Math.cos(angle);
+    } else if (angle >= Math.PI / 4 && angle <= 3 * Math.PI / 4) {
+      // Bas
+      ctx.textAlign = 'center';
+      ly = cy + (radius + 25) * Math.sin(angle);
+    } else if (angle > 3 * Math.PI / 4 || angle < -3 * Math.PI / 4) {
+      // Gauche
+      ctx.textAlign = 'right';
+      lx = cx + (radius + 15) * Math.cos(angle);
+    } else {
+      // Haut
+      ctx.textAlign = 'center';
+      ly = cy + (radius + 20) * Math.sin(angle);
+    }
+
+    // Dessiner le label
+    ctx.fillStyle = textColor;
+    ctx.font = 'bold 11px system-ui, sans-serif';
+    ctx.fillText(labels[i], lx, ly);
+
+    // Afficher le score sous le label
+    var dimScore = calculerScoreDimension(dimensions[i].nom);
+    if (dimScore !== null) {
+      ctx.fillStyle = scoreTextColor;
+      ctx.font = '10px system-ui, sans-serif';
+      ctx.fillText(dimScore.toFixed(1) + '/4', lx, ly + 12);
+    }
+  }
+
+  // Récupérer les scores
+  var scores = [];
+  var hasData = false;
+  for (var i = 0; i < dimensions.length; i++) {
+    var score = calculerScoreDimension(dimensions[i].nom);
+    scores.push(score);
+    if (score !== null) {
+      hasData = true;
+    }
+  }
+
+  // Si pas de données, afficher un message
+  if (!hasData) {
+    ctx.fillStyle = '#9ca3af';
+    ctx.font = 'italic 12px system-ui, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Évaluez les critères pour voir le radar', cx, cy);
+    return;
+  }
+
+  // Dessiner la zone de données
+  ctx.beginPath();
+  for (var i = 0; i < n; i++) {
+    var s = scores[i] === null ? 0 : scores[i];
+    var r = radius * (s / 4);
+    var angle = (Math.PI * 2 * i / n) - Math.PI / 2;
+    var x = cx + r * Math.cos(angle);
+    var y = cy + r * Math.sin(angle);
+    if (i === 0) {
+      ctx.moveTo(x, y);
+    } else {
+      ctx.lineTo(x, y);
+    }
+  }
+  ctx.closePath();
+
+  // Remplissage avec la couleur primary (bleu)
+  ctx.fillStyle = primaryFill;
+  ctx.fill();
+
+  // Bordure avec la couleur primary
+  ctx.strokeStyle = primaryColor;
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+
+  // Dessiner les points sur chaque sommet
+  for (var i = 0; i < n; i++) {
+    var s = scores[i] === null ? 0 : scores[i];
+    if (scores[i] !== null) {
+      var r = radius * (s / 4);
+      var angle = (Math.PI * 2 * i / n) - Math.PI / 2;
+      var x = cx + r * Math.cos(angle);
+      var y = cy + r * Math.sin(angle);
+
+      // Point extérieur (bordure)
+      ctx.beginPath();
+      ctx.arc(x, y, 6, 0, Math.PI * 2);
+      ctx.fillStyle = '#ffffff';
+      ctx.fill();
+      ctx.strokeStyle = primaryColor;
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Point intérieur (couleur selon le score)
+      ctx.beginPath();
+      ctx.arc(x, y, 3, 0, Math.PI * 2);
+      if (s >= 3) {
+        ctx.fillStyle = '#059669'; // Vert (success)
+      } else if (s >= 2) {
+        ctx.fillStyle = '#2563eb'; // Bleu (info)
+      } else {
+        ctx.fillStyle = '#dc2626'; // Rouge (danger)
+      }
+      ctx.fill();
+    }
+  }
+
+  // Légende en bas
+  var legendY = H - 15;
+  ctx.font = '9px system-ui, sans-serif';
+  ctx.textAlign = 'center';
+  
+  // Point vert
+  ctx.beginPath();
+  ctx.arc(cx - 60, legendY, 4, 0, Math.PI * 2);
+  ctx.fillStyle = '#059669';
+  ctx.fill();
+  ctx.fillStyle = '#6b7280';
+  ctx.fillText('≥ 3 Bon', cx - 40, legendY + 3);
+  
+  // Point bleu
+  ctx.beginPath();
+  ctx.arc(cx, legendY, 4, 0, Math.PI * 2);
+  ctx.fillStyle = '#2563eb';
+  ctx.fill();
+  ctx.fillStyle = '#6b7280';
+  ctx.fillText('2 Moyen', cx + 25, legendY + 3);
+  
+  // Point rouge
+  ctx.beginPath();
+  ctx.arc(cx + 70, legendY, 4, 0, Math.PI * 2);
+  ctx.fillStyle = '#dc2626';
+  ctx.fill();
+  ctx.fillStyle = '#6b7280';
+  ctx.fillText('< 2 Faible', cx + 100, legendY + 3);
+}
+
+function showNormeHelp() {
+  openModal('Norme / obligation associee', '<p>Ce tag signale un rattachement a une obligation de conformite.</p><ul><li><strong>RGPD</strong> : securite des donnees</li><li><strong>NEP</strong> : documentation, tracabilite</li><li><strong>Deontologie</strong> : secret professionnel</li><li><strong>LCB-FT</strong> : procedures vigilance</li></ul>');
+}
+
+function showImpactHelp(type) {
+  const helps = {
+    normes: { title: 'Impact : Normes', body: '<p>Critere a enjeu normatif fort. Lecture bloquante si score insuffisant.</p>' },
+    clients: { title: 'Impact : Clients', body: '<p>Critere oriente experience client et qualite de service.</p>' },
+    collaborateurs: { title: 'Impact : Collaborateurs', body: '<p>Critere oriente organisation interne et productivite.</p>' }
+  };
+  const h = helps[type] || helps.clients;
+  openModal(h.title, h.body);
+}
+
+function getStateObject() {
+  return {
+    meta: { savedAt: new Date().toISOString(), typeCabinet: document.getElementById('typeCabinet').value, effectif: document.getElementById('effectif').value, secteur: document.getElementById('secteur').value },
+    evaluations,
+    commentaires
+  };
+}
+
+function applyStateObject(state) {
+  if (!state) return;
+  document.getElementById('typeCabinet').value = state.meta?.typeCabinet || '';
+  document.getElementById('effectif').value = state.meta?.effectif || '';
+  document.getElementById('secteur').value = state.meta?.secteur || '';
+  dimensions.forEach(dim => {
+    dim.criteres.forEach(crit => {
+      const v = state.evaluations?.[dim.nom]?.[crit.label];
+      evaluations[dim.nom][crit.label] = [0,1,2,3,4].includes(v) ? v : null;
+      const c = state.commentaires?.[dim.nom]?.[crit.label];
+      commentaires[dim.nom][crit.label] = typeof c === 'string' ? c : '';
+    });
+  });
+  // Afficher bandeau si profil Cabinet X détecté
+  if (state.meta?.typeCabinet === 'Ex-nihilo' && state.meta?.effectif === 'Solo') {
+    var sg = calculerScoreGlobal();
+    if (sg !== null && sg < 2) {
+      document.getElementById('caseStudyBox').style.display = 'block';
+    }
+  }
+  renderAll();
+}
+
+
+function saveState() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(getStateObject())); toast('✅ Sauvegarde effectuee'); } catch (e) { toast('❌ Erreur'); }
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return toast('Aucune sauvegarde trouvee');
+    applyStateObject(JSON.parse(raw));
+    toast('✅ Sauvegarde chargee');
+  } catch (e) { toast('❌ Erreur'); }
+}
+
+let autoSaveTimeout;
+function autoSave() {
+  clearTimeout(autoSaveTimeout);
+  autoSaveTimeout = setTimeout(() => { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(getStateObject())); } catch (e) {} }, 500);
+}
+
+function resetAll() {
+  if (!confirm('Reinitialiser toutes les evaluations ?')) return;
+  initState();
+  document.getElementById('typeCabinet').value = '';
+  document.getElementById('effectif').value = '';
+  document.getElementById('secteur').value = '';
+  document.getElementById('caseStudyBox').style.display = 'none';
+  try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+  renderAll();
+  toast('🔄 Reinitialise');
+}
+
+
+function exportJSON() {
+  const obj = getStateObject();
+  const blob = new Blob([JSON.stringify(obj, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'diagnostic-maturite-' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('📥 JSON exporte');
+}
+
+function importJSON(event) {
+  const file = event.target.files?.[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try { applyStateObject(JSON.parse(reader.result)); saveState(); toast('✅ JSON importe'); }
+    catch (e) { toast('❌ JSON invalide'); }
+    event.target.value = '';
+  };
+  reader.readAsText(file);
+}
+
+function showLoading() { document.getElementById('loadingOverlay').classList.add('show'); }
+function hideLoading() { document.getElementById('loadingOverlay').classList.remove('show'); }
+
+function exportPDF() {
+  showLoading();
+  
+  setTimeout(function() {
+    try {
+      var jsPDF = window.jspdf.jsPDF;
+      var doc = new jsPDF('p', 'mm', 'a4');
+      var pageWidth = doc.internal.pageSize.getWidth();
+      var pageHeight = doc.internal.pageSize.getHeight();
+      var margin = 15;
+      var contentWidth = pageWidth - 2 * margin;
+      var y = 0;
+      var pageNum = 0;
+
+      var primaryR = 30, primaryG = 58, primaryB = 95;
+      var secondaryR = 13, secondaryG = 148, secondaryB = 136;
+      var successR = 5, successG = 150, successB = 105;
+      var dangerR = 220, dangerG = 38, dangerB = 38;
+
+      var dimensionLabels = [
+        'Infrastructure & Outils',
+        'Relation Client',
+        'Processus & Automatisation',
+        'Competences & Culture',
+        'Marketing Digital',
+        'Pilotage & Data'
+      ];
+
+      function cleanText(text) {
+        if (!text) return '';
+        return String(text)
+          .replace(/[\u{1F300}-\u{1F9FF}]/gu, '')
+          .replace(/[\u{2600}-\u{26FF}]/gu, '')
+          .replace(/[\u{2700}-\u{27BF}]/gu, '')
+          .replace(/🔧|👥|⚙️|🎓|📱|📊|🎯|⚖️|📈|📚|💡|✅|⚠️|🏢|📏|🆕|🔀|🔄|👤|🚀|⚕️|🔨|🛒/g, '')
+          .replace(/é/g, 'e').replace(/è/g, 'e').replace(/ê/g, 'e').replace(/ë/g, 'e')
+          .replace(/à/g, 'a').replace(/â/g, 'a').replace(/ä/g, 'a')
+          .replace(/ù/g, 'u').replace(/û/g, 'u').replace(/ü/g, 'u')
+          .replace(/î/g, 'i').replace(/ï/g, 'i')
+          .replace(/ô/g, 'o').replace(/ö/g, 'o')
+          .replace(/ç/g, 'c').replace(/Ç/g, 'C')
+          .replace(/É/g, 'E').replace(/È/g, 'E').replace(/Ê/g, 'E')
+          .replace(/À/g, 'A').replace(/Â/g, 'A')
+          .replace(/€/g, 'EUR')
+          .replace(/['']/g, "'").replace(/[""]/g, '"')
+          .replace(/…/g, '...').replace(/[–—]/g, '-')
+          .replace(/≥/g, '>=').replace(/≤/g, '<=')
+          .trim();
+      }
+
+      function addPageFooter() {
+        doc.setDrawColor(200, 200, 200);
+        doc.setLineWidth(0.3);
+        doc.line(margin, pageHeight - 15, pageWidth - margin, pageHeight - 15);
+        doc.setFontSize(8);
+        doc.setTextColor(120, 120, 120);
+        doc.setFont('helvetica', 'normal');
+        doc.text('Annexe 2 \u2014 Diagnostic de Maturit\u00e9 Digitale | Source : r\u00e9alis\u00e9 par le candidat', margin, pageHeight - 10);
+        doc.text('Page ' + pageNum + ' / 5', pageWidth - margin - 15, pageHeight - 10);
+      }
+
+      function addHeader(title) {
+        doc.setFillColor(primaryR, primaryG, primaryB);
+        doc.rect(margin, y, contentWidth, 10, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(12);
+        doc.setFont('helvetica', 'bold');
+        doc.text(cleanText(title), margin + 4, y + 7);
+        y += 15;
+        doc.setTextColor(0, 0, 0);
+      }
+
+      function addSubHeader(title) {
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(primaryR, primaryG, primaryB);
+        doc.text(cleanText(title), margin, y);
+        y += 6;
+        doc.setTextColor(0, 0, 0);
+      }
+
+      function addBullet(text) {
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(50, 50, 50);
+        var lines = doc.splitTextToSize('  •  ' + cleanText(text), contentWidth - 5);
+        for (var i = 0; i < lines.length; i++) {
+          doc.text(lines[i], margin, y);
+          y += 4;
+        }
+      }
+
+      function addTable(headers, rows, colWidths) {
+        var tableWidth = 0;
+        for (var i = 0; i < colWidths.length; i++) tableWidth += colWidths[i];
+        var startX = margin;
+        var rowH = 5.5;
+        var headerH = 6;
+
+        doc.setFillColor(primaryR, primaryG, primaryB);
+        doc.rect(startX, y, tableWidth, headerH, 'F');
+        doc.setFontSize(7);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(255, 255, 255);
+        var x = startX;
+        for (var h = 0; h < headers.length; h++) {
+          doc.text(cleanText(headers[h]), x + 2, y + 4);
+          x += colWidths[h];
+        }
+        y += headerH;
+
+        for (var r = 0; r < rows.length; r++) {
+          doc.setFillColor(r % 2 === 0 ? 248 : 255, r % 2 === 0 ? 250 : 255, r % 2 === 0 ? 252 : 255);
+          doc.rect(startX, y, tableWidth, rowH, 'F');
+          
+          x = startX;
+          doc.setFontSize(7);
+          doc.setFont('helvetica', 'normal');
+          doc.setTextColor(40, 40, 40);
+          
+          for (var c = 0; c < rows[r].length; c++) {
+            var cellText = cleanText(String(rows[r][c]));
+            var maxW = colWidths[c] - 3;
+            while (doc.getTextWidth(cellText) > maxW && cellText.length > 3) {
+              cellText = cellText.slice(0, -1);
+            }
+            doc.text(cellText, x + 2, y + 3.8);
+            x += colWidths[c];
+          }
+          y += rowH;
+        }
+        
+        doc.setDrawColor(200, 200, 200);
+        doc.setLineWidth(0.2);
+        doc.rect(startX, y - (rows.length * rowH) - headerH, tableWidth, (rows.length * rowH) + headerH);
+        y += 4;
+      }
+
+      function drawRadar(centerX, centerY, radius) {
+        var n = 6;
+        var scores = [];
+        for (var i = 0; i < dimensions.length; i++) {
+          scores.push(calculerScoreDimension(dimensions[i].nom));
+        }
+
+        // Grille
+        doc.setDrawColor(220, 220, 220);
+        doc.setLineWidth(0.2);
+        
+        for (var k = 1; k <= 4; k++) {
+          var r = radius * (k / 4);
+          for (var i = 0; i < n; i++) {
+            var angle1 = (Math.PI * 2 * i / n) - Math.PI / 2;
+            var angle2 = (Math.PI * 2 * ((i + 1) % n) / n) - Math.PI / 2;
+            doc.line(
+              centerX + r * Math.cos(angle1),
+              centerY + r * Math.sin(angle1),
+              centerX + r * Math.cos(angle2),
+              centerY + r * Math.sin(angle2)
+            );
+          }
+        }
+
+        // Axes
+        for (var i = 0; i < n; i++) {
+          var angle = (Math.PI * 2 * i / n) - Math.PI / 2;
+          doc.line(centerX, centerY, centerX + radius * Math.cos(angle), centerY + radius * Math.sin(angle));
+        }
+
+        // Labels - positions fixes bien espacées
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(7);
+        doc.setTextColor(primaryR, primaryG, primaryB);
+
+        // 0: Infrastructure (haut)
+        doc.text(dimensionLabels[0], centerX, centerY - radius - 12, { align: 'center' });
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(6);
+        doc.setTextColor(100, 100, 100);
+        doc.text('(' + (scores[0] !== null ? scores[0].toFixed(1) : '-') + '/4)', centerX, centerY - radius - 7, { align: 'center' });
+
+        // 1: Relation Client (haut-droite)
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(7);
+        doc.setTextColor(primaryR, primaryG, primaryB);
+        doc.text(dimensionLabels[1], centerX + radius + 8, centerY - radius/2 - 5, { align: 'left' });
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(6);
+        doc.setTextColor(100, 100, 100);
+        doc.text('(' + (scores[1] !== null ? scores[1].toFixed(1) : '-') + '/4)', centerX + radius + 8, centerY - radius/2, { align: 'left' });
+
+        // 2: Processus (bas-droite)
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(7);
+        doc.setTextColor(primaryR, primaryG, primaryB);
+        doc.text(dimensionLabels[2], centerX + radius + 8, centerY + radius/2, { align: 'left' });
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(6);
+        doc.setTextColor(100, 100, 100);
+        doc.text('(' + (scores[2] !== null ? scores[2].toFixed(1) : '-') + '/4)', centerX + radius + 8, centerY + radius/2 + 5, { align: 'left' });
+
+        // 3: Competences (bas) - BIEN SEPARE DE LA LEGENDE
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(7);
+        doc.setTextColor(primaryR, primaryG, primaryB);
+        doc.text(dimensionLabels[3], centerX, centerY + radius + 10, { align: 'center' });
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(6);
+        doc.setTextColor(100, 100, 100);
+        doc.text('(' + (scores[3] !== null ? scores[3].toFixed(1) : '-') + '/4)', centerX, centerY + radius + 15, { align: 'center' });
+
+        // 4: Marketing (bas-gauche)
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(7);
+        doc.setTextColor(primaryR, primaryG, primaryB);
+        doc.text(dimensionLabels[4], centerX - radius - 8, centerY + radius/2, { align: 'right' });
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(6);
+        doc.setTextColor(100, 100, 100);
+        doc.text('(' + (scores[4] !== null ? scores[4].toFixed(1) : '-') + '/4)', centerX - radius - 8, centerY + radius/2 + 5, { align: 'right' });
+
+        // 5: Pilotage (haut-gauche)
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(7);
+        doc.setTextColor(primaryR, primaryG, primaryB);
+        doc.text(dimensionLabels[5], centerX - radius - 8, centerY - radius/2 - 5, { align: 'right' });
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(6);
+        doc.setTextColor(100, 100, 100);
+        doc.text('(' + (scores[5] !== null ? scores[5].toFixed(1) : '-') + '/4)', centerX - radius - 8, centerY - radius/2, { align: 'right' });
+
+        // Zone de données
+        var hasData = scores.some(function(s) { return s !== null; });
+        
+        if (hasData) {
+          var points = [];
+          for (var i = 0; i < n; i++) {
+            var s = scores[i] !== null ? scores[i] : 0;
+            var r = radius * (s / 4);
+            var angle = (Math.PI * 2 * i / n) - Math.PI / 2;
+            points.push({ x: centerX + r * Math.cos(angle), y: centerY + r * Math.sin(angle) });
+          }
+
+          // Lignes du polygone
+          doc.setDrawColor(primaryR, primaryG, primaryB);
+          doc.setLineWidth(1);
+          for (var i = 0; i < n; i++) {
+            doc.line(points[i].x, points[i].y, points[(i + 1) % n].x, points[(i + 1) % n].y);
+          }
+
+          // Points
+          for (var i = 0; i < n; i++) {
+            if (scores[i] !== null) {
+              if (scores[i] >= 3) doc.setFillColor(successR, successG, successB);
+              else if (scores[i] >= 2) doc.setFillColor(primaryR, primaryG, primaryB);
+              else doc.setFillColor(dangerR, dangerG, dangerB);
+              doc.circle(points[i].x, points[i].y, 1.8, 'F');
+            }
+          }
+        }
+      }
+
+      // ================================================================
+      // PAGE 1
+      // ================================================================
+      pageNum = 1;
+
+      doc.setFillColor(primaryR, primaryG, primaryB);
+      doc.rect(0, 0, pageWidth, 40, 'F');
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(20);
+      doc.setFont('helvetica', 'bold');
+      doc.text('ANNEXE 2', margin, 16);
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'normal');
+      doc.text('Diagnostic de Maturite Digitale', margin, 25);
+      doc.setFontSize(9);
+      doc.text('Cabinet d\'expertise comptable 100 % num\u00e9rique \u2014 Source : r\u00e9alis\u00e9 par le candidat', margin, 33);
+
+      y = 47;
+
+      var typeCabinet = document.getElementById('typeCabinet').value || 'Non renseigne';
+      var effectif = document.getElementById('effectif').value || 'Non renseigne';
+      var secteur = document.getElementById('secteur').value || 'Non renseigne';
+      var sg = calculerScoreGlobal();
+      var sc = calculerScoreConformite();
+      var stats = getStats();
+
+      // Info box
+      doc.setFillColor(248, 250, 252);
+      doc.rect(margin, y, contentWidth, 14, 'F');
+      doc.setFontSize(7);
+      doc.setTextColor(80, 80, 80);
+      doc.text('Date : ' + new Date().toLocaleDateString('fr-FR') + '   |   Type : ' + cleanText(typeCabinet) + '   |   Effectif : ' + cleanText(effectif) + '   |   Secteur : ' + cleanText(secteur), margin + 3, y + 6);
+      doc.text('Criteres evalues : ' + stats.criteresEvalues + '/42   |   Dimensions : ' + stats.dimensionsComplete + '/6   |   Points forts : ' + stats.pointsForts + '   |   A ameliorer : ' + stats.pointsFaibles, margin + 3, y + 11);
+
+      y += 18;
+
+      // Scores
+      var colW = (contentWidth - 6) / 2;
+      
+      doc.setFillColor(primaryR, primaryG, primaryB);
+      doc.roundedRect(margin, y, colW, 20, 2, 2, 'F');
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(8);
+      doc.setFont('helvetica', 'bold');
+      doc.text('SCORE GLOBAL', margin + colW/2, y + 5, { align: 'center' });
+      doc.setFontSize(16);
+      doc.text((sg !== null ? sg.toFixed(1) : '0.0') + ' / 4', margin + colW/2, y + 13, { align: 'center' });
+      doc.setFontSize(6);
+      doc.setFont('helvetica', 'normal');
+      doc.text(cleanText(getNiveauMaturite(sg)), margin + colW/2, y + 18, { align: 'center' });
+
+      doc.setFillColor(secondaryR, secondaryG, secondaryB);
+      doc.roundedRect(margin + colW + 6, y, colW, 20, 2, 2, 'F');
+      doc.setFontSize(8);
+      doc.setFont('helvetica', 'bold');
+      doc.text('SCORE CONFORMITE', margin + colW + 6 + colW/2, y + 5, { align: 'center' });
+      doc.setFontSize(16);
+      doc.text((sc !== null ? sc.toFixed(1) : '0.0') + ' / 4', margin + colW + 6 + colW/2, y + 13, { align: 'center' });
+      doc.setFontSize(6);
+      doc.setFont('helvetica', 'normal');
+      doc.text(cleanText(getStatutConformite(sc).label), margin + colW + 6 + colW/2, y + 18, { align: 'center' });
+
+      y += 26;
+
+      // Radar - plus petit et mieux positionné
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(primaryR, primaryG, primaryB);
+      doc.text('Radar de Maturite Digitale', margin, y);
+      y += 3;
+
+      var radarCenterX = pageWidth / 2;
+      var radarCenterY = y + 38;
+      var radarSize = 28;
+      
+      drawRadar(radarCenterX, radarCenterY, radarSize);
+
+      // Légende BIEN EN DESSOUS du radar (après Compétences & Culture)
+      y = radarCenterY + radarSize + 25;
+      
+      doc.setFontSize(6);
+      doc.setFillColor(successR, successG, successB);
+      doc.circle(pageWidth/2 - 45, y, 1.5, 'F');
+      doc.setTextColor(80, 80, 80);
+      doc.text('>= 3 Bon', pageWidth/2 - 42, y + 0.5);
+      
+      doc.setFillColor(primaryR, primaryG, primaryB);
+      doc.circle(pageWidth/2 - 10, y, 1.5, 'F');
+      doc.text('2 Moyen', pageWidth/2 - 7, y + 0.5);
+      
+      doc.setFillColor(dangerR, dangerG, dangerB);
+      doc.circle(pageWidth/2 + 25, y, 1.5, 'F');
+      doc.text('< 2 Faible', pageWidth/2 + 28, y + 0.5);
+
+      y += 10;
+
+      // Tableau synthèse dimension
+      addSubHeader('Synthese par dimension');
+      y += 2;
+
+      var dimRows = [];
+      for (var d = 0; d < dimensions.length; d++) {
+        var dimScore = calculerScoreDimension(dimensions[d].nom);
+        dimRows.push([
+          (d + 1) + '. ' + dimensionLabels[d],
+          dimScore !== null ? dimScore.toFixed(1) : '-',
+          dimScore !== null ? (dimScore >= 3 ? 'Bon' : (dimScore >= 2 ? 'Moyen' : 'Faible')) : '-'
+        ]);
+      }
+      addTable(['Dimension', 'Score', 'Niveau'], dimRows, [120, 30, 32]);
+
+      addPageFooter();
+
+      // ================================================================
+      // PAGE 2 : DETAIL EVALUATIONS (partie 1)
+      // ================================================================
+      doc.addPage();
+      pageNum = 2;
+      y = 15;
+
+      addHeader('2. DETAIL DES EVALUATIONS');
+
+      for (var di = 0; di < 3; di++) {
+        var dimension = dimensions[di];
+        
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(primaryR, primaryG, primaryB);
+        var dimScore = calculerScoreDimension(dimension.nom);
+        doc.text((di + 1) + '. ' + dimensionLabels[di] + (dimScore !== null ? ' (' + dimScore.toFixed(1) + '/4)' : ''), margin, y);
+        y += 4;
+
+        var critRows = [];
+        for (var ci = 0; ci < dimension.criteres.length; ci++) {
+          var crit = dimension.criteres[ci];
+          var val = evaluations[dimension.nom][crit.label];
+          critRows.push([
+            cleanText(crit.label),
+            val !== null ? val + '/4' : '-',
+            crit.impact === 'normes' ? 'Normes' : (crit.impact === 'clients' ? 'Clients' : 'Collab.')
+          ]);
+        }
+        addTable(['Critere', 'Score', 'Impact'], critRows, [120, 25, 37]);
+        y += 2;
+      }
+
+      addPageFooter();
+
+      // ================================================================
+      // PAGE 3 : DETAIL EVALUATIONS (partie 2)
+      // ================================================================
+      doc.addPage();
+      pageNum = 3;
+      y = 15;
+
+      addHeader('2. DETAIL DES EVALUATIONS (suite)');
+
+      for (var di = 3; di < 6; di++) {
+        var dimension = dimensions[di];
+        
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(primaryR, primaryG, primaryB);
+        var dimScore = calculerScoreDimension(dimension.nom);
+        doc.text((di + 1) + '. ' + dimensionLabels[di] + (dimScore !== null ? ' (' + dimScore.toFixed(1) + '/4)' : ''), margin, y);
+        y += 4;
+
+        var critRows = [];
+        for (var ci = 0; ci < dimension.criteres.length; ci++) {
+          var crit = dimension.criteres[ci];
+          var val = evaluations[dimension.nom][crit.label];
+          critRows.push([
+            cleanText(crit.label),
+            val !== null ? val + '/4' : '-',
+            crit.impact === 'normes' ? 'Normes' : (crit.impact === 'clients' ? 'Clients' : 'Collab.')
+          ]);
+        }
+        addTable(['Critere', 'Score', 'Impact'], critRows, [120, 25, 37]);
+        y += 2;
+      }
+
+      addPageFooter();
+
+      // ================================================================
+      // PAGE 4 : POINTS FORTS + AXES AMELIORATION + RECOMMANDATIONS
+      // ================================================================
+      doc.addPage();
+      pageNum = 4;
+      y = 15;
+
+      addHeader('3. ANALYSE ET RECOMMANDATIONS');
+
+      // Points forts (compact)
+      addSubHeader('Points forts (score >= 3)');
+      
+      var fortsCount = 0;
+      for (var pf = 0; pf < dimensions.length; pf++) {
+        for (var cf = 0; cf < dimensions[pf].criteres.length; cf++) {
+          var valF = evaluations[dimensions[pf].nom][dimensions[pf].criteres[cf].label];
+          if (valF !== null && valF >= 3) fortsCount++;
+        }
+      }
+      
+      if (fortsCount > 0) {
+        var fortsRows = [];
+        for (var pf = 0; pf < dimensions.length; pf++) {
+          for (var cf = 0; cf < dimensions[pf].criteres.length; cf++) {
+            var critF = dimensions[pf].criteres[cf];
+            var valF = evaluations[dimensions[pf].nom][critF.label];
+            if (valF !== null && valF >= 3) {
+              fortsRows.push([cleanText(critF.label), dimensionLabels[pf], valF + '/4']);
+            }
+          }
+        }
+        addTable(['Critere', 'Dimension', 'Score'], fortsRows.slice(0, 10), [90, 70, 22]);
+        if (fortsRows.length > 10) {
+          doc.setFontSize(7);
+          doc.setTextColor(100, 100, 100);
+          doc.text('+ ' + (fortsRows.length - 10) + ' autres criteres...', margin, y);
+          y += 4;
+        }
+      } else {
+        doc.setFontSize(8);
+        doc.setTextColor(100, 100, 100);
+        doc.text('Aucun critere >= 3', margin, y);
+        y += 5;
+      }
+
+      y += 2;
+      addSubHeader('Axes d\'amelioration (score < 2)');
+      
+      var faiblesCount = 0;
+      for (var pa = 0; pa < dimensions.length; pa++) {
+        for (var ca = 0; ca < dimensions[pa].criteres.length; ca++) {
+          var valA = evaluations[dimensions[pa].nom][dimensions[pa].criteres[ca].label];
+          if (valA !== null && valA < 2) faiblesCount++;
+        }
+      }
+      
+      if (faiblesCount > 0) {
+        var faiblesRows = [];
+        for (var pa = 0; pa < dimensions.length; pa++) {
+          for (var ca = 0; ca < dimensions[pa].criteres.length; ca++) {
+            var critA = dimensions[pa].criteres[ca];
+            var valA = evaluations[dimensions[pa].nom][critA.label];
+            if (valA !== null && valA < 2) {
+              faiblesRows.push([cleanText(critA.label), dimensionLabels[pa], valA + '/4']);
+            }
+          }
+        }
+        addTable(['Critere', 'Dimension', 'Score'], faiblesRows.slice(0, 10), [90, 70, 22]);
+        if (faiblesRows.length > 10) {
+          doc.setFontSize(7);
+          doc.setTextColor(100, 100, 100);
+          doc.text('+ ' + (faiblesRows.length - 10) + ' autres criteres...', margin, y);
+          y += 4;
+        }
+      } else {
+        doc.setFontSize(8);
+        doc.setTextColor(100, 100, 100);
+        doc.text('Aucun critere < 2', margin, y);
+        y += 5;
+      }
+
+      y += 4;
+      addSubHeader('Recommandations — Plan d\'action en 3 phases');
+      y += 2;
+
+      if (sg !== null) {
+        if (sg < 1.5) {
+          addBullet('PHASE 1 (urgence, 500-1000 EUR) : Registre RGPD, chiffrement postes, sauvegarde 3-2-1, MFA');
+          addBullet('PHASE 2 (fondation, 3000-5000 EUR) : Controle acces RBAC, journalisation, procedures NPMQ, GED');
+          addBullet('PHASE 3 (consolidation, 5000-10000 EUR) : SIEM, e-facture, BI, PCA');
+        } else if (sg < 2.5) {
+          addBullet('PHASE 1 : Completer le socle de conformite (RGPD art. 32, NPMQ)');
+          addBullet('PHASE 2 : Automatiser processus (OCR, rapprochement bancaire, workflows)');
+          addBullet('PHASE 3 : Deployer BI, marketing digital, formation avancee');
+        } else if (sg < 3.5) {
+          addBullet('Optimiser les interconnexions API entre outils');
+          addBullet('Developper BI et analytics pour le conseil a valeur ajoutee');
+          addBullet('Structurer la strategie marketing digital');
+        } else {
+          addBullet('Maintenir le leadership : innovation continue, veille active');
+          addBullet('Explorer IA generative et analytics predictifs');
+        }
+      }
+
+      if (typeCabinet === 'Ex-nihilo') {
+        y += 2;
+        addBullet('Creation : Socle conformite des J1, outils cloud natifs');
+      } else if (typeCabinet === 'Reprise') {
+        y += 2;
+        addBullet('Reprise : Diagnostic cabinet, plan modernisation progressif');
+      } else if (typeCabinet === 'Transformation') {
+        y += 2;
+        addBullet('Transformation : Conduite du changement, formation equipes');
+      }
+
+      addPageFooter();
+
+      // ================================================================
+      // PAGE 5 : METHODOLOGIE
+      // ================================================================
+      doc.addPage();
+      pageNum = 5;
+      y = 15;
+
+      addHeader('4. METHODOLOGIE ET REFERENTIELS');
+
+      addSubHeader('Les 6 dimensions evaluees');
+      y += 2;
+
+      addTable(['N.', 'Dimension', 'Perimetre'], [
+        ['1', 'Infrastructure & Outils', 'Logiciels cloud, GED, signature, securite'],
+        ['2', 'Relation Client', 'Portail client, CRM, facturation electronique'],
+        ['3', 'Processus & Automatisation', 'OCR, workflows, declarations'],
+        ['4', 'Competences & Culture', 'Formation, cybersecurite, veille'],
+        ['5', 'Marketing Digital', 'Site web, reseaux sociaux, SEO'],
+        ['6', 'Pilotage & Data', 'Tableaux de bord, KPIs, BI']
+      ], [12, 55, 115]);
+
+      y += 3;
+      addSubHeader('Echelle de notation');
+      y += 2;
+
+      addTable(['Score', 'Niveau', 'Description'], [
+        ['0', 'Inexistant', 'Non mis en place'],
+        ['1', 'Initial', 'En reflexion'],
+        ['2', 'En cours', 'Partiellement deploye'],
+        ['3', 'Maitrise', 'Operationnel'],
+        ['4', 'Optimise', 'Excellence']
+      ], [20, 35, 127]);
+
+      y += 3;
+      addSubHeader('Referentiels de conformite');
+      y += 2;
+
+      addBullet('RGPD : Reglement (UE) 2016/679 - Securite donnees (art. 32)');
+      addBullet('Code deontologie : edition 2025 - Secret pro. (art. 12), competence (art. 145)');
+      addBullet('NPMQ : Transposition ISQM 1 - Acceptation, supervision, documentation');
+      addBullet('NPLAB / LCB-FT : Vigilance, classification risques, TRACFIN');
+      addBullet('Facturation electronique : Art. 91 LF 2024 (reception sept. 2026)');
+      addBullet('AI Act : Reglement (UE) 2024/1689');
+      addBullet('ANSSI : Socle minimal securite TPE (2023)');
+
+      y += 5;
+      addSubHeader('Sources');
+      y += 2;
+
+      addBullet('CNOEC : Referentiel normatif edition 2025 (NPMQ, NPLAB)');
+      addBullet('Code de deontologie, edition 2025');
+      addBullet('OMECA : Barometre des metiers S2 2025');
+      addBullet('ANSSI : Panorama cybermenace 2024, socle minimal TPE');
+      addBullet('Enquete aupres de 26 experts-comptables (Annexe 24)');
+
+      y += 8;
+
+      // Box finale
+      doc.setFillColor(248, 250, 252);
+      doc.roundedRect(margin, y, contentWidth, 12, 2, 2, 'F');
+      doc.setFontSize(7);
+      doc.setFont('helvetica', 'italic');
+      doc.setTextColor(100, 100, 100);
+      doc.text('Document genere le ' + new Date().toLocaleDateString('fr-FR') + ' - Outil de diagnostic de maturite digitale pour cabinet d\'expertise comptable', margin + 4, y + 7);
+
+      addPageFooter();
+
+      doc.save('Annexe_2_Diagnostic_Maturite_Digitale.pdf');
+      hideLoading();
+      toast('PDF exporte avec succes !');
+
+    } catch (e) {
+      hideLoading();
+      console.error('Erreur PDF:', e);
+      alert('Erreur : ' + e.message);
+    }
+  }, 200);
+}
+(function init() {
+  try { const raw = localStorage.getItem(STORAGE_KEY); if (raw) applyStateObject(JSON.parse(raw)); } catch (e) {}
+  renderAll();
+})();
+</script>
+</body>
+</html>
